@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .admin__layout {
+        @apply flex h-screen overflow-hidden relative
+    }
+
+    .admin__layout--main {
+        @apply h-screen overflow-hidden overflow-y-scroll w-full pb-8
+    }
+
+    .sidemenu {
+        @apply absolute z-30 -left-[100%] lg:relative lg:left-0 h-screen flex flex-col pb-8 bg-white px-8 max-w-[340px] w-full border-r border-gray-300 transition-all
+    }
+
+    .sidemenu-show {
+        @apply left-0 transition-all
+    }
+
+    .sidemenu__item {
+        @apply justify-start text-base gap-4 text-gray-600 font-bold transition-all hover:text-primary
+    }
+    .sidemenu__scroll-item {
+        @apply justify-start ml-4 text-base gap-4 text-gray-600 font-bold transition-all
+    }
+
+    .sidemenu__item--active {
+        @apply justify-start text-base gap-4 font-bold text-primary transition-all hover:text-primary pl-8
+    }
+
+    .sidemenu__scroll-item--active {
+        @apply justify-start text-base gap-4 font-bold text-primary transition-all hover:text-primary pl-8
+    }
+
+    .side__cart{
+        @apply py-8 px-8 absolute -right-[100%] z-20 h-screen bg-white flex flex-col border-l border-gray-300 max-w-[380px] w-full  transition-all
+    }
+
+    .side__cart--show {
+        @apply right-0
+    }
+
+    .navbar {
+        @apply bg-white w-full py-4 border-b border-gray-300 shadow-sm
+    }
+
+    .navbar__container {
+        @apply container flex items-center justify-between
+    }
+
+    .auth__layout {
+        @apply grid grid-cols-1 md:grid-cols-2 h-screen
+    }
+
+    .login__page {
+        @apply flex flex-col justify-center items-center w-full
+    }
+
+    .login__form {
+        @apply bg-white px-8 pt-6 pb-8 rounded-lg space-y-6 shadow-medium
+    }
+}
+
+@layer components {
+    .container {
+        @apply max-w-[90%] mx-auto
+    }
+
+    .header {
+        @apply container pt-8 flex flex-col md:flex-row justify-between md:items-center
+    }
+}

@@ -1,0 +1,69 @@
+"use server"
+import { isApiError, valeryClient } from "@/lib/api";
+import { revalidatePath } from "next/cache";
+
+interface IResponse {
+    error: boolean;
+    message: any;
+    response?: any;
+}
+
+export const updateSupplier = async (formData: FormData, supplierId: string): Promise<IResponse> => {
+    const data = {
+        name: formData.get('supplierName'),
+        address: formData.get('supplierAddress'),
+        city: formData.get('supplierCity'),
+        state: formData.get('supplierState'),
+        country: formData.get('supplierCountry'),
+        zipCode: formData.get('supplierZipCode') || undefined,
+        websiteUrl: formData.get('supplierWebsiteUrl') || undefined,
+        taxId: formData.get('supplierTaxId') || undefined,
+        isActive: formData.get('supplierIsActive') === 'true',
+        contactsInfo: formData.getAll('supplierIds').map(contactId => ({
+            ...(Number(contactId) > 0 && {
+                id: Number(contactId)
+            }),
+            contactName: formData.get(`contactName[${contactId}]`),
+            email: formData.get(`contactEmail[${contactId}]`),
+            phoneNumber: formData.get(`contactPhoneNumber[${contactId}]`),
+            phoneType: formData.get(`contactPhoneType[${contactId}]`),
+            position: formData.get(`contactPosition[${contactId}]`),
+            isPrimary: formData.get(`contactIsPrimary[${contactId}]`) === 'true',
+        })),
+    };
+
+    console.log(data);
+
+    try {
+        // Realizar la solicitud para actualizar el proveedor
+        await valeryClient(`/suppliers/${supplierId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json', // Indicar que el cuerpo es un JSON
+            },
+            body: JSON.stringify(data) // Convertir el objeto a una cadena JSON
+        });
+
+        // Revalidar la ruta de proveedores
+        revalidatePath('/admin/suppliers');
+
+        return {
+            error: false,
+            message: 'Se actualizó con éxito.'
+        }
+    } catch (error) {
+        if (isApiError(error)) {
+            return {
+                error: true,
+                message: error.message,
+            };
+        }
+
+        // Manejar errores no relacionados con la API
+        return {
+            error: true,
+            message: 'Ha ocurrido un error desconocido.',
+        };
+    }
+
+}
