@@ -1,5 +1,5 @@
 // snnipet rafc
-import { Accordion, AccordionItem, Button } from '@nextui-org/react'
+import { Accordion, AccordionItem, Button } from '@heroui/react'
 import { AlignBoxBottomLeftIcon, BoxerIcon, BoxingBagIcon, CircleIcon, Factory01Icon, HelpCircleIcon, Home01Icon, Invoice01Icon, Layers01Icon, MenuSquareIcon, PresentationBarChart01Icon, ProductLoadingIcon, RulerIcon, Settings01Icon, ShoppingBag01Icon, Store01Icon, TruckIcon, UserGroupIcon, UserListIcon, UserMultipleIcon, WarehouseIcon } from 'hugeicons-react'
 import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'

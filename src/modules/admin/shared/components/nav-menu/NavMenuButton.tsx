@@ -1,6 +1,6 @@
 import React from 'react'
 import { useUIStore } from '../../stores/ui.store'
-import { Button } from '@nextui-org/react';
+import { Button } from '@heroui/react';
 import { Menu01Icon } from 'hugeicons-react';
 
 export const NavMenuButton = () => {

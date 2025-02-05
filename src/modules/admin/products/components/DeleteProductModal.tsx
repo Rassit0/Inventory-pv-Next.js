@@ -1,5 +1,5 @@
 "use client"
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react'
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@heroui/react'
 import React, { useState } from 'react'
 import { deleteProduct } from '@/modules/admin/products';
 import { toast } from 'sonner';

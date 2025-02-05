@@ -1,5 +1,5 @@
 "use client"
-import { Button, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Select, SelectItem } from "@nextui-org/react";
+import { Button, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Select, SelectItem } from "@heroui/react";
 import { ISimpleCategory } from "@/modules/admin/categories";
 import { IBranchProductInventory, IProduct } from "@/modules/admin/products";
 import { ISimpleHandlingUnit } from "@/modules/admin/handling-units";

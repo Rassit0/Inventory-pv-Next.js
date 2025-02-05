@@ -1,5 +1,5 @@
 "use client"
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useDisclosure } from '@nextui-org/react'
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useDisclosure } from '@heroui/react'
 import React, { useEffect, useState } from 'react'
 import { ICategoryStatisticsResponse } from '@/modules/admin/products'
 import Image from 'next/image';

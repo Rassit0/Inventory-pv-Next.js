@@ -1,7 +1,7 @@
 "use client"
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { IBranch } from '../interfaces/branch-response'
-import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, useDisclosure } from '@nextui-org/react';
+import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
 import { LatitudeIcon, LongitudeIcon, PencilEdit01Icon } from 'hugeicons-react';
 import Image from 'next/image';
 import no_image from '@/assets/no_image.png';

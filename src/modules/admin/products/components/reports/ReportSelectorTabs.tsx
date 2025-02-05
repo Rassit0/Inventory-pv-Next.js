@@ -1,6 +1,6 @@
 "use client"
 import React, { ReactNode } from 'react'
-import { Card, CardBody, Tab, Tabs } from '@nextui-org/react';
+import { Card, CardBody, Tab, Tabs } from '@heroui/react';
 
 interface Iitem {
     id: string;

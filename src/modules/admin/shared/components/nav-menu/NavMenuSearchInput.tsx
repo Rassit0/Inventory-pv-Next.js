@@ -1,5 +1,5 @@
 // snnipet rafc
-import { Input } from '@nextui-org/react'
+import { Input } from '@heroui/react'
 import { Search01Icon } from 'hugeicons-react'
 import React from 'react'
 

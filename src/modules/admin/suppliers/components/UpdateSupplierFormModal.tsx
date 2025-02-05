@@ -1,5 +1,5 @@
 "use client"
-import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Switch, useDisclosure } from '@nextui-org/react'
+import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Switch, useDisclosure } from '@heroui/react'
 import React, { FormEvent, useEffect, useState } from 'react'
 import { DeleteContact, ISupplier, ISupplierContactInfo, updateSupplier } from '@/modules/admin/suppliers';
 import { Delete01Icon, PencilEdit01Icon, PlusSignIcon } from 'hugeicons-react';

@@ -1,6 +1,6 @@
 import React, { FormEvent, useEffect, useState } from 'react'
 import { ISimpleCategory } from '../interfaces/simple-category'
-import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, useDisclosure } from '@nextui-org/react';
+import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
 import { toast } from 'sonner';
 import { updateCategory } from '../actions/update-category';
 import { PencilEdit01Icon } from 'hugeicons-react';

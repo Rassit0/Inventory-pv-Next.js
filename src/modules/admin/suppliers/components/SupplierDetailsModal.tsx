@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { Button, Card, Chip, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react'
+import { Button, Card, Chip, Link, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@heroui/react'
 import { EyeIcon } from 'hugeicons-react'
 import { ISupplier } from '@/modules/admin/suppliers'
 

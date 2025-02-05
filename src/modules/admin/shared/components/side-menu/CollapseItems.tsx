@@ -1,5 +1,5 @@
 "use client"
-import { Accordion, AccordionItem, Button } from '@nextui-org/react';
+import { Accordion, AccordionItem, Button } from '@heroui/react';
 import { ArrowDown01Icon, IconjarIcon, Layers01Icon, MenuSquareIcon, ProductLoadingIcon, RulerIcon } from 'hugeicons-react';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { ReactNode, useState } from 'react'

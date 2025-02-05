@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react'
 import { useUIStore } from '../../stores/ui.store'
 import { SideMenuItems } from './SideMenuList';
-import { Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, useDisclosure } from '@nextui-org/react';
+import { Button, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, useDisclosure } from '@heroui/react';
 import { Cancel01Icon } from 'hugeicons-react';
 import Image from 'next/image';
 import LogoValeryLetras from '@/assets/logo_valery_letras.png'

@@ -1,5 +1,5 @@
 "use client"
-import { NextUIProvider } from '@nextui-org/react'
+import { HeroUIProvider } from '@heroui/react'
 import React from 'react'
 import { Toaster } from 'sonner'
 
@@ -8,7 +8,7 @@ interface Props {
 }
 export const Providers = ({ children }: Props) => {
     return (
-        <NextUIProvider>
+        <HeroUIProvider>
             <Toaster
                 position='top-center'
                 closeButton
@@ -18,6 +18,6 @@ export const Providers = ({ children }: Props) => {
                 }
             />
             {children}
-        </NextUIProvider>
+        </HeroUIProvider>
     )
 }

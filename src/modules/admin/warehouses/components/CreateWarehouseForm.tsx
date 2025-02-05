@@ -3,7 +3,7 @@ import React, { ChangeEvent, FormEvent, useState } from 'react'
 import { IUser, IUsersResponse, UserAccessWarehouseTable } from '@/modules/admin/users'
 import { IBranch } from '@/modules/admin/branches'
 import { useRouter } from 'next/navigation'
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Select, SelectItem } from '@nextui-org/react'
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Select, SelectItem } from '@heroui/react'
 import { LatitudeIcon, LongitudeIcon, PlusSignIcon } from 'hugeicons-react'
 
 interface Props {

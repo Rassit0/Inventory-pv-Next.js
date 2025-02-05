@@ -1,7 +1,7 @@
 "use client"
 import React, { FormEvent, useState } from 'react'
 import { ISimpleHandlingUnit } from '../interfaces/simple-hanlding-unit'
-import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react'
+import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@heroui/react'
 import { updateHandlingUnit } from '@/modules/admin/handling-units';
 import { toast } from 'sonner';
 import { PencilEdit01Icon } from 'hugeicons-react';

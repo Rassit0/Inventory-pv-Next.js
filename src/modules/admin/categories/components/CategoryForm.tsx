@@ -1,5 +1,5 @@
 "use client"
-import { Button, Form, Input, Select, SelectItem } from '@nextui-org/react'
+import { Button, Form, Input, Select, SelectItem } from '@heroui/react'
 import React, { FormEvent, useState } from 'react'
 import { createCategory, ICategoriesResponse } from '@/modules/admin/categories'
 import { useRouter } from 'next/navigation'

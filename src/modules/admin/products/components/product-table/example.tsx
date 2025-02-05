@@ -15,7 +15,7 @@
 //   Chip,
 //   User,
 //   Pagination,
-// } from "@nextui-org/react";
+// } from "@heroui/react";
 
 // export const columns = [
 //   {name: "ID", uid: "id", sortable: true},

@@ -1,4 +1,4 @@
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/react'
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@heroui/react'
 import React, { useState } from 'react'
 import { deleteHandlingUnit } from '@/modules/admin/handling-units';
 import { toast } from 'sonner';

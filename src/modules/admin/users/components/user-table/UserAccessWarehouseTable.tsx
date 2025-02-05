@@ -1,8 +1,7 @@
 "use client"
-import { Key } from '@react-types/shared';
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { IUser, IUsersResponse } from '@/modules/admin/users'
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, Select, SelectItem, SharedSelection, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, User } from '@nextui-org/react';
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, Select, SelectItem, SelectSectionProps, SharedSelection, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, User } from '@heroui/react';
 import { usePathname } from 'next/navigation';
 import { getUsersResponse } from '@/modules/admin/users';
 import Image from 'next/image';
@@ -53,7 +52,7 @@ export const UserAccessWarehouseTable = ({ usersResponse }: Props) => {
     const [isLoading, setIsLoading] = useState(false);
 
 
-    const [selectedKeys, setSelectedKeys] = useState<Selection>();
+    const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
     // useState filters
     const [searchValue, setSearchValue] = useState('');
     const [visibleColumns, setVisibleColumns] = useState<SharedSelection>(new Set(INITIAL_VISIBLE_COLUMNS));
@@ -359,40 +358,38 @@ export const UserAccessWarehouseTable = ({ usersResponse }: Props) => {
     }, [usersFilteredResponse, page, totalPages, hasSearchFilter]);
 
     return (
-        <section className='container pt-8'>
-            <Table
-                isHeaderSticky
-                aria-label='Lista de usuarios'
-                // selectedKeys={['c7cb7dbc-f9ad-4818-968d-d3165518bc8c']}
-                // // onSelectionChange={setSelectedKeys}
-                selectionMode='multiple'
-                bottomContent={bottomContent}
-                bottomContentPlacement='outside'
-                topContent={topContent}
-                topContentPlacement='outside'
-                sortDescriptor={sortDescriptor}
-                onSortChange={(descriptor) => setSortDescriptor(descriptor)}
-            >
-                <TableHeader columns={headerColumns}>
-                    {(column) => (
-                        <TableColumn
-                            key={column.uid}
-                            align={column.uid === "actions" ? "center" : "start"}
-                            allowsSorting={column.sortable}
-                        >
-                            {column.name}
-                        </TableColumn>
-                    )}
-                </TableHeader>
+        <Table
+            // isHeaderSticky
+            aria-label='Lista de usuarios para seleccionar'
+            defaultSelectedKeys={selectedKeys}
+            onSelectionChange={(keys) => setSelectedKeys([...keys as string])}
+            selectionMode='multiple'
+            bottomContent={bottomContent}
+            bottomContentPlacement='outside'
+            topContent={topContent}
+            topContentPlacement='outside'
+            sortDescriptor={sortDescriptor}
+            onSortChange={(descriptor) => setSortDescriptor(descriptor)}
+        >
+            <TableHeader columns={headerColumns}>
+                {(column) => (
+                    <TableColumn
+                        key={column.uid}
+                        align={column.uid === "actions" ? "center" : "start"}
+                        allowsSorting={column.sortable}
+                    >
+                        {column.name}
+                    </TableColumn>
+                )}
+            </TableHeader>
 
-                <TableBody loadingContent={<Spinner />} loadingState={isLoading ? 'loading' : 'filtering'} emptyContent={"¡Ups! No encontramos nada aquí."} items={sortedItems}>
-                    {(items) => (
-                        <TableRow key={items.id}>
-                            {(columnKey) => <TableCell>{renderCell(items, columnKey as keyof IUser)}</TableCell>}
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </section>
+            <TableBody loadingContent={<Spinner />} loadingState={isLoading ? 'loading' : 'filtering'} emptyContent={"¡Ups! No encontramos nada aquí."} items={sortedItems}>
+                {(items) => (
+                    <TableRow key={`row-${items.id}`}>
+                        {(columnKey) => <TableCell>{renderCell(items, columnKey as keyof IUser)}</TableCell>}
+                    </TableRow>
+                )}
+            </TableBody>
+        </Table>
     )
 }

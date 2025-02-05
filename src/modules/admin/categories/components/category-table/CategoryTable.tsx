@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { DeleteCategoryModal, ICategoriesResponse, ISimpleCategory } from '@/modules/admin/categories'
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react'
 import Image from 'next/image'
 import no_image from '@/assets/no_image.png';
 import warning_error_image from '@/assets/warning_error.png'

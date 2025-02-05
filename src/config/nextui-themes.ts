@@ -1,4 +1,4 @@
-import { ConfigTheme } from "@nextui-org/react";
+import { ConfigTheme } from "@heroui/react";
 
 export const valeryLight: ConfigTheme = {
     extend: 'light',

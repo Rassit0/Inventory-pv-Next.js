@@ -4,7 +4,7 @@ import { IProduct, updateProduct } from '@/modules/admin/products';
 import { ISimpleCategory } from '@/modules/admin/categories';
 import { ISimpleHandlingUnit } from '@/modules/admin/handling-units';
 import { toast } from 'sonner';
-import { Button, DatePicker, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, useDisclosure } from '@nextui-org/react';
+import { Button, DatePicker, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
 import { PencilEdit01Icon } from 'hugeicons-react';
 import { parseDate } from '@internationalized/date';
 import Image, { StaticImageData } from 'next/image';

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { DeleteBranchModal, IBranch, UpdateBranchFormModal } from '@/modules/admin/branches'
 import no_image from '@/assets/no_image.png';
 import warning_error_image from '@/assets/warning_error.png'
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import Image from 'next/image';
 import { IUser } from '@/modules/admin/users';
 

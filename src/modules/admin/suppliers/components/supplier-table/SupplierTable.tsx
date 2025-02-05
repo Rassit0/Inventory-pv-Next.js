@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import { Chip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
+import { Chip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react'
 import { ISupplier, SupplierDetailsModal, UpdateSupplierFormModal } from '@/modules/admin/suppliers';
 import { DeleteSupplierModal } from '../DeleteSupplierModal';
 

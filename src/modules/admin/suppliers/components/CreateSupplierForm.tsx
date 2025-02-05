@@ -1,5 +1,5 @@
 "use client"
-import { Button, Form, Input, Select, SelectItem, Switch } from '@nextui-org/react'
+import { Button, Form, Input, Select, SelectItem, Switch } from '@heroui/react'
 import React, { FormEvent, useState } from 'react'
 import { ISupplierContactInfo } from '../interfaces/supplier-response';
 import { CheckmarkCircle01Icon, Delete01Icon, PlusSignIcon } from 'hugeicons-react';
