@@ -23,7 +23,7 @@ export const SupplierDetailsModal = ({ supplier }: Props) => {
                 onPress={onOpen}
             />
 
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} size='xl' scrollBehavior='outside' placement='top'>
+            <Modal isDismissable={false} isOpen={isOpen} onOpenChange={onOpenChange} size='xl' scrollBehavior='outside' placement='top'>
                 <ModalContent>
                     {(onClose) => (
                         <>

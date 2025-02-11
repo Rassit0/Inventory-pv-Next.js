@@ -1,5 +1,5 @@
 "use client"
-import { Button, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Select, SelectItem } from "@heroui/react";
+import { Badge, Button, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Select, SelectItem, Switch } from "@heroui/react";
 import { ISimpleCategory } from "@/modules/admin/categories";
 import { IBranchProductInventory, IProduct } from "@/modules/admin/products";
 import { ISimpleHandlingUnit } from "@/modules/admin/handling-units";
@@ -26,17 +26,13 @@ interface SelectedProduct {
 
 export const CreateProductForm = ({ products, categories, handlingUnits, branches }: Props) => {
 
-    // const branches = [
-    //     { id: "branch-1", name: "branch 1" },
-    //     { id: "branch-2", name: "branch 2" },
-    //     { id: "branch-3", name: "branch 3" },
-    //     { id: "branch-4", name: "branch 4" },
-    //     { id: "branch-5", name: "branch 5" },
-    // ]
+    //Form
+    const [productName, setProductName] = useState('');
+    const [productDescription, setProductDescription] = useState('');
+    const [productIsEnable, setProductIsEnable] = useState(true);
 
     const router = useRouter();
 
-    const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [branchProductInventory, setBranchProductInventory] = useState<IBranchProductInventory[]>([])
     const [availableBranches, setAvailableBranches] = useState<IBranch[]>(branches); // Sucursales disponibles
@@ -52,32 +48,6 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
             setPreviewImage(null);
         }
     }
-
-    const handleSelectionChange = (selected: Set<string>) => {
-        const selectedIds = Array.from(selected); // Convierte a un arreglo de IDs
-        const updatedProducts = selectedIds.map((id) => {
-            const existingProduct = selectedProducts.find((p) => p.id === id);
-            return existingProduct || { id, quantity: 1 }; // Si no existe, inicializa con cantidad 1
-        });
-        setSelectedProducts(updatedProducts);
-    };
-
-    const handleQuantityChange = (id: string, quantity: string) => {
-        // Usamos setSelectedProducts para actualizar el estado de los productos seleccionados.
-        setSelectedProducts((prev) =>
-            // 'prev' es el estado anterior (el listado de productos), y lo estamos iterando con 'map' para actualizar solo el producto que tiene el 'id' correspondiente.
-            prev.map((product) =>
-                // Comprobamos si el 'id' del producto coincide con el 'id' proporcionado.
-                product.id === id
-                    ? {
-                        // Si coincide, actualizamos ese producto.
-                        ...product, // Mantenemos todas las propiedades del producto original.
-                        quantity: parseFloat(quantity) || 1 // La cantidad se actualiza con el valor convertido a número. Si no es un número válido, se asigna 1.
-                    }
-                    : product // Si el 'id' no coincide, dejamos el producto sin cambios.
-            )
-        );
-    };
 
     const handleBranchInventoryChange = (branchId: string, field: keyof IBranchProductInventory, value: string) => {
         setBranchProductInventory((prev) => {
@@ -198,6 +168,14 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                         label="Nombre"
                         placeholder="Agrega un nombre a el producto"
                         variant="underlined"
+                        value={productName}
+                        onChange={(e) => setProductName(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === ' ' || e.key === 'Enter') setProductName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                        }}
+                        onBlur={() => {
+                            setProductName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                        }}
                     />
 
                     <Input
@@ -206,6 +184,14 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                         label="Descripción"
                         placeholder="Agrega una descripción a el producto"
                         variant="underlined"
+                        value={productDescription}
+                        onChange={(e) => setProductDescription(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === ' ' || e.key === 'Enter') setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                        }}
+                        onBlur={() => {
+                            setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                        }}
                     />
 
                     <Select
@@ -301,6 +287,18 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                             ))
                         }
                     </Select>
+
+                    <input type="hidden" name="productIsEnable" value={productIsEnable ? 'true' : 'false'} />
+                    <Switch
+                        className='pt-4'
+                        defaultSelected
+                        color="success"
+                        size="sm"
+                        isSelected={productIsEnable}
+                        onValueChange={(value) => setProductIsEnable(value)}
+                    >
+                        Activo
+                    </Switch>
                 </div>
             </div>
 
@@ -310,9 +308,14 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                 <div className="space-y-4 p-2">
                     {branchProductInventory.map((branchInventory, index) => (
                         <div key={branchInventory.branchId} className="hover:bg-primary-50 rounded-lg p-4">
-                            <h3 className="font-semibold">
-                                Sucursal: {branches.find(branch => branch.id === branchInventory.branchId)?.name || "Sucursal no encontrada"}
-                            </h3>
+                            {/* Contenedor de título e indicador */}
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-semibold">
+                                    Sucursal: {branches.find(branch => branch.id === branchInventory.branchId)?.name || "Sucursal no encontrada"}
+                                </h3>
+                                {/* Punto verde para indicar que es nuevo */}
+                                <span className="min-w-3 h-3 bg-green-500 rounded-full"></span>
+                            </div>
                             <input type="hidden" name="branchesIds" value={branchInventory.branchId} />
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -346,14 +349,21 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                                     value={branchInventory.reorderPoint}
                                     onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'reorderPoint', e.target.value)}
                                 />
-                                <Input
+                                <Select
                                     isRequired
                                     name={`inventoryWarehouseId[${branchInventory.branchId}]`}
-                                    label="Ubicación del Stock"
-                                    variant="underlined"
-                                    value={branchInventory.warehouseId || ""}
+                                    aria-label={`select-${branchInventory.id}`}
+                                    placeholder="Seleccione almacén"
+                                    variant='underlined'
+                                    selectedKeys={[branchInventory.warehouseId || '']}
                                     onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'warehouseId', e.target.value)}
-                                />
+                                >
+                                    {(branches.find(branch => branch.id === branchInventory.branchId)?.warehouses || []).map(warehouse => (
+                                        <SelectItem key={warehouse.id} value={warehouse.id}>
+                                            {warehouse.name}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
                                 <Input
                                     name={`inventoryPurchasePriceOverride[${branchInventory.branchId}]`}
                                     label="Precio de Compra"
@@ -383,23 +393,6 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                             />
                         </div>
                     ))}
-
-                    {/* Selección de sucursal para agregar un nuevo formulario */}
-                    {/* <Select
-                        aria-label="Seleccione una Sucursal"
-                        placeholder="Selecciona una Sucursal"
-                        label="Sucursal"
-                        // onChange={(e) => handleAddBranchForm(e.target.value)}
-                        isDisabled={availableBranches.length === 0}
-                        variant="underlined"
-                        items={availableBranches}
-                    >
-                        {(item) => (
-                            <SelectItem key={item.id} onPress={() => handleAddBranchForm(item.id)}>
-                                {item.name}
-                            </SelectItem>
-                        )}
-                    </Select> */}
                     <Dropdown>
                         <DropdownTrigger>
                             <Button color="primary" radius="full" size="sm" isIconOnly variant="ghost" startContent={<PlusSignIcon />} />
@@ -415,61 +408,6 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                             )}
                         </DropdownMenu>
                     </Dropdown>
-                    {/* <Button
-                        isIconOnly
-                        radius="full"
-                        size="sm"
-                        color="primary"
-                        className="mt-4"
-                        onPress={() => handleAddBranchForm(availableBranches[0]?.id || "")}
-                        isDisabled={availableBranches.length === 0}
-                        startContent={<PlusSignIcon />}
-                    /> */}
-                </div>
-            </div>
-
-            <div className="w-full">
-                <h2 className="font-semibold">Insumos del producto</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 p-2 gap-4">
-                    <Select
-                        name="componentIds"
-                        label="Insumos para preparación"
-                        placeholder="Selecciona si tiene insumos para su preparación"
-                        variant="underlined"
-                        selectionMode="multiple"
-                        onSelectionChange={(selected) => handleSelectionChange(selected as Set<string>)}
-                    >
-                        {
-                            products
-                                // .filter(product => product.type === "RawMaterial")
-                                .map(product => (
-                                    <SelectItem key={product.id}>
-                                        {product.name}
-                                    </SelectItem>
-                                ))
-                        }
-                    </Select>
-
-                    {/* Renderiza los inputs de cantidad */}
-                    {/* <div className="ml-1 mt-1 space-y-4"> */}
-                    {selectedProducts.map((product) => (
-                        <div key={product.id} className="flex flex-wrap gap-0 mb-1 items-center">
-                            {/* <span className="w-full md:w-auto">{products.find((p) => p.id === product.id)?.name}</span> */}
-                            <Input
-                                name={`quantities[${product.id}]`}
-                                label={products.find((p) => p.id === product.id)?.name}
-                                type="number"
-                                variant="flat"
-                                value={product.quantity.toString()}
-                                onChange={(e) => handleQuantityChange(product.id, e.target.value)}
-                                placeholder="Cantidad"
-                                endContent={(products.find(prod => prod.id === product.id))?.unit?.abbreviation || ''}
-                                min="1"
-                                step="0.01"
-                            />
-                        </div>
-                    ))}
-                    {/* </div> */}
                 </div>
             </div>
 

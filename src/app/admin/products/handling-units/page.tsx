@@ -14,7 +14,7 @@ export default async function HandlingUnitsPage() {
           description="Listado de las unidades de manejo de los productos"
           linkProps={{
             linkText: "Nueva unidad",
-            url: "/admin/handling-units/new"
+            url: "/admin/products/handling-units/new"
           }}
         />
 

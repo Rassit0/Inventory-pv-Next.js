@@ -10,6 +10,7 @@ export const CreateHanldinfUnitForm = () => {
     const router = useRouter();
 
     const [isLoading, setIsLoading] = useState(false);
+    const [unitName, setUnitName] = useState('');
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -42,7 +43,7 @@ export const CreateHanldinfUnitForm = () => {
         toast.success(message);
         setIsLoading(false);
 
-        router.push('/admin/handling-units');
+        router.push('/admin/products/handling-units');
 
         return;
     }
@@ -61,6 +62,14 @@ export const CreateHanldinfUnitForm = () => {
                 label='Nombre'
                 placeholder='Agrega un nombre a la unidad'
                 variant='underlined'
+                value={unitName}
+                onChange={(e) => setUnitName(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') setUnitName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                }}
+                onBlur={() => {
+                    setUnitName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                }}
             />
 
             <Input

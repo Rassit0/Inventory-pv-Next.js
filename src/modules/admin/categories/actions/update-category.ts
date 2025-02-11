@@ -59,7 +59,7 @@ export const updateCategory = async (formData: FormData, categoryId: string) => 
         });
 
         // Revalidar la ruta de categorías
-        revalidatePath('/admin/categories');
+        revalidatePath('/admin/products/categories');
 
         return {
             error: null,

@@ -1,5 +1,13 @@
 export interface IWarehousesResponse {
     warehouses: IWarehouse[];
+    meta: IWarehouseMeta;
+}
+
+export interface IWarehouseMeta {
+    totalItems: number;
+    itemsPerPage: number;
+    totalPages: number;
+    currentPage: number;
 }
 
 export interface IWarehouse {
@@ -7,14 +15,15 @@ export interface IWarehouse {
     name: string;
     slug: string;
     location: string;
-    latitude: number;
-    longitude: number;
-    imageUrl: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    imageUrl: null | string;
+    isEnable: boolean;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;
     branches: IWarehouseBranch[];
-    usersAccess: IWarehouseUsersAccess[];
+    usersAccess: UsersAccess[];
 }
 
 export interface IWarehouseBranch {
@@ -37,7 +46,7 @@ export interface IWarehouseBranchDetails {
     updatedAt: Date;
 }
 
-export interface IWarehouseUsersAccess {
+export interface UsersAccess {
     userId: string;
     role: string;
 }

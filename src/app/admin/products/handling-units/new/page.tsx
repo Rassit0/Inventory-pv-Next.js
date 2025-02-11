@@ -9,7 +9,7 @@ export default function NewHandlingUnitsPage() {
         description="Agrega una nueva unidad de manejo"
         linkProps={{
           linkText: "Volver",
-          url: "/admin/handling-units"
+          url: "/admin/products/handling-units"
         }}
       />
       <section className="container pt-8">

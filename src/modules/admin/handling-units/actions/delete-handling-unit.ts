@@ -9,7 +9,7 @@ export const deleteHandlingUnit = async (id: string) => {
             method: 'DELETE',
         });
 
-        revalidatePath('/admin/handling-units')
+        revalidatePath('/admin/products/handling-units')
 
         return {
             error: null,

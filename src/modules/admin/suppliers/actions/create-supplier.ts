@@ -19,10 +19,11 @@ export const createSupplier = async (formData: FormData): Promise<IResponse> => 
         zipCode: formData.get('supplierZipCode') || undefined,
         websiteUrl: formData.get('supplierWebsiteUrl') || undefined,
         taxId: formData.get('supplierTaxId') || undefined,
-        isActive: formData.get('supplierIsActive')==='true',
+        isActive: formData.get('supplierIsActive') === 'true',
         contactsInfo: formData.getAll('supplierIds').map(contactId => ({
             contactName: formData.get(`contactName[${contactId}]`),
-            email: formData.get(`contactEmail[${contactId}]`),
+            secondLastname: formData.get(`contactSecondLastname[${contactId}]`) !== '' ? formData.get(`contactSecondLastname[${contactId}]`) : undefined,
+            email: formData.get(`contactEmail[${contactId}]`) !== '' ? formData.get(`contactEmail[${contactId}]`) : undefined,
             phoneNumber: formData.get(`contactPhoneNumber[${contactId}]`),
             phoneType: formData.get(`contactPhoneType[${contactId}]`),
             position: formData.get(`contactPosition[${contactId}]`),

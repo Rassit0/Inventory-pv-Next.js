@@ -13,6 +13,9 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
+    // Form
+    const [categoryName, setCategoryName] = useState('');
+    const [categoryDescription, setCategoryDescription] = useState('');
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -73,7 +76,7 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
         toast.success(message);
         setIsLoading(false);
 
-        router.push('/admin/categories')
+        router.push('/admin/products/categories')
         return;
     }
 
@@ -92,6 +95,14 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
                 label='Nombre'
                 placeholder='Agrega un nombre a la categoría'
                 variant='underlined'
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') setCategoryName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                }}
+                onBlur={() => {
+                    setCategoryName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                }}
             />
 
             <Input
@@ -100,6 +111,14 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
                 label='Descripción'
                 placeholder='Agrega una descripción a la categoría'
                 variant='underlined'
+                value={categoryDescription}
+                onChange={(e) => setCategoryDescription(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') setCategoryDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                }}
+                onBlur={() => {
+                    setCategoryDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                }}
             />
 
             <Select
@@ -126,15 +145,15 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
             />
 
             {/* Previsualización de la imagen */}
-                <div className='relative mt-4 w-full h-[200px] flex items-center justify-center'>
-                    <Image
-                        src={previewImage || no_image}
-                        alt='Vista previa'
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className='rounded-lg object-contain'
-                    />
-                </div>
+            <div className='relative mt-4 w-full h-[200px] flex items-center justify-center'>
+                <Image
+                    src={previewImage || no_image}
+                    alt='Vista previa'
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className='rounded-lg object-contain'
+                />
+            </div>
 
             <Button
                 type='submit'

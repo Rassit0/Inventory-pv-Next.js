@@ -25,7 +25,7 @@ export const SideMenuItems = () => {
                 Inicio
             </Button>
 
-            <CollapseItems
+            {/* <CollapseItems
                 title='Sucursales'
                 ariaLabel='Module Branches'
                 moduleIcon={<Store01Icon />}
@@ -58,7 +58,18 @@ export const SideMenuItems = () => {
                         ]
                     },
                 ]}
-            />
+            /> */}
+            <Button
+                as='li'
+                size='lg'
+                variant='light'
+                color='primary'
+                onPress={() => router.push('/admin/branches')}
+                className={pathname.includes('/admin/branches') ? 'sidemenu__item--active' : 'sidemenu__item'}
+                startContent={<Store01Icon />}
+            >
+                Sucursales
+            </Button>
 
             <CollapseItems
                 title='Proveedores'
@@ -68,23 +79,23 @@ export const SideMenuItems = () => {
                     {
                         label: 'Gestión',
                         linkPath: '/admin/suppliers',
-                        icon: <CircleIcon size={13}/>
+                        icon: <CircleIcon size={13} />
                     },
                     {
                         label: 'Ordenes',
                         linkPath: '/admin/suppliers/orders',
-                        icon: <CircleIcon size={13}/>
+                        icon: <CircleIcon size={13} />
                     },
                     {
                         label: 'Reportes',
                         linkPath: '/admin/suppliers/reports',
-                        icon: <CircleIcon size={13}/>
+                        icon: <CircleIcon size={13} />
                         // icon: <PresentationBarChart01Icon />
                     },
                 ]}
             />
 
-            <CollapseItems
+            {/* <CollapseItems
                 title='Almacenes'
                 ariaLabel='Module Warehouses'
                 moduleIcon={<WarehouseIcon />}
@@ -92,21 +103,32 @@ export const SideMenuItems = () => {
                     {
                         label: 'Gestión',
                         linkPath: '/admin/warehouses',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Transferencias',
                         linkPath: '/admin/warehouses/transfers',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Reportes',
                         linkPath: '/admin/warehouses/reports',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                         // icon: <PresentationBarChart01Icon />
                     },
                 ]}
-            />
+            /> */}
+            <Button
+                as='li'
+                size='lg'
+                variant='light'
+                color='primary'
+                onPress={() => router.push('/admin/warehouses')}
+                className={pathname.includes('/admin/warehouses') ? 'sidemenu__item--active' : 'sidemenu__item'}
+                startContent={<WarehouseIcon />}
+            >
+                Almacenes
+            </Button>
 
             <CollapseItems
                 title='Productos'
@@ -116,25 +138,25 @@ export const SideMenuItems = () => {
                     {
                         label: 'Lista',
                         linkPath: '/admin/products',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                         // icon: <MenuSquareIcon />
                     },
                     {
                         label: 'Unidades',
                         linkPath: '/admin/products/handling-units',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                         // icon: <RulerIcon />
                     },
                     {
                         label: 'Categorías',
                         linkPath: '/admin/products/categories',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                         // icon: <Layers01Icon />
                     },
                     {
                         label: 'Reportes',
                         linkPath: '/admin/products/reports',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                         // icon: <PresentationBarChart01Icon />
                     },
                 ]}
@@ -148,22 +170,22 @@ export const SideMenuItems = () => {
                     {
                         label: 'Recetas',
                         linkPath: '/admin/production/recipes',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Ordenes',
                         linkPath: '/admin/production/orders',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Costos',
                         linkPath: '/admin/production/costs',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Reportes',
                         linkPath: '/admin/production/reports',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                         // icon: <PresentationBarChart01Icon />
                     },
                 ]}
@@ -198,32 +220,32 @@ export const SideMenuItems = () => {
                     {
                         label: 'Entradas',
                         linkPath: '/admin/inventory/entries',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Salidas',
                         linkPath: '/admin/inventory/exits',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Devolución',
                         linkPath: '/admin/inventory/returns',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Ajustes',
                         linkPath: '/admin/inventory/settings',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Conteos',
                         linkPath: '/admin/inventory/counts',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Reportes',
                         linkPath: '/admin/inventory/reports',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                         // icon: <PresentationBarChart01Icon />
                     },
                 ]}
@@ -237,27 +259,27 @@ export const SideMenuItems = () => {
                     {
                         label: 'Invetario General',
                         linkPath: '/admin/reports/general',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Compras',
                         linkPath: '/admin/reports/shopping',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Producción',
                         linkPath: '/admin/reports/productions',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Proveedores',
                         linkPath: '/admin/reports/suppliers',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Movimientos de inventario',
                         linkPath: '/admin/reports/inventory',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                 ]}
             />
@@ -270,17 +292,17 @@ export const SideMenuItems = () => {
                     {
                         label: 'Gestión',
                         linkPath: '/admin/users',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Roles',
                         linkPath: '/admin/users/roles',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Reportes',
                         linkPath: '/admin/users/reports',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                         // icon: <PresentationBarChart01Icon />
                     },
                 ]}
@@ -293,17 +315,17 @@ export const SideMenuItems = () => {
                     {
                         label: 'General',
                         linkPath: '/admin/settings',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Notificaciones',
                         linkPath: '/admin/settings/notifications',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                     {
                         label: 'Integraciones',
                         linkPath: '/admin/settings/integrations',
-                        icon: <CircleIcon size={13}/>,
+                        icon: <CircleIcon size={13} />,
                     },
                 ]}
             />

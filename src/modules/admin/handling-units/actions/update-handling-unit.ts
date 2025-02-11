@@ -23,7 +23,7 @@ export const updateHandlingUnit = async (formData: FormData, unitId: string) => 
         });
 
         // Revalidar la ruta handling-units
-        revalidatePath('/admin/handling-units');
+        revalidatePath('/admin/products/handling-units');
 
         return {
             error: null,

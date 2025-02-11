@@ -7,12 +7,26 @@ import { createSupplier } from '../actions/create-supplier';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
+
+interface Contact {
+  id: number;
+  name: string;
+  phone?: string;
+}
+
 export const CreateSupplierForm = () => {
   const router = useRouter();
 
   const [supplierIsActive, setSupplierIsActive] = useState<boolean>(true);
   const [contacts, setContacts] = useState<ISupplierContactInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  // FORM
+  const [supplierName, setSupplierName] = useState('');
+  const [supplierAddress, setSupplierAddress] = useState('');
+  const [supplierCity, setSupplierCity] = useState('');
+  const [supplierState, setSupplierState] = useState('');
+  const [supplierCountry, setSupplierCountry] = useState('');
+  const [contactName, setContactName] = useState<Record<number, Contact>>();
 
   const handleContactChange = (id: number, field: keyof ISupplierContactInfo, value: string) => {
     setContacts((prev) => {
@@ -39,6 +53,8 @@ export const CreateSupplierForm = () => {
         {
           id: newId,
           contactName: "",
+          lastname: '',
+          secondLastname: '',
           email: "",
           phoneNumber: '',
           phoneType: null,
@@ -126,6 +142,14 @@ export const CreateSupplierForm = () => {
             label='Nombre'
             placeholder='Ingrese el nombre del contacto'
             variant='underlined'
+            value={supplierName}
+            onChange={(e) => setSupplierName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') setSupplierName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+            }}
+            onBlur={() => {
+              setSupplierName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+            }}
           />
 
           <Input
@@ -134,6 +158,14 @@ export const CreateSupplierForm = () => {
             label='Dirección'
             placeholder='Ingrese el nombre del contacto'
             variant='underlined'
+            value={supplierAddress}
+            onChange={(e) => setSupplierAddress(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') setSupplierAddress(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+            }}
+            onBlur={() => {
+              setSupplierAddress(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+            }}
           />
 
           <Input
@@ -142,6 +174,14 @@ export const CreateSupplierForm = () => {
             label='Ciudad'
             placeholder='Ingrese el nombre del contacto'
             variant='underlined'
+            value={supplierCity}
+            onChange={(e) => setSupplierCity(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') setSupplierCity(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+            }}
+            onBlur={() => {
+              setSupplierCity(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+            }}
           />
 
           <Input
@@ -150,6 +190,14 @@ export const CreateSupplierForm = () => {
             label='Estado o provincia'
             placeholder='Ingrese el nombre del contacto'
             variant='underlined'
+            value={supplierState}
+            onChange={(e) => setSupplierState(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') setSupplierState(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+            }}
+            onBlur={() => {
+              setSupplierState(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+            }}
           />
 
           <Input
@@ -158,14 +206,22 @@ export const CreateSupplierForm = () => {
             label='País'
             placeholder='Ingrese el nombre del contacto'
             variant='underlined'
+            value={supplierCountry}
+            onChange={(e) => setSupplierCountry(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') setSupplierCountry(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+            }}
+            onBlur={() => {
+              setSupplierCountry(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+            }}
           />
 
-          <Input
+          {/* <Input
             name='supplierZipCode'
             label='C. Postal'
             placeholder='Ingrese el codigo postal'
             variant='underlined'
-          />
+          /> */}
 
           <Input
             name='supplierTaxId'
@@ -213,6 +269,41 @@ export const CreateSupplierForm = () => {
                   variant='underlined'
                   value={contact.contactName}
                   onChange={(e) => handleContactChange(contact.id, 'contactName', e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') handleContactChange(contact.id, 'contactName', contact.contactName.charAt(0).toUpperCase() + contact.contactName.slice(1));
+                  }}
+                  onBlur={() => {
+                    handleContactChange(contact.id, 'contactName', contact.contactName.charAt(0).toUpperCase() + contact.contactName.slice(1));
+                  }}
+                />
+                <Input
+                  isRequired
+                  name={`contactLastname[${contact.id}]`}
+                  label='Apellido'
+                  placeholder='Ingrese el apellido del contacto'
+                  variant='underlined'
+                  value={contact.lastname}
+                  onChange={(e) => handleContactChange(contact.id, 'lastname', e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') handleContactChange(contact.id, 'lastname', contact.lastname.charAt(0).toUpperCase() + contact.contactName.slice(1));
+                  }}
+                  onBlur={() => {
+                    handleContactChange(contact.id, 'lastname', contact.lastname.charAt(0).toUpperCase() + contact.contactName.slice(1));
+                  }}
+                />
+                <Input
+                  name={`contactSecondLastname[${contact.id}]`}
+                  label='Segundo Apellido'
+                  placeholder='Ingrese el segundo apellido'
+                  variant='underlined'
+                  value={contact.secondLastname || ''}
+                  onChange={(e) => handleContactChange(contact.id, 'secondLastname', e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') handleContactChange(contact.id, 'secondLastname', contact.secondLastname ? contact.secondLastname.charAt(0).toUpperCase() + contact.secondLastname.slice(1) : '');
+                  }}
+                  onBlur={() => {
+                    handleContactChange(contact.id, 'secondLastname', contact.secondLastname ? contact.contactName.charAt(0).toUpperCase() + contact.contactName.slice(1) : '');
+                  }}
                 />
 
                 <Input
@@ -249,7 +340,8 @@ export const CreateSupplierForm = () => {
                 // isInvalid={contact.phoneType ? undefined : contact.phoneNumber !== '' ? undefined : false}
                 />
 
-                <Select
+                  <input type="hidden" name={`contactPhoneType[${contact.id}]`} value='MOBILE' />
+                {/* <Select
                   isRequired={contact.phoneNumber && contact.phoneNumber !== '' ? true : false}
                   name={`contactPhoneType[${contact.id}]`}
                   label='Tipo de teléfono'
@@ -262,7 +354,7 @@ export const CreateSupplierForm = () => {
                   <SelectItem key='LANDLINE'>Fijo</SelectItem>
                   <SelectItem key='WHATSAPP'>Whatsapp</SelectItem>
                   <SelectItem key='OTHER'>Otro</SelectItem>
-                </Select>
+                </Select> */}
 
                 <Select
                   isRequired

@@ -43,8 +43,6 @@ export const BranchTable = ({ branches, users }: Props) => {
                     <TableColumn>TELÉFONO</TableColumn>
                     <TableColumn>CORREO</TableColumn>
                     <TableColumn>GERENTE</TableColumn>
-                    <TableColumn>LATITUD</TableColumn>
-                    <TableColumn>LONGITUD</TableColumn>
                     <TableColumn>CREACIÓN</TableColumn>
                     <TableColumn>ACCIONES</TableColumn>
                 </TableHeader>
@@ -69,9 +67,7 @@ export const BranchTable = ({ branches, users }: Props) => {
                                 <TableCell>{branch.location}</TableCell>
                                 <TableCell>{branch.phone}</TableCell>
                                 <TableCell>{branch.email}</TableCell>
-                                <TableCell>{branch.managerId}</TableCell>
-                                <TableCell>{branch.latitude}</TableCell>
-                                <TableCell>{branch.longitude}</TableCell>
+                                <TableCell>{branch.manager.email}</TableCell>
                                 <TableCell>{branch.createdaAt.toLocaleString()}</TableCell>
                                 <TableCell>
                                     <div className="flex">

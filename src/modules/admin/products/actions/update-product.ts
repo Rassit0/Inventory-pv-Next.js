@@ -4,6 +4,8 @@ import { uploadFile } from "@/utils/upload-file";
 import { revalidatePath } from "next/cache";
 
 export const updateProduct = async (formData: FormData, productId: string) => {
+
+    console.log(formData.get("productLaunchDate"))
     const file = formData.get("productImage");
     let imageUrl: string | null = null;
 
@@ -36,27 +38,31 @@ export const updateProduct = async (formData: FormData, productId: string) => {
         description: formData.get("productDescription"),
         type: formData.get("productType"),
         price: Number(formData.get("productPrice")).toFixed(2),
-        stock: Number(0).toFixed(2),
         unitId: formData.get("productUnitId"),
-        ...(imageUrl && { imageUrl }), // Solo agrega si `imageUrl` tiene valor
+        ...(imageUrl && { imageUrl }),
         lastSaleDate: null,
-        launchDate: formData.get("productLaunchDate") ? new Date(formData.get("productLaunchDate")!.toString()).toISOString() : null,
-        expirationDate: formData.get("productExpirationDate") ? new Date(formData.get("productExpirationDate")!.toString()).toISOString() : null,
-        isEnable: true,
+        launchDate: formData.get("productLaunchDate") ? new Date(formData.get("productLaunchDate")!.toString().replace(/\[.*?\]/, '')).toISOString() : null,
+        expirationDate: formData.get("productExpirationDate") ? new Date(formData.get("productExpirationDate")!.toString().replace(/\[.*?\]/, '')).toISOString() : null,
+        isEnable: formData.get('productIsEnable') === 'true',
         purchasePrice: Number(formData.get("productPurchasePrice")).toFixed(2),
-        minimumStock: Number(formData.get("productMinimunStock")).toFixed(2),
-        reorderPoint: Number(formData.get("productReorderPoint")).toFixed(2),
-        stockLocation: null,
         seasonId: formData.get("productSeasonId"),
         categories: formData.getAll("categoryIds").map(categoryId => (
             { id: categoryId }
         )),
-        composedByProducts: formData.getAll("componentIds").map(componentId => (
-            {
-                composedProductId: componentId,
-                quantity: Number(formData.get(`quantities[${componentId}]`)).toFixed(2)
-            }
-        )),
+        branchProductInventory: formData.getAll("branchesIds").map(branchId => ({
+            branchId: branchId,
+            stock: Number(formData.get(`inventoryStock[${branchId}]`)).toFixed(2),
+            minimumStock: Number(formData.get(`inventoryMinimumStock[${branchId}]`)).toFixed(2),
+            reorderPoint: Number(formData.get(`inventoryReorderPoint[${branchId}]`)).toFixed(2),
+            warehouseId: formData.get(`inventoryWarehouseId[${branchId}]`),
+            purchasePriceOverride: formData.get(`inventoryPurchasePriceOverride[${branchId}]`) ?
+                Number(formData.get(`inventoryPurchasePriceOverride[${branchId}]`)).toFixed(2)
+                : undefined,
+            priceOverride: formData.get(`inventoryPriceOverride[${branchId}]`) ?
+                Number(formData.get(`inventoryPriceOverride[${branchId}]`)).toFixed(2)
+                : undefined,
+            lastStockUpdate: "2025-01-20T12:00:00.000Z",
+        })),
     }
 
     console.log(data)

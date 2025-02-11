@@ -12,7 +12,7 @@ export const deleteCategory = async (id: string) => {
             }
         });
 
-        revalidatePath('/admin/categories');
+        revalidatePath('/admin/products/categories');
 
         return {
             error: null,

@@ -1,9 +1,10 @@
 
 // COMPONENTS
-export { ProductTable } from './components/product-table/ProductTable';
 export { CreateProductForm } from './components/CreateProductForm';
-export { UpdateProductFormModal } from './components/UpdateProductFormModal';
 export { DeleteProductModal } from './components/DeleteProductModal';
+export { InventoryByBranchForm } from './components/InventoryByBranchForm';
+export { ProductTable } from './components/product-table/ProductTable';
+export { UpdateProductFormModal } from './components/UpdateProductFormModal';
 
 // COMPONENTS REPORTS
 export { OutOfStockTable } from './components/reports/OutOfStockTable';
@@ -24,7 +25,7 @@ export { getInventoryByCategory } from './actions/reports/get-inventory-by-catre
 export { getCategoryStatistics } from './actions/reports/get-category-statistics';
 
 // INTERFACES
-export type { IProductResponse, IProduct, IBranchProductInventory } from './interfaces/products-response';
+export type { IProductsResponse, IProduct, IProductCategory, IBranchProductInventory } from './interfaces/products-response';
 // export type { ISimpleProduct } from './interfaces/simple-product';
 export type { IOutOfStock } from './interfaces/reports/out-of-stock-response';
 export type { IHighDemand } from './interfaces/reports/high-demand-reesponse';

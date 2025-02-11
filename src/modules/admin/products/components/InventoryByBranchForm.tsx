@@ -1,0 +1,180 @@
+"use client"
+import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Tooltip } from '@heroui/react';
+import React, { useState } from 'react'
+import { IBranch } from '@/modules/admin/branches';
+import { IBranchProductInventory, IProduct } from '@/modules/admin/products';
+import { ArrowTurnBackwardIcon, Delete01Icon, PlusSignIcon } from 'hugeicons-react';
+
+
+interface Props {
+    branches: IBranch[];
+    branchProductInventory: IBranchProductInventory[]
+    setBranchProductInvetory: (obj: IBranchProductInventory[]) => void;
+    handleBranchInventoryChange: (branchId: string, field: keyof IBranchProductInventory, value: string) => void;
+    product: IProduct;
+    handleRemoveBranchForm: (branchId: string) => void;
+    handleAddBranchForm: (branchId: string) => void;
+    availableBranches: IBranch[];
+}
+
+export const InventoryByBranchForm = ({ branchProductInventory, branches, handleBranchInventoryChange, product, handleRemoveBranchForm, handleAddBranchForm, availableBranches, setBranchProductInvetory }: Props) => {
+
+
+    const [backupBranchProductInventory, setBackupBranchProductInventory] = useState<IBranchProductInventory[]>(product.branchProductInventory)
+    const [countDeleteInventory, setCountDeleteInventory] = useState(0)
+
+    const handleRemoveInventoryForm = (branchId: string) => {
+        if (backupBranchProductInventory.some(backup => backup.branchId === branchId)) {
+            setCountDeleteInventory(prev => prev + 1);
+        }
+        handleRemoveBranchForm(branchId);
+    }
+
+    const handleRestoreBackup = () => {
+        setBranchProductInvetory([...backupBranchProductInventory, ...branchProductInventory.filter(invetory =>
+            !backupBranchProductInventory.some(backup => backup.branchId === invetory.branchId)
+        )]);
+        setCountDeleteInventory(0);
+    }
+
+    return (
+        <div className="w-full">
+            <h2 className="font-semibold">Inventario por Sucursal</h2>
+            <div className="space-y-4 p-2">
+                {((countDeleteInventory > 0) &&
+                    (
+                        <div className='flex items-center'>
+                            <span className='text-small text-danger-500 mx-2'>Se eliminará {countDeleteInventory} inventario(s) guardado!</span>
+                            <Tooltip color="primary" content="Resturar">
+                                <Button onPress={handleRestoreBackup} color='primary' radius='full' isIconOnly variant='light' startContent={<ArrowTurnBackwardIcon />} />
+                            </Tooltip>
+                        </div>
+                    )
+                )}
+                {branchProductInventory.map((branchInventory, index) => (
+                    <div key={branchInventory.branchId} className="hover:bg-primary-50 rounded-lg p-4">
+                        {/* Contenedor de título e indicador */}
+                        <div className="flex justify-between items-center">
+                            <h3 className="font-semibold">
+                                Sucursal: {branches.find(branch => branch.id === branchInventory.branchId)?.name || "Sucursal no encontrada"}
+                            </h3>
+                            {/* Punto verde si hay cambios en los valores */}
+                            {(() => {
+                                const originalInventory = product.branchProductInventory.find(inventory => inventory.branchId === branchInventory.branchId);
+
+                                if (!originalInventory) return <span className="min-w-3 h-3 bg-green-500 rounded-full"></span>;
+
+                                // Comparar dinámicamente todas las propiedades usando `keyof IBranchProductInventory`
+                                const hasChanges = (Object.keys(branchInventory) as (keyof IBranchProductInventory)[]).some((key) => {
+                                    const currentValue = branchInventory[key];
+                                    const originalValue = originalInventory[key];
+
+                                    // Manejar el caso especial de fechas
+                                    if (currentValue instanceof Date && originalValue instanceof Date) {
+                                        return currentValue.toISOString() !== originalValue.toISOString();
+                                    }
+
+                                    return currentValue !== originalValue;
+                                });
+
+                                return hasChanges && <span className="min-w-3 h-3 bg-danger-500 rounded-full"></span>;
+                            })()}
+                        </div>
+                        <input type="hidden" name="branchesIds" value={branchInventory.branchId} />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Input
+                                isRequired
+                                min={1}
+                                name={`inventoryStock[${branchInventory.branchId}]`}
+                                label="Stock"
+                                type="number"
+                                variant="underlined"
+                                value={branchInventory.stock}
+                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'stock', e.target.value)}
+                            />
+                            <Input
+                                isRequired
+                                min={1}
+                                name={`inventoryMinimumStock[${branchInventory.branchId}]`}
+                                label="Stock Mínimo"
+                                type="number"
+                                variant="underlined"
+                                value={branchInventory.minimumStock}
+                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'minimumStock', e.target.value)}
+                            />
+                            <Input
+                                isRequired
+                                min={1}
+                                name={`inventoryReorderPoint[${branchInventory.branchId}]`}
+                                label="Punto de Reorden"
+                                type="number"
+                                variant="underlined"
+                                value={branchInventory.reorderPoint}
+                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'reorderPoint', e.target.value)}
+                            />
+                            <Select
+                                isRequired
+                                aria-label={`select-${branchInventory.id}`}
+                                name={`inventoryWarehouseId[${branchInventory.branchId}]`}
+                                variant='underlined'
+                                placeholder="Seleccione almacén"
+                                selectedKeys={[branchInventory.warehouseId || '']}
+                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'warehouseId', e.target.value)}
+                            >
+                                {(branches.find(branch => branch.id === branchInventory.branchId)?.warehouses || []).map(warehouse => (
+                                    <SelectItem key={warehouse.id} value={warehouse.id}>
+                                        {warehouse.name}
+                                    </SelectItem>
+                                ))}
+                            </Select>
+
+
+                            <Input
+                                name={`inventoryPurchasePriceOverride[${branchInventory.branchId}]`}
+                                label="Precio de Compra"
+                                type="number"
+                                variant="underlined"
+                                value={branchInventory.purchasePriceOverride || ""}
+                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'purchasePriceOverride', e.target.value)}
+                            />
+                            <Input
+                                name={`inventoryPriceOverride[${branchInventory.branchId}]`}
+                                label="Precio de Venta"
+                                type="number"
+                                variant="underlined"
+                                value={branchInventory.priceOverride || ""}
+                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'priceOverride', e.target.value)}
+                            />
+                        </div>
+
+                        <Button
+                            isIconOnly
+                            radius="full"
+                            size="sm"
+                            color="danger"
+                            onPress={() => handleRemoveInventoryForm(branchInventory.branchId)}
+                            className="mt-4"
+                            startContent={<Delete01Icon />}
+                        />
+                    </div>
+                ))}
+                <Dropdown>
+                    <DropdownTrigger>
+                        <Button color="primary" radius="full" size="sm" isIconOnly variant="ghost" startContent={<PlusSignIcon />} />
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Dynamic Actions" items={availableBranches}>
+                        {(item) => (
+                            <DropdownItem
+                                key={item.id}
+                                onPress={() => handleAddBranchForm(item.id)}
+                            >
+                                {item.name}
+                            </DropdownItem>
+                        )}
+                    </DropdownMenu>
+                </Dropdown>
+            </div>
+        </div>
+    )
+}

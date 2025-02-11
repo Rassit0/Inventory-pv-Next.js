@@ -23,6 +23,8 @@ export interface ISupplierContactInfo {
     id: number;
     supplierId?: string;
     contactName: string;
+    lastname: string;
+    secondLastname: string | null;
     email: null | string;
     phoneNumber: null | string;
     phoneType: null | 'MOBILE' | 'LANDLINE' | 'WHATSAPP' | 'OTHER';

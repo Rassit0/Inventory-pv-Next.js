@@ -14,6 +14,12 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
     const [contacts, setContacts] = useState<ISupplierContactInfo[]>(supplier.contactInfo);
     const [isLoading, setIsLoading] = useState(false);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    // FORM
+    const [supplierName, setSupplierName] = useState(supplier.name);
+    const [supplierAddress, setSupplierAddress] = useState(supplier.address || '');
+    const [supplierCity, setSupplierCity] = useState(supplier.city || '');
+    const [supplierState, setSupplierState] = useState(supplier.state || '');
+    const [supplierCountry, setSupplierCountry] = useState(supplier.country || '');
 
     useEffect(() => {
         setContacts(supplier.contactInfo);
@@ -46,6 +52,8 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                 {
                     id: id ?? (newId > 0 ? -newId : newId),
                     contactName: "",
+                    lastname: '',
+                    secondLastname: '',
                     email: "",
                     phoneNumber: '',
                     phoneType: null,
@@ -115,231 +123,305 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                 startContent={<PencilEdit01Icon />}
             />
 
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior='outside' placement='top' size='5xl'>
-                <ModalContent>
-                    {(onClose) => (
-                        <Form
-                            validationBehavior='native'
-                            onSubmit={handleSubmit}
-                        >
-                            <ModalHeader>Editar Proveedor</ModalHeader>
+            <Modal isDismissable={false} isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior='outside' placement='top' size='5xl'>
+                <Form
+                    validationBehavior='native'
+                    onSubmit={handleSubmit}
+                >
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader>Editar Proveedor</ModalHeader>
 
-                            <ModalBody className='w-full'>
-                                <div className="w-full">
-                                    <h2 className='font-semibold'>Datos generales</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <ModalBody className='w-full'>
+                                    <div className="w-full">
+                                        <h2 className='font-semibold'>Datos generales</h2>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-                                        <Input
-                                            isRequired
-                                            name='supplierName'
-                                            label='Nombre'
-                                            placeholder='Ingrese el nombre del contacto'
-                                            variant='underlined'
-                                            defaultValue={supplier.name}
-                                        />
+                                            <Input
+                                                isRequired
+                                                name='supplierName'
+                                                label='Nombre'
+                                                placeholder='Ingrese el nombre del contacto'
+                                                variant='underlined'
+                                                value={supplierName}
+                                                onChange={(e) => setSupplierName(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === ' ' || e.key === 'Enter') setSupplierName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                                                }}
+                                                onBlur={() => {
+                                                    setSupplierName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                                                }}
+                                            />
 
-                                        <Input
-                                            isRequired
-                                            name='supplierAddress'
-                                            label='Dirección'
-                                            placeholder='Ingrese la dirección del contacto'
-                                            variant='underlined'
-                                            defaultValue={supplier.address || ''}
-                                        />
+                                            <Input
+                                                isRequired
+                                                name='supplierAddress'
+                                                label='Dirección'
+                                                placeholder='Ingrese la dirección del contacto'
+                                                variant='underlined'
+                                                value={supplierAddress}
+                                                onChange={(e) => setSupplierAddress(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === ' ' || e.key === 'Enter') setSupplierAddress(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                                                }}
+                                                onBlur={() => {
+                                                    setSupplierAddress(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                                                }}
+                                            />
 
-                                        <Input
-                                            isRequired
-                                            name='supplierCity'
-                                            label='Ciudad'
-                                            placeholder='Ingrese el nombre del contacto'
-                                            variant='underlined'
-                                            defaultValue={supplier.city || ''}
-                                        />
+                                            <Input
+                                                isRequired
+                                                name='supplierCity'
+                                                label='Ciudad'
+                                                placeholder='Ingrese el nombre del contacto'
+                                                variant='underlined'
+                                                value={supplierCity}
+                                                onChange={(e) => setSupplierCity(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === ' ' || e.key === 'Enter') setSupplierCity(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                                                }}
+                                                onBlur={() => {
+                                                    setSupplierCity(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                                                }}
+                                            />
 
-                                        <Input
-                                            isRequired
-                                            name='supplierState'
-                                            label='Estado o provincia'
-                                            placeholder='Ingrese el nombre del contacto'
-                                            variant='underlined'
-                                            defaultValue={supplier.state || ''}
-                                        />
+                                            <Input
+                                                isRequired
+                                                name='supplierState'
+                                                label='Estado o provincia'
+                                                placeholder='Ingrese el nombre del contacto'
+                                                variant='underlined'
+                                                value={supplierState}
+                                                onChange={(e) => setSupplierState(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === ' ' || e.key === 'Enter') setSupplierState(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                                                }}
+                                                onBlur={() => {
+                                                    setSupplierState(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                                                }}
+                                            />
 
-                                        <Input
-                                            isRequired
-                                            name='supplierCountry'
-                                            label='País'
-                                            placeholder='Ingrese el nombre del contacto'
-                                            variant='underlined'
-                                            defaultValue={supplier.country || ''}
-                                        />
+                                            <Input
+                                                isRequired
+                                                name='supplierCountry'
+                                                label='País'
+                                                placeholder='Ingrese el nombre del contacto'
+                                                variant='underlined'
+                                                value={supplierCountry}
+                                                onChange={(e) => setSupplierCountry(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === ' ' || e.key === 'Enter') setSupplierCountry(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                                                }}
+                                                onBlur={() => {
+                                                    setSupplierCountry(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                                                }}
+                                            />
 
-                                        <Input
-                                            name='supplierZipCode'
-                                            label='C. Postal'
-                                            placeholder='Ingrese el codigo postal'
-                                            variant='underlined'
-                                            defaultValue={supplier.zipCode || ''}
-                                        />
+                                            {/* <Input
+                                                name='supplierZipCode'
+                                                label='C. Postal'
+                                                placeholder='Ingrese el codigo postal'
+                                                variant='underlined'
+                                                defaultValue={supplier.zipCode || ''}
+                                            /> */}
 
-                                        <Input
-                                            name='supplierTaxId'
-                                            label='NIT o id Fiscal'
-                                            placeholder='Ingrese el nombre del contacto'
-                                            variant='underlined'
-                                            defaultValue={supplier.taxId || ''}
-                                        />
+                                            <Input
+                                                name='supplierTaxId'
+                                                label='NIT o id Fiscal'
+                                                placeholder='Ingrese el nombre del contacto'
+                                                variant='underlined'
+                                                defaultValue={supplier.taxId || ''}
+                                            />
 
-                                        <Input
-                                            name='supplierWebsiteUrl'
-                                            label='URL sitio web'
-                                            placeholder='Ingrese una url del sitio'
-                                            variant='underlined'
-                                            defaultValue={supplier.websiteUrl || ''}
-                                        />
+                                            <Input
+                                                name='supplierWebsiteUrl'
+                                                label='URL sitio web'
+                                                placeholder='Ingrese una url del sitio'
+                                                variant='underlined'
+                                                defaultValue={supplier.websiteUrl || ''}
+                                            />
 
-                                        <input type="hidden" name="supplierIsActive" value={supplierIsActive ? 'true' : 'false'} />
-                                        <Switch
-                                            className='pt-4'
-                                            name='supplierIsActive'
-                                            defaultSelected
-                                            color="success"
-                                            size="sm"
-                                            isSelected={supplierIsActive}
-                                            onValueChange={(value) => setSupplierIsActive(value)}
-                                        >
-                                            Activo
-                                        </Switch>
+                                            <input type="hidden" name="supplierIsActive" value={supplierIsActive ? 'true' : 'false'} />
+                                            <Switch
+                                                className='pt-4'
+                                                name='supplierIsActive'
+                                                defaultSelected
+                                                color="success"
+                                                size="sm"
+                                                isSelected={supplierIsActive}
+                                                onValueChange={(value) => setSupplierIsActive(value)}
+                                            >
+                                                Activo
+                                            </Switch>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="w-full">
-                                    <h2 className='font-semibold'>Contacto(s)</h2>
-                                    <div className='space-y-4 p-2'>
-                                        {contacts.map((contact, index) => (
-                                            <div key={contact.id} className='hover:bg-primary-50 rounded-lg p-4'>
-                                                <h3 className='font-semibold'>{contact.contactName?contact.contactName:'Nuevo Contacto'}</h3>
+                                    <div className="w-full">
+                                        <h2 className='font-semibold'>Contacto(s)</h2>
+                                        <div className='space-y-4 p-2'>
+                                            {contacts.map((contact, index) => (
+                                                <div key={contact.id} className='hover:bg-primary-50 rounded-lg p-4'>
+                                                    <h3 className='font-semibold'>{contact.contactName ? contact.contactName : 'Nuevo Contacto'}</h3>
 
-                                                <input type="hidden" name="supplierIds" value={contact.id} />
-                                                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                                                    <Input
-                                                        isRequired
-                                                        name={`contactName[${contact.id}]`}
-                                                        label='Nombre'
-                                                        placeholder='Ingrese el nombre del contacto'
-                                                        variant='underlined'
-                                                        value={contact.contactName}
-                                                        onChange={(e) => handleContactChange(contact.id, 'contactName', e.target.value)}
-                                                    />
+                                                    <input type="hidden" name="supplierIds" value={contact.id} />
+                                                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                                                        <Input
+                                                            isRequired
+                                                            name={`contactName[${contact.id}]`}
+                                                            label='Nombre'
+                                                            placeholder='Ingrese el nombre del contacto'
+                                                            variant='underlined'
+                                                            value={contact.contactName}
+                                                            onChange={(e) => handleContactChange(contact.id, 'contactName', e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === ' ' || e.key === 'Enter') handleContactChange(contact.id, 'contactName', contact.contactName.charAt(0).toUpperCase() + contact.contactName.slice(1));
+                                                            }}
+                                                            onBlur={() => {
+                                                                handleContactChange(contact.id, 'contactName', contact.contactName.charAt(0).toUpperCase() + contact.contactName.slice(1));
+                                                            }}
+                                                        />
+                                                        <Input
+                                                            isRequired
+                                                            name={`contactLastname[${contact.id}]`}
+                                                            label='Apellido'
+                                                            placeholder='Ingrese el apellido del contacto'
+                                                            variant='underlined'
+                                                            value={contact.lastname}
+                                                            onChange={(e) => handleContactChange(contact.id, 'lastname', e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === ' ' || e.key === 'Enter') handleContactChange(contact.id, 'lastname', contact.lastname.charAt(0).toUpperCase() + contact.lastname.slice(1));
+                                                            }}
+                                                            onBlur={() => {
+                                                                handleContactChange(contact.id, 'lastname', contact.lastname.charAt(0).toUpperCase() + contact.lastname.slice(1));
+                                                            }}
+                                                        />
+                                                        <Input
+                                                            name={`contactSecondLastname[${contact.id}]`}
+                                                            label='Segundo Apellido'
+                                                            placeholder='Ingrese el segundo apellido'
+                                                            variant='underlined'
+                                                            value={contact.secondLastname || ''}
+                                                            onChange={(e) => handleContactChange(contact.id, 'secondLastname', e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === ' ' || e.key === 'Enter') handleContactChange(contact.id, 'secondLastname', contact.secondLastname ? contact.secondLastname.charAt(0).toUpperCase() + contact.secondLastname.slice(1) : '');
+                                                            }}
+                                                            onBlur={() => {
+                                                                handleContactChange(contact.id, 'secondLastname', contact.secondLastname ? contact.secondLastname.charAt(0).toUpperCase() + contact.secondLastname.slice(1) : '');
+                                                            }}
+                                                        />
 
-                                                    <Input
-                                                        type='email'
-                                                        name={`contactEmail[${contact.id}]`}
-                                                        label='Correo'
-                                                        placeholder='Ingrese el nombre del contacto'
-                                                        variant='underlined'
-                                                        value={contact.email || ''}
-                                                        onChange={(e) => handleContactChange(contact.id, 'email', e.target.value)}
-                                                    />
+                                                        <Input
+                                                            type='email'
+                                                            name={`contactEmail[${contact.id}]`}
+                                                            label='Correo'
+                                                            placeholder='Ingrese el nombre del contacto'
+                                                            variant='underlined'
+                                                            value={contact.email || ''}
+                                                            onChange={(e) => handleContactChange(contact.id, 'email', e.target.value)}
+                                                        />
 
-                                                    <Input
-                                                        // isRequired={contact.phoneType ? true : false}
-                                                        isRequired
-                                                        name={`contactPhoneNumber[${contact.id}]`}
-                                                        label='Número de contacto'
-                                                        placeholder='Ingrese el número del contacto'
-                                                        variant='underlined'
-                                                        startContent={<span className='text-sm text-gray-500'>+591 </span>}
-                                                        value={contact.phoneNumber || ''}
-                                                        onChange={(e) => handleContactChange(contact.id, 'phoneNumber', e.target.value)}
-                                                        inputMode='numeric'
-                                                        // pattern='[0-9]*'
-                                                        validate={(value) => {
-                                                            // Verifica si el valor contiene solo números
-                                                            if (value && !/^\d+$/.test(value)) {
-                                                                return "Solo se permiten números";  // Mensaje de error si no es un número
-                                                            }
+                                                        <Input
+                                                            // isRequired={contact.phoneType ? true : false}
+                                                            isRequired
+                                                            name={`contactPhoneNumber[${contact.id}]`}
+                                                            label='Número de contacto'
+                                                            placeholder='Ingrese el número del contacto'
+                                                            variant='underlined'
+                                                            startContent={<span className='text-sm text-gray-500'>+591 </span>}
+                                                            value={contact.phoneNumber || ''}
+                                                            onChange={(e) => handleContactChange(contact.id, 'phoneNumber', e.target.value)}
+                                                            inputMode='numeric'
+                                                            // pattern='[0-9]*'
+                                                            validate={(value) => {
+                                                                // Verifica si el valor contiene solo números
+                                                                if (value && !/^\d+$/.test(value)) {
+                                                                    return "Solo se permiten números";  // Mensaje de error si no es un número
+                                                                }
 
-                                                            // Puedes agregar más validaciones si es necesario
-                                                            return null;  // Si no hay error
-                                                        }}
-                                                    // isInvalid={contact.phoneType ? undefined : contact.phoneNumber !== '' ? undefined : false}
-                                                    />
+                                                                // Puedes agregar más validaciones si es necesario
+                                                                return null;  // Si no hay error
+                                                            }}
+                                                        // isInvalid={contact.phoneType ? undefined : contact.phoneNumber !== '' ? undefined : false}
+                                                        />
 
-                                                    <Select
-                                                        isRequired={contact.phoneNumber && contact.phoneNumber !== '' ? true : false}
-                                                        name={`contactPhoneType[${contact.id}]`}
-                                                        label='Tipo de teléfono'
-                                                        variant='underlined'
-                                                        selectedKeys={[contact.phoneType || '']}
-                                                        onSelectionChange={(value) => handleContactChange(contact.id, 'phoneType', value.currentKey || '')}
-                                                        isInvalid={contact.phoneNumber !== '' ? undefined : false}
-                                                    >
-                                                        <SelectItem key='MOBILE'>Movil</SelectItem>
-                                                        <SelectItem key='LANDLINE'>Fijo</SelectItem>
-                                                        <SelectItem key='WHATSAPP'>Whatsapp</SelectItem>
-                                                        <SelectItem key='OTHER'>Otro</SelectItem>
-                                                    </Select>
 
-                                                    <Select
-                                                        isRequired
-                                                        name={`contactPosition[${contact.id}]`}
-                                                        label='Rol del contacto'
-                                                        variant='underlined'
-                                                        selectedKeys={[contact.position || '']}
-                                                        onSelectionChange={(value) => handleContactChange(contact.id, 'position', value.currentKey || '')}
-                                                    >
-                                                        <SelectItem key={'SALES'}>Ventas</SelectItem>
-                                                        <SelectItem key={'SUPPORT'}>Soporte</SelectItem>
-                                                        <SelectItem key={'MANAGER'}>Gerente</SelectItem>
-                                                        <SelectItem key={'ADMINISTRATOR'}>Administrador</SelectItem>
-                                                        <SelectItem key={'OTHER'}>Otro</SelectItem>
-                                                    </Select>
+                                                        <input type="hidden" name={`contactPhoneType[${contact.id}]`} value='MOBILE' />
+                                                        {/* <Select
+                                                            isRequired={contact.phoneNumber && contact.phoneNumber !== '' ? true : false}
+                                                            name={`contactPhoneType[${contact.id}]`}
+                                                            label='Tipo de teléfono'
+                                                            variant='underlined'
+                                                            selectedKeys={[contact.phoneType || '']}
+                                                            onSelectionChange={(value) => handleContactChange(contact.id, 'phoneType', value.currentKey || '')}
+                                                            isInvalid={contact.phoneNumber !== '' ? undefined : false}
+                                                        >
+                                                            <SelectItem key='MOBILE'>Movil</SelectItem>
+                                                            <SelectItem key='LANDLINE'>Fijo</SelectItem>
+                                                            <SelectItem key='WHATSAPP'>Whatsapp</SelectItem>
+                                                            <SelectItem key='OTHER'>Otro</SelectItem>
+                                                        </Select> */}
 
-                                                    <input type="hidden" name={`contactIsPrimary[${contact.id}]`} value={String(contact.isPrimary)} />
-                                                    <Switch
-                                                        className='pt-4'
-                                                        defaultSelected
-                                                        color="success"
-                                                        size="sm"
-                                                        isSelected={contact.isPrimary}
-                                                        onValueChange={(value) => handleIsPrimaryChange(contact.id, value)}
-                                                    >
-                                                        Contacto Principal
-                                                    </Switch>
+                                                        <Select
+                                                            isRequired
+                                                            name={`contactPosition[${contact.id}]`}
+                                                            label='Rol del contacto'
+                                                            variant='underlined'
+                                                            selectedKeys={[contact.position || '']}
+                                                            onSelectionChange={(value) => handleContactChange(contact.id, 'position', value.currentKey || '')}
+                                                        >
+                                                            <SelectItem key={'SALES'}>Ventas</SelectItem>
+                                                            <SelectItem key={'SUPPORT'}>Soporte</SelectItem>
+                                                            <SelectItem key={'MANAGER'}>Gerente</SelectItem>
+                                                            <SelectItem key={'ADMINISTRATOR'}>Administrador</SelectItem>
+                                                            <SelectItem key={'OTHER'}>Otro</SelectItem>
+                                                        </Select>
+
+                                                        <input type="hidden" name={`contactIsPrimary[${contact.id}]`} value={String(contact.isPrimary)} />
+                                                        <Switch
+                                                            className='pt-4'
+                                                            defaultSelected
+                                                            color="success"
+                                                            size="sm"
+                                                            isSelected={contact.isPrimary}
+                                                            onValueChange={(value) => handleIsPrimaryChange(contact.id, value)}
+                                                        >
+                                                            Contacto Principal
+                                                        </Switch>
+                                                    </div>
+
+                                                    <DeleteContact contactId={contact.id} onDelete={() => handleRemoveContactForm(contact.id)} />
                                                 </div>
+                                            ))}
 
-                                                <DeleteContact contactId={contact.id} onDelete={() => handleRemoveContactForm(contact.id)} />
-                                            </div>
-                                        ))}
-
-                                        <Button
-                                            isIconOnly
-                                            radius='full'
-                                            size='sm'
-                                            color='primary'
-                                            variant='ghost'
-                                            startContent={<PlusSignIcon />}
-                                            onPress={() => handleAddContactForm()}
-                                        />
+                                            <Button
+                                                isIconOnly
+                                                radius='full'
+                                                size='sm'
+                                                color='primary'
+                                                variant='ghost'
+                                                startContent={<PlusSignIcon />}
+                                                onPress={() => handleAddContactForm()}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button color='danger' variant='light' onPress={onClose}>Cancelar</Button>
-                                <Button
-                                    type='submit'
-                                    color='primary'
-                                    className='block'
-                                    isLoading={isLoading}
-                                    isDisabled={isLoading}
-                                >
-                                    Actualizar
-                                </Button>
-                            </ModalFooter>
-                        </Form>
-                    )}
-                </ModalContent>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color='danger' variant='light' onPress={onClose}>Cancelar</Button>
+                                    <Button
+                                        type='submit'
+                                        color='primary'
+                                        className='block'
+                                        isLoading={isLoading}
+                                        isDisabled={isLoading}
+                                    >
+                                        Actualizar
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Form>
             </Modal>
         </>
     )

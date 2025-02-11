@@ -6,7 +6,7 @@ export { UpdateWarehouseFormModal } from './components/UpdateWarehouseFormModal'
 
 // ACTIONS
 export { createWarehouse } from './actions/create-warehouse';
-export { getWarehouses } from './actions/get-warehouses';
+export { getWarehousesResponse } from './actions/get-warehouses-response';
 export { updateWarehouse } from './actions/update-warehouse';
 
 // INTERGACES

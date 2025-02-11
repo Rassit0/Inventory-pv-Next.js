@@ -41,17 +41,11 @@ export const createProduct = async (formData: FormData) => {
         lastSaleDate: null,
         launchDate: formData.get("productLaunchDate") ? new Date(formData.get("productLaunchDate")!.toString()).toISOString() : null,
         expirationDate: formData.get("productExpirationDate") ? new Date(formData.get("productExpirationDate")!.toString()).toISOString() : null,
-        isEnable: true,
+        isEnable: formData.get('productIsEnable') === 'true',
         purchasePrice: Number(formData.get("productPurchasePrice")).toFixed(2),
         seasonId: formData.get("productSeasonId"),
         categories: formData.getAll("categoryIds").map(categoryId => (
             { id: categoryId }
-        )),
-        composedByProducts: formData.getAll("componentIds").map(componentId => (
-            {
-                composedProductId: componentId,
-                quantity: Number(formData.get(`quantities[${componentId}]`)).toFixed(2)
-            }
         )),
         branchProductInventory: formData.getAll("branchesIds").map(branchId => ({
             branchId: branchId,

@@ -66,7 +66,7 @@ export const DeleteContact = ({ contactId, onDelete }: Props) => {
             // onPress={() => handleRemoveContactForm(contact.id)}
             />
 
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+            <Modal isDismissable={false} isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     {(onClosee) => (
                         <>

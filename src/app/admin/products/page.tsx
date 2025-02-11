@@ -1,8 +1,10 @@
 //snipet prc
+import { getBranches } from "@/modules/admin/branches";
 import { getCategories } from "@/modules/admin/categories";
 import { getHandlingUnits } from "@/modules/admin/handling-units";
 import { getProducts, ProductTable } from "@/modules/admin/products";
 import { HeaderPage } from "@/modules/admin/shared";
+import { getWarehousesResponse } from "@/modules/admin/warehouses";
 
 export default async function ProductsPage() {
 
@@ -11,6 +13,8 @@ export default async function ProductsPage() {
   const allProductsResponse = await getProducts();
   const categories = await getCategories();
   const handlingUnits = await getHandlingUnits();
+  const branches = await getBranches();
+  const warehousesResponse = await getWarehousesResponse();
 
 
   return (
@@ -28,9 +32,10 @@ export default async function ProductsPage() {
       {/* TABLA DE PRODUCTOS */}
       <ProductTable
         productsResponse={productsResponse}
-        allProducts={allProductsResponse.products}
         categories={categories}
         handlingUnits={handlingUnits}
+        branches={branches || []}
+        warehouses={warehousesResponse?.warehouses || []}
       />
     </>
   );

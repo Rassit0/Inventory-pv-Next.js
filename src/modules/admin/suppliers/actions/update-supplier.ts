@@ -24,7 +24,9 @@ export const updateSupplier = async (formData: FormData, supplierId: string): Pr
                 id: Number(contactId)
             }),
             contactName: formData.get(`contactName[${contactId}]`),
-            email: formData.get(`contactEmail[${contactId}]`),
+            lastname: formData.get(`contactLastname[${contactId}]`),
+            secondLastname: formData.get(`contactSecondLastname[${contactId}]`) !== '' ? formData.get(`contactSecondLastname[${contactId}]`) : undefined,
+            email: formData.get(`contactEmail[${contactId}]`) !== '' ? formData.get(`contactEmail[${contactId}]`) : undefined,
             phoneNumber: formData.get(`contactPhoneNumber[${contactId}]`),
             phoneType: formData.get(`contactPhoneType[${contactId}]`),
             position: formData.get(`contactPosition[${contactId}]`),

@@ -1,22 +1,25 @@
 "use client"
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, SharedSelection, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react'
+import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, SharedSelection, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react'
 import React, { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { DeleteProductModal, getProducts, IProduct, IProductResponse, UpdateProductFormModal } from '@/modules/admin/products'
+import { DeleteProductModal, getProducts, IProduct, IProductsResponse, UpdateProductFormModal } from '@/modules/admin/products'
 import Image from 'next/image'
 import no_image from '@/assets/no_image.png'
 import warning_error_image from '@/assets/warning_error.png'
 import { ISimpleCategory } from '@/modules/admin/categories'
 import { ISimpleHandlingUnit } from '@/modules/admin/handling-units'
-import { ArrowDown01Icon, PlusMinus01Icon, Search01Icon } from 'hugeicons-react'
+import { ArrowDown01Icon, Search01Icon } from 'hugeicons-react'
 import { HighlinghtedText } from '@/modules/admin/shared'
 import { usePathname } from 'next/navigation'
+import { IBranch } from '@/modules/admin/branches'
+import { IWarehouse } from '@/modules/admin/warehouses'
 
 
 interface Props {
-  productsResponse: IProductResponse;
-  allProducts: IProduct[];
+  productsResponse: IProductsResponse;
   categories: ISimpleCategory[];
   handlingUnits: ISimpleHandlingUnit[];
+  branches: IBranch[];
+  warehouses: IWarehouse[];
 }
 
 const columns = [
@@ -48,9 +51,9 @@ type TSortDescriptor = {
 
 const INITIAL_VISIBLE_COLUMNS: string[] = ["image", "name", "description", "price", "status", "actions"];
 
-export const ProductTable = ({ productsResponse, allProducts, categories, handlingUnits }: Props) => {
+export const ProductTable = ({ productsResponse, categories, handlingUnits, branches, warehouses }: Props) => {
   const isMounted = useRef(false);
-  const [productsFilteredResponse, setProductsFilteredresponse] = useState<IProductResponse>(productsResponse)
+  const [productsFilteredResponse, setProductsFilteredresponse] = useState<IProductsResponse>(productsResponse)
   const [isLoading, setIsLoading] = useState(false);
 
   // USESTATE UI DE FILTROS
@@ -157,14 +160,8 @@ export const ProductTable = ({ productsResponse, allProducts, categories, handli
         );
       case "name":
         return (
-          <div className='flex flex-col'>
-            <p className='text-bold text-sm'><HighlinghtedText text={product.name} highlight={filterValue} /></p>
-            <p className='text-bold text-xs text-default-400'>
-              {product.composedByProducts
-                .map(composition => `${composition.quantity}${composition.componentProduct.unit.abbreviation} ${composition.componentProduct.name}`)
-                .join(", ")
-              }
-            </p>
+          <div>
+            <HighlinghtedText text={product.name} highlight={filterValue} />
           </div>
         );
       case "description":
@@ -178,15 +175,19 @@ export const ProductTable = ({ productsResponse, allProducts, categories, handli
       case "createdAt":
         return product.createdAt.toLocaleString();
       case "status":
-        return product.isEnable ? 'Activo' : 'Inactivo'
+        return (
+          <Chip color={product.isEnable ? 'success' : 'danger'} size='sm' variant='flat'>
+            {product.isEnable ? 'Activo' : 'Inactivo'}
+          </Chip>
+        )
       case "actions":
         return (
           <div className="flex">
             <UpdateProductFormModal
               categories={categories}
               product={product}
-              products={allProducts}
               handlingUnits={handlingUnits}
+              branches={branches}
             />
             <DeleteProductModal productId={product.id} />
           </div>
@@ -248,7 +249,7 @@ export const ProductTable = ({ productsResponse, allProducts, categories, handli
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<ArrowDown01Icon className="text-small" />} variant="flat">
-                  Status
+                  Estado
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
@@ -269,7 +270,7 @@ export const ProductTable = ({ productsResponse, allProducts, categories, handli
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button endContent={<ArrowDown01Icon className="text-small" />} variant="flat">
-                  Columns
+                  Columnas
                 </Button>
               </DropdownTrigger>
               <DropdownMenu

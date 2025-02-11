@@ -21,7 +21,7 @@ export default async function NewWarehousePage() {
 
             <section className="container pt-8">
                 <CreateWarehouseForm
-                    usersResponse={responseUser!}
+                    usersResponse={responseUser || { users: [], meta: { currentPage: 0, itemsPerPage: 0, totalItems: 0, totalPages: 0 } }}
                     branches={branches || []}
                 />
             </section>

@@ -14,6 +14,8 @@ export const UpdateHanldingUnitModalForm = ({ unit }: Props) => {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
+    //Form
+    const [unitName, setUnitName] = useState(unit.name);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -59,49 +61,58 @@ export const UpdateHanldingUnitModalForm = ({ unit }: Props) => {
                 radius='full'
                 startContent={<PencilEdit01Icon />}
             />
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior='outside' placement='top'>
-                <ModalContent>
-                    {(onClose) => (
-                        <Form
-                            validationBehavior='native'
-                            onSubmit={handleSubmit}
-                        >
-                            <ModalHeader>Editar Unidad de Manejo</ModalHeader>
+            <Modal isDismissable={false} isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior='outside' placement='top'>
+                <Form
+                    validationBehavior='native'
+                    onSubmit={handleSubmit}
+                >
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader>Editar Unidad de Manejo</ModalHeader>
 
-                            <ModalBody className='w-full'>
-                                <Input
-                                    isRequired
-                                    name='unitName'
-                                    label='Nombre'
-                                    placeholder='Agrega un nombre a la unidad'
-                                    variant='underlined'
-                                    defaultValue={unit.name}
-                                />
+                                <ModalBody className='w-full'>
+                                    <Input
+                                        isRequired
+                                        name='unitName'
+                                        label='Nombre'
+                                        placeholder='Agrega un nombre a la unidad'
+                                        variant='underlined'
+                                        value={unitName}
+                                        onChange={(e) => setUnitName(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === ' ' || e.key === 'Enter') setUnitName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                                        }}
+                                        onBlur={() => {
+                                            setUnitName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                                        }}
+                                    />
 
-                                <Input
-                                    isRequired
-                                    name='unitAbbreviation'
-                                    label="Abreviación"
-                                    placeholder="Agrega una abreviación a la unidad"
-                                    variant='underlined'
-                                    defaultValue={unit.abbreviation}
-                                />
-                            </ModalBody>
+                                    <Input
+                                        isRequired
+                                        name='unitAbbreviation'
+                                        label="Abreviación"
+                                        placeholder="Agrega una abreviación a la unidad"
+                                        variant='underlined'
+                                        defaultValue={unit.abbreviation}
+                                    />
+                                </ModalBody>
 
-                            <ModalFooter>
-                                <Button color='danger' variant='light' onPress={onClose}>Cancelar</Button>
-                                <Button
-                                    type='submit'
-                                    color='primary'
-                                    isLoading={isLoading}
-                                    isDisabled={isLoading}
-                                >
-                                    Actualizar
-                                </Button>
-                            </ModalFooter>
-                        </Form>
-                    )}
-                </ModalContent>
+                                <ModalFooter>
+                                    <Button color='danger' variant='light' onPress={onClose}>Cancelar</Button>
+                                    <Button
+                                        type='submit'
+                                        color='primary'
+                                        isLoading={isLoading}
+                                        isDisabled={isLoading}
+                                    >
+                                        Actualizar
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Form>
             </Modal>
         </>
     )

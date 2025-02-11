@@ -20,6 +20,8 @@ export const CreateBranchForm = ({ users }: Props) => {
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  // FORM
+  const [branchName, setBranchName] = useState('');
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -82,40 +84,48 @@ export const CreateBranchForm = ({ users }: Props) => {
         <h2 className='font-semibold'>Datos de la Sucursal</h2>
         <div className='p-2 rounded-lg'>
           <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-3">
-          <Input
-            isRequired
-            name='branchName'
-            label='Nombre'
-            placeholder='Agrega un nombre a la sucursal'
-            variant='underlined'
-          />
+            <Input
+              isRequired
+              name='branchName'
+              label='Nombre'
+              placeholder='Agrega un nombre a la sucursal'
+              variant='underlined'
+              value={branchName}
+              onChange={(e) => setBranchName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') setBranchName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+              }}
+              onBlur={() => {
+                setBranchName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+              }}
+            />
 
-          <Input
-            isRequired
-            name='branchLocation'
-            label='Ubicación'
-            placeholder='Ingrese la ubicación de la Sucursal'
-            variant='underlined'
-          />
+            <Input
+              isRequired
+              name='branchLocation'
+              label='Ubicación'
+              placeholder='Ingrese la ubicación de la Sucursal'
+              variant='underlined'
+            />
 
-          <Input
-            type='number'
-            name='branchPhone'
-            label='Teléfono'
-            placeholder='Agregue un número de telefono'
-            variant='underlined'
-            startContent={<span className='text-sm text-gray-500'>+591 </span>}
-          />
+            <Input
+              type='number'
+              name='branchPhone'
+              label='Teléfono'
+              placeholder='Agregue un número de telefono'
+              variant='underlined'
+              startContent={<span className='text-sm text-gray-500'>+591 </span>}
+            />
 
-          <Input
-            type='email'
-            name='branchEmail'
-            label='Correo de la sucursal'
-            placeholder='ingrese@correo.com'
-            variant='underlined'
-          />
+            <Input
+              type='email'
+              name='branchEmail'
+              label='Correo de la sucursal'
+              placeholder='ingrese@correo.com'
+              variant='underlined'
+            />
 
-          <Input
+            {/* <Input
             name='branchLatitude'
             label='Latitud'
             placeholder='Agregue latitud'
@@ -129,22 +139,22 @@ export const CreateBranchForm = ({ users }: Props) => {
             placeholder='Agregue longitud'
             variant='underlined'
             endContent={<div className='text-gray-500 mb-[4px]'><LongitudeIcon size={15} /></div>}
-          />
+          /> */}
 
-          <Select
-            isRequired
-            name='branchManagerId'
-            aria-label='List users'
-            label="Encargado"
-            placeholder='Selecciona el encargado'
-            variant='underlined'
-          >
-            {
-              users.map(user => (
-                <SelectItem key={user.id}>{user.email}</SelectItem>
-              ))
-            }
-          </Select>
+            <Select
+              isRequired
+              name='branchManagerId'
+              aria-label='List users'
+              label="Encargado"
+              placeholder='Selecciona el encargado'
+              variant='underlined'
+            >
+              {
+                users.map(user => (
+                  <SelectItem key={user.id}>{user.email}</SelectItem>
+                ))
+              }
+            </Select>
           </div>
         </div>
       </div>

@@ -1,102 +1,65 @@
-// import { ISimpleProduct } from "./simple-product";
-
-// export interface IProductsResponse {
-//     products: ISimpleProduct[];
-//     meta: Meta
-// }
-
-// export interface Meta {
-//     totalItems: number;
-//     totalPages: number;
-//     currentPage: number;
-// }
-
-
-export interface IProductResponse {
+export interface IProductsResponse {
     products: IProduct[];
-    meta:     IProductResponseMeta;
+    meta: Meta;
 }
 
-export interface IProductResponseMeta {
-    totalItems:     number;
-    itemsPerPage:   number
-    totalPages:     number;
-    currentPage:    number;
+export interface Meta {
+    totalItems: number;
+    itemsPerPage: number;
+    totalPages: number;
+    currentPage: number;
 }
 
 export interface IProduct {
-    id:                     string;
-    name:                   string;
-    description:            string;
-    slug:                   string;
-    type:                   string;
-    price:                  string;
-    imageUrl?:              string | null;
-    lastSaleDate?:          Date | null;
-    launchDate?:            Date | null;
-    expirationDate?:        Date | null;
-    isEnable:               boolean;
-    unitId:                 string;
-    purchasePrice:          string;
-    seasonId?:              string | null;
-    createdAt:              Date;
-    updatedAt:              Date;
-    unit:                   IProductUnit;
-    categories:             IProductCategory[];
-    composesProducts:       IComposesProduct[];
-    composedByProducts:     IComposedByProduct[];
+    id: string;
+    name: string;
+    description: string;
+    slug: string;
+    type: string;
+    price: string;
+    imageUrl: null | string;
+    lastSaleDate: Date | null;
+    launchDate: Date | null;
+    expirationDate: Date | null;
+    isEnable: boolean;
+    unitId: string;
+    purchasePrice: string;
+    seasonId: null;
+    createdAt: Date;
+    updatedAt: Date;
+    unit: Unit;
+    categories: IProductCategory[];
     branchProductInventory: IBranchProductInventory[];
 }
 
-export interface IComposesProduct {
-    product:  IComposedByProductChildren;
-    quantity: string;
-}
-
-export interface IComposedByProduct {
-    componentProduct:  IComposedByProductChildren;
-    quantity: string;
-}
-
-export interface IComposedByProductChildren {
-    id:   string;
-    name: string;
-    unit: IComposedByProductChildrenUnit;
-}
-
-export interface IComposedByProductChildrenUnit {
-    name:         string;
-    abbreviation: string;
-}
-
 export interface IBranchProductInventory {
-    id?:                   string;
-    productId?:            string;
-    branchId:              string;
-    stock:                 string;
-    updatedAt?:             Date;
-    minimumStock:          string;
-    reorderPoint:          string;
-    warehouseId?:          string;
-    lastStockUpdate:       Date;
-    purchasePriceOverride?: string | null;
-    priceOverride?:         string | null;
+    id?: string;
+    productId?: string;
+    branchId: string;
+    stock: string;
+    updatedAt?: Date;
+    minimumStock: string;
+    reorderPoint: string;
+    warehouseId?: null | string;
+    lastStockUpdate: Date;
+    purchasePriceOverride: null | string;
+    priceOverride: null;
 }
 
 export interface IProductCategory {
-    id:          string;
-    name:        string;
+    id: string;
+    name: string;
     description: string;
-    slug:        string;
-    imageUrl?:   string | null;
-    createdAt:   Date;
-    updatedAt:   Date;
+    slug: string;
+    imageUrl: null | string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
-export interface IProductUnit {
-    id:           string;
-    name:         string;
+export interface Unit {
+    id: string;
+    name: string;
     abbreviation: string;
-    createdAt:    Date;
-    updatedAt:    Date;
+    createdAt: Date;
+    updatedAt: Date;
 }

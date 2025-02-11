@@ -56,7 +56,7 @@ export const DeleteSupplierModal = ({ supplierId }: Props) => {
                 startContent={<Delete01Icon />}
             />
 
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+            <Modal isDismissable={false} isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>

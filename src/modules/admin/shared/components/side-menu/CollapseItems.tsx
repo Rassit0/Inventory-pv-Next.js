@@ -2,7 +2,7 @@
 import { Accordion, AccordionItem, Button } from '@heroui/react';
 import { ArrowDown01Icon, IconjarIcon, Layers01Icon, MenuSquareIcon, ProductLoadingIcon, RulerIcon } from 'hugeicons-react';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 
 // Definimos un tipo para los ítems
 interface IItem {
@@ -24,15 +24,24 @@ export const CollapseItems = ({ items, title, ariaLabel, moduleIcon }: Props) =>
 
     const router = useRouter();
     const pathname = usePathname();
+    const [selectedKeys, setSelectedKeys] = useState<any>([])
+
+    useEffect(() => {
+        // Si no es igual al path no se va expandir
+        if (!items.some(item =>
+            pathname === item.linkPath
+        )) {
+            setSelectedKeys([]);
+        }
+    }, [pathname])
+
     return (
         <div className='my-1'>
             <Accordion
                 as='li'
                 isCompact
                 variant="light"
-                defaultExpandedKeys={[
-                    items.some(item => pathname.includes(item.linkPath)) ? ariaLabel : "",
-                ]}
+                selectedKeys={selectedKeys} onSelectionChange={setSelectedKeys}
             >
                 <AccordionItem
                     key={ariaLabel}
@@ -66,7 +75,7 @@ export const CollapseItems = ({ items, title, ariaLabel, moduleIcon }: Props) =>
                                             variant='light'
                                             color='primary'
                                             onPress={() => router.push(item.linkPath)}
-                                            className={pathname === item.linkPath || pathname.includes(item.linkPath) ? 'sidemenu__item--active' : 'sidemenu__item'}
+                                            className={pathname === item.linkPath ? 'sidemenu__item--active' : 'sidemenu__item'}
                                             startContent={item.icon || null}
                                         >
                                             {item.label}
