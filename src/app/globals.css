@@ -3,6 +3,28 @@
 @tailwind utilities;
 
 @layer utilities {
+    /* Barra de desplazamiento personalizada */
+    .custom-scrollbar {
+        scrollbar-width: thin; /* Para Firefox: hace la barra más delgada */
+        scrollbar-color: #9ca3af transparent; /* Color del thumb (barra) y del track (fondo) */
+    }
+
+    /* Para WebKit browsers (Chrome, Safari, Edge) */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px; /* Ancho de la barra de desplazamiento */
+        border-radius: 8px; /* Bordes redondeados */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #9ca3af; /* Color de la barra de desplazamiento */
+        border-radius: 8px; /* Bordes redondeados */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent; /* Fondo transparente */
+        border-radius: 8px; /* Bordes redondeados */
+    }
+    
     .admin__layout {
         @apply flex h-screen overflow-hidden relative
     }

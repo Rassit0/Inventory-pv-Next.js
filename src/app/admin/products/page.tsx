@@ -5,6 +5,7 @@ import { getHandlingUnits } from "@/modules/admin/handling-units";
 import { getProducts, ProductTable } from "@/modules/admin/products";
 import { HeaderPage } from "@/modules/admin/shared";
 import { getWarehousesResponse } from "@/modules/admin/warehouses";
+import { Add01Icon } from "hugeicons-react";
 
 export default async function ProductsPage() {
 
@@ -24,9 +25,14 @@ export default async function ProductsPage() {
         title="Productos"
         description="Listado de tus productos en el restaurante"
         linkProps={{
-          linkText: "Nuevo Producto",
+          linkText: <Add01Icon />,
           url: "/admin/products/new"
         }}
+        isButton
+        colorButton='primary'
+        variantButton='flat'
+        popoverText="Nuevo Producto"
+        delayPopover={1000}
       />
 
       {/* TABLA DE PRODUCTOS */}

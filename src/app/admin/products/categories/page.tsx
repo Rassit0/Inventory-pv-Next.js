@@ -1,5 +1,6 @@
 import { CategoryTable, getCategories, ISimpleCategory } from "@/modules/admin/categories";
 import { HeaderPage } from "@/modules/admin/shared";
+import { Add01Icon } from "hugeicons-react";
 import { toast } from "sonner";
 
 export default async function CategoriesPage() {
@@ -14,9 +15,14 @@ export default async function CategoriesPage() {
         title="Categorías"
         description="Listado de tus categorías en el restaurante"
         linkProps={{
-          linkText: "Nueva Categoría",
-          url: "/admin//products/categories/new"
+          linkText: <Add01Icon />,
+          url: "/admin/products/categories/new"
         }}
+        isButton
+        colorButton='primary'
+        variantButton='flat'
+        popoverText="Nueva Categoría"
+        delayPopover={1000}
       />
 
       {/* TABLA DE CATEGORIAS */}

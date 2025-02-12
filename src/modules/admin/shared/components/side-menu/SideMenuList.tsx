@@ -71,7 +71,7 @@ export const SideMenuItems = () => {
                 Sucursales
             </Button>
 
-            <CollapseItems
+            {/* <CollapseItems
                 title='Proveedores'
                 ariaLabel='Module Suppliers'
                 moduleIcon={<TruckIcon />}
@@ -93,7 +93,18 @@ export const SideMenuItems = () => {
                         // icon: <PresentationBarChart01Icon />
                     },
                 ]}
-            />
+            /> */}
+            <Button
+                as='li'
+                size='lg'
+                variant='light'
+                color='primary'
+                onPress={() => router.push('/admin/suppliers')}
+                className={pathname.includes('/admin/suppliers') ? 'sidemenu__item--active' : 'sidemenu__item'}
+                startContent={<TruckIcon />}
+            >
+                Proveedores
+            </Button>
 
             {/* <CollapseItems
                 title='Almacenes'

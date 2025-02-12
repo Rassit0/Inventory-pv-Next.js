@@ -1,5 +1,6 @@
 import { HeaderPage } from "@/modules/admin/shared";
 import { getSuppliers, SupplierTable } from "@/modules/admin/suppliers";
+import { Add01Icon } from "hugeicons-react";
 
 export default async function SuppliersPage() {
     const suppliers = await getSuppliers();
@@ -9,9 +10,14 @@ export default async function SuppliersPage() {
                 title="Proveedores"
                 description="Listado de tus proveedores de los productos"
                 linkProps={{
-                    linkText: 'Nuevo Proveedor',
-                    url: '/admin/suppliers/new'
+                    linkText: <Add01Icon />,
+                    url: "/admin/suppliers/new"
                 }}
+                isButton
+                colorButton='primary'
+                variantButton='flat'
+                popoverText="Nuevo Proveedor"
+                delayPopover={1000}
             />
 
             {/* TABLA PROVEEDORES */}

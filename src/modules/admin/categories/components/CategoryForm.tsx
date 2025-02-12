@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import Image from 'next/image'
 import no_image from '@/assets/no_image.png'
+import { ImageUploaderInput } from '../../shared'
 
 export const CategoryForm = ({ categories }: ICategoriesResponse) => {
     // const [errors, setErrors] = useState({});
@@ -88,73 +89,65 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
             onSubmit={handleSubmit}
         >
             <h2 className='text-2xl font-semibold'>Formulario</h2>
+            <div className='grid md:grid-cols-3 w-full'>
+                <div className='md:col-span-1 pb-6'>
+                    <h2 className="font-semibold">Imagen de presentación</h2>
+                    <div>
+                        <ImageUploaderInput name='image' imageDefault={previewImage || undefined} />
+                    </div>
+                </div>
+                <div className='md:col-span-2'>
+                    <h2 className="font-semibold">Datos generales</h2>
+                    <div className='p-2'>
+                        <Input
+                            isRequired
+                            name='categoryName'
+                            label='Nombre'
+                            placeholder='Agrega un nombre a la categoría'
+                            variant='underlined'
+                            value={categoryName}
+                            onChange={(e) => setCategoryName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === ' ' || e.key === 'Enter') setCategoryName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                            }}
+                            onBlur={() => {
+                                setCategoryName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                            }}
+                        />
 
-            <Input
-                isRequired
-                name='categoryName'
-                label='Nombre'
-                placeholder='Agrega un nombre a la categoría'
-                variant='underlined'
-                value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
-                onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') setCategoryName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
-                }}
-                onBlur={() => {
-                    setCategoryName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
-                }}
-            />
+                        <Input
+                            isRequired
+                            name='categoryDescription'
+                            label='Descripción'
+                            placeholder='Agrega una descripción a la categoría'
+                            variant='underlined'
+                            value={categoryDescription}
+                            onChange={(e) => setCategoryDescription(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === ' ' || e.key === 'Enter') setCategoryDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                            }}
+                            onBlur={() => {
+                                setCategoryDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                            }}
+                        />
 
-            <Input
-                isRequired
-                name='categoryDescription'
-                label='Descripción'
-                placeholder='Agrega una descripción a la categoría'
-                variant='underlined'
-                value={categoryDescription}
-                onChange={(e) => setCategoryDescription(e.target.value)}
-                onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') setCategoryDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
-                }}
-                onBlur={() => {
-                    setCategoryDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
-                }}
-            />
+                        <Select
+                            name='categoryPaternId'
+                            label='Categorías Padre'
+                            placeholder='Selecciona categorías padre'
+                            variant='underlined'
+                            selectionMode='multiple'
+                        >
+                            {
+                                categories.map((categoryPatern => (
+                                    <SelectItem key={categoryPatern.id}>{categoryPatern.name}</SelectItem>
+                                )))
+                            }
+                        </Select>
+                    </div>
+                </div>
 
-            <Select
-                name='categoryPaternId'
-                label='Categorías Padre'
-                placeholder='Selecciona categorías padre'
-                variant='underlined'
-                selectionMode='multiple'
-            >
-                {
-                    categories.map((categoryPatern => (
-                        <SelectItem key={categoryPatern.id}>{categoryPatern.name}</SelectItem>
-                    )))
-                }
-            </Select>
-
-            <Input
-                name='image'
-                label="Imagen"
-                placeholder='Selecciana una imagen'
-                type="file"
-                variant='underlined'
-                onChange={handleImageChange}
-            />
-
-            {/* Previsualización de la imagen */}
-            <div className='relative mt-4 w-full h-[200px] flex items-center justify-center'>
-                <Image
-                    src={previewImage || no_image}
-                    alt='Vista previa'
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className='rounded-lg object-contain'
-                />
             </div>
-
             <Button
                 type='submit'
                 color='primary'

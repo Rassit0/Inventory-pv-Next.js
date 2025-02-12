@@ -9,9 +9,11 @@ interface Props {
     limit?: number | null;
     search?: string | null;
     status?: string | null;
+    orderBy?: 'asc' | 'desc' | null
+    columnOrderBy?: 'name' | 'description' | 'createdAt' | null
 }
 
-export const getProducts = async ({ token, limit, page, search, status }: Props = { token: 'sadf', limit: null, page: null, search: null, status: null }): Promise<IProductsResponse> => {
+export const getProducts = async ({ token, limit, page, search, status, columnOrderBy, orderBy }: Props={token:'sdfa'}): Promise<IProductsResponse> => {
     try {
         // Construir dinámicamente los parámetros de consulta
         const searchParams = new URLSearchParams();
@@ -20,6 +22,8 @@ export const getProducts = async ({ token, limit, page, search, status }: Props 
         if (limit) searchParams.append('limit', limit.toString());
         if (search) searchParams.append('search', search);
         if (status) searchParams.append('status', status);
+        if (orderBy) searchParams.append('orderBy', orderBy);
+        if (columnOrderBy) searchParams.append('columnOrderBy', columnOrderBy);
 
         // Construir la URL con los parámetros de consulta
         const url = '/products?' + searchParams.toString();
@@ -40,20 +44,20 @@ export const getProducts = async ({ token, limit, page, search, status }: Props 
             updatedAt: new Date(product.updatedAt)
         }));
 
-    return {
-        products,
-        meta: response.meta
-    };
-} catch (error) {
-    console.log(error);
-    return {
-        products: [],
-        meta: {
-            currentPage: 1,
-            itemsPerPage: 0,
-            totalItems: 0,
-            totalPages: 1,
-        }
-    };
-}
+        return {
+            products,
+            meta: response.meta
+        };
+    } catch (error) {
+        console.log(error);
+        return {
+            products: [],
+            meta: {
+                currentPage: 1,
+                itemsPerPage: 0,
+                totalItems: 0,
+                totalPages: 1,
+            }
+        };
+    }
 }

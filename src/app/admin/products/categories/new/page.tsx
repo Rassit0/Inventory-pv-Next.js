@@ -1,5 +1,6 @@
 import { CategoryForm, getCategories } from "@/modules/admin/categories";
 import { HeaderPage } from "@/modules/admin/shared";
+import { LinkBackwardIcon } from "hugeicons-react";
 
 export default async function NewCategoryPage() {
     // OBTENER CATEGORIAS
@@ -9,7 +10,13 @@ export default async function NewCategoryPage() {
             <HeaderPage
                 title="Agregar Categoría"
                 description="Agrega una nueva categoría para tus productos"
-                linkProps={{ linkText: "Volver", url: "/admin/products/categories" }}
+                linkProps={{
+                    linkText: <LinkBackwardIcon />,
+                    url: '/admin/products/categories'
+                }}
+                isButton
+                popoverText='Volver a la lista'
+                delayPopover={1000}
             />
             <section className="container pt-8">
                 <CategoryForm categories={categories} />

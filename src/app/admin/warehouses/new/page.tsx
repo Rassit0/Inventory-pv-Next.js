@@ -2,6 +2,7 @@ import { getBranches } from "@/modules/admin/branches";
 import { HeaderPage } from "@/modules/admin/shared";
 import { getUsersResponse } from "@/modules/admin/users";
 import { CreateWarehouseForm } from "@/modules/admin/warehouses";
+import { LinkBackwardIcon } from "hugeicons-react";
 
 export default async function NewWarehousePage() {
 
@@ -14,9 +15,12 @@ export default async function NewWarehousePage() {
                 title="Agregar Almacén"
                 description="Formulario de Registro"
                 linkProps={{
-                    linkText: 'Volver',
+                    linkText: <LinkBackwardIcon />,
                     url: '/admin/warehouses'
                 }}
+                isButton
+                popoverText='Volver a la lista'
+                delayPopover={1000}
             />
 
             <section className="container pt-8">

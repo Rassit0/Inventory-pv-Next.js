@@ -119,7 +119,7 @@ export const UpdateWarehouseFormModal = ({ warehouse, branches, usersResponse }:
                           placeholder='Seleccione la(s) sucursal'
                           variant='underlined'
                           selectionMode='multiple'
-                          selectedKeys={warehouse.branches.map(branch => branch.branchId)}
+                          defaultSelectedKeys={warehouse.branches.map(branch => branch.branchId)}
                         >
                           {
                             branches.map(branch => (

@@ -23,7 +23,7 @@ interface Props {
 }
 
 const columns = [
-  { name: "IMAGEN", uid: "image", sortable: true },
+  { name: "IMAGEN", uid: "image" },
   { name: "NOMBRE", uid: "name", sortable: true },
   { name: "DESCRIPCIÓN", uid: "description", sortable: true },
   { name: "PRECIO", uid: "price" },
@@ -45,7 +45,7 @@ type TImageErrors = {
 };
 
 type TSortDescriptor = {
-  column: keyof IProduct; // Esto asegura que 'column' sea una de las claves de ISimpleProduct
+  column: 'name' | 'description' | 'createdAt'; // Esto asegura que 'column' sea una de las claves de ISimpleProduct
   direction: 'ascending' | 'descending';
 };
 
@@ -105,7 +105,9 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
         limit: rowsPerPage,
         page: page,
         search: filterValue,
-        status: Array.from(statusFilter).length === statusOptions.length || statusFilter === "all" ? "all" : String(Array.from(statusFilter)[0])
+        status: Array.from(statusFilter).length === statusOptions.length || statusFilter === "all" ? "all" : String(Array.from(statusFilter)[0]),
+        orderBy: sortDescriptor.direction === 'ascending' ? 'asc' : 'desc',
+        columnOrderBy: sortDescriptor.column ? sortDescriptor.column : undefined
       });
       // console.log(response)
       setProductsFilteredresponse(response!);
@@ -114,7 +116,7 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
     }
     setIsLoading(true);
     fetchProducts(); // Llama a la funcion que llama a los productos con filtros(params)
-  }, [rowsPerPage, page, filterValue, productsResponse, statusFilter]);
+  }, [rowsPerPage, page, filterValue, productsResponse, statusFilter, sortDescriptor]);
 
   // CONTROL DE LAS IMAGENES QUE TIENEN ERROR AL CARGAR
   const [imageErrors, setImageErrors] = useState<TImageErrors>({});
@@ -130,15 +132,15 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
   };
 
   // Articulos ordenados
-  const sortedItems = useMemo(() => {
-    return [...productsFilteredResponse.products].sort((a, b) => {
-      const first = a[sortDescriptor.column] ?? "";
-      const second = b[sortDescriptor.column] ?? "";
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
+  // const sortedItems = useMemo(() => {
+  //   return [...productsFilteredResponse.products].sort((a, b) => {
+  //     const first = a[sortDescriptor.column] ?? "";
+  //     const second = b[sortDescriptor.column] ?? "";
+  //     const cmp = first < second ? -1 : first > second ? 1 : 0;
 
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    })
-  }, [sortDescriptor, productsFilteredResponse, statusFilter])
+  //     return sortDescriptor.direction === "descending" ? -cmp : cmp;
+  //   })
+  // }, [sortDescriptor, productsFilteredResponse, statusFilter])
 
   // RENDERIZAR CELDA
   const renderCell = useCallback((product: IProduct, columnKey: keyof IProduct) => {
@@ -371,7 +373,7 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
           )}
         </TableHeader>
 
-        <TableBody loadingContent={<Spinner />} loadingState={isLoading ? 'loading' : 'filtering'} emptyContent={"¡Ups! No encontramos nada aquí."} items={sortedItems}>
+        <TableBody loadingContent={<Spinner />} loadingState={isLoading ? 'loading' : 'filtering'} emptyContent={"¡Ups! No encontramos nada aquí."} items={productsFilteredResponse.products}>
           {(items) => (
             <TableRow key={items.id}>
               {(columnKey) => <TableCell>{renderCell(items, columnKey as keyof IProduct)}</TableCell>}

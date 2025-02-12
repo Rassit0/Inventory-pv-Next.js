@@ -3,6 +3,7 @@ import { getCategories } from '@/modules/admin/categories';
 import { getHandlingUnits } from '@/modules/admin/handling-units';
 import { CreateProductForm, getProducts } from '@/modules/admin/products'
 import { HeaderPage } from '@/modules/admin/shared';
+import { LinkBackwardIcon } from 'hugeicons-react';
 import React from 'react'
 
 export default async function NewProductPage() {
@@ -18,9 +19,12 @@ export default async function NewProductPage() {
                 title='Agregar Producto'
                 description='Agrega un nuevo producto al inventario'
                 linkProps={{
-                    linkText: 'Volver',
+                    linkText: <LinkBackwardIcon />,
                     url: '/admin/products'
                 }}
+                isButton
+                popoverText='Volver a la lista'
+                delayPopover={1000}
             />
 
             <section className='container pt-8'>

@@ -4,7 +4,7 @@ import { IBranchProductInventory, InventoryByBranchForm, IProduct, updateProduct
 import { ISimpleCategory } from '@/modules/admin/categories';
 import { ISimpleHandlingUnit } from '@/modules/admin/handling-units';
 import { toast } from 'sonner';
-import { Button, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Switch, useDisclosure } from '@heroui/react';
+import { Button, Checkbox, CheckboxGroup, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Switch, useDisclosure } from '@heroui/react';
 import { Delete01Icon, PencilEdit01Icon, PlusSignIcon } from 'hugeicons-react';
 import Image from 'next/image';
 import no_image from '@/assets/no_image.png';
@@ -12,6 +12,7 @@ import warning_error_image from '@/assets/warning_error.png';
 import { IBranch } from '@/modules/admin/branches';
 import { parseAbsolute } from '@internationalized/date';
 import { IWarehouse } from '@/modules/admin/warehouses';
+import { ImageUploaderInput } from "@/modules/admin/shared";
 
 interface Props {
     product: IProduct,
@@ -173,137 +174,150 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                 <ModalHeader>Editar Producto</ModalHeader>
 
                                 <ModalBody className='w-full'>
-                                    <div className="w-full">
-                                        <h2 className="font-semibold">Datos generales</h2>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
-                                            <Input
-                                                isRequired
-                                                name="productName"
-                                                label="Nombre"
-                                                placeholder="Agrega un nombre a el producto"
-                                                variant="underlined"
-                                                value={productName}
-                                                onChange={(e) => setProductName(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === ' ' || e.key === 'Enter') setProductName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
-                                                }}
-                                                onBlur={() => {
-                                                    setProductName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
-                                                }}
-                                            />
+                                    <div className='grid grid-cols-3 overflow-hidden'>
+                                        <div className="w-full gap-4 p-2 col-span-1">
+                                            <h2 className="font-semibold">Imagen de presentación</h2>
+                                            <div className='flex flex-col justify-between h-full pb-4'>
+                                                <ImageUploaderInput name='productImage' imageDefault={product.imageUrl || undefined} />
+                                                <CheckboxGroup isRequired name='productType' defaultValue={product.types.map(type => type.type)}>
+                                                    <Checkbox value="FinalProduct">Producto</Checkbox>
+                                                    <Checkbox value="RawMaterial">Insumo</Checkbox>
+                                                    <Checkbox value="Recipe">Receta/Servicio/Combo</Checkbox>
+                                                </CheckboxGroup>
+                                            </div>
+                                        </div>
+                                        <div className="w-full col-span-2">
+                                            <h2 className="font-semibold">Datos generales</h2>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-2">
+                                                <Input
+                                                    isRequired
+                                                    name="productName"
+                                                    label="Nombre"
+                                                    placeholder="Agrega un nombre a el producto"
+                                                    variant="underlined"
+                                                    value={productName}
+                                                    onChange={(e) => setProductName(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === ' ' || e.key === 'Enter') setProductName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                                                    }}
+                                                    onBlur={() => {
+                                                        setProductName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                                                    }}
+                                                />
 
-                                            <Input
-                                                isRequired
-                                                name="productDescription"
-                                                label="Descripción"
-                                                placeholder="Agrega una descripción a el producto"
-                                                variant="underlined"
-                                                value={productDescription}
-                                                onChange={(e) => setProductDescription(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === ' ' || e.key === 'Enter') setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
-                                                }}
-                                                onBlur={() => {
-                                                    setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
-                                                }}
-                                            />
+                                                <Input
+                                                    isRequired
+                                                    name="productDescription"
+                                                    label="Descripción"
+                                                    placeholder="Agrega una descripción a el producto"
+                                                    variant="underlined"
+                                                    value={productDescription}
+                                                    onChange={(e) => setProductDescription(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === ' ' || e.key === 'Enter') setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                                                    }}
+                                                    onBlur={() => {
+                                                        setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                                                    }}
+                                                />
 
-                                            <Select
-                                                isRequired
-                                                name="productType"
-                                                label='Tipo de Producto'
-                                                placeholder="Selecciona el tipo de producto"
-                                                variant="underlined"
-                                                defaultSelectedKeys={[product.type]}
-                                            >
-                                                <SelectItem key={'FinalProduct'}>Producto Final</SelectItem>
-                                                <SelectItem key={'RawMaterial'}>Insumo</SelectItem>
-                                            </Select>
+                                                {/* <Select
+                                                    isRequired
+                                                    name="productType"
+                                                    label='Tipo de Producto'
+                                                    placeholder="Selecciona el tipo de producto"
+                                                    variant="underlined"
+                                                    defaultSelectedKeys={[product.type]}
+                                                >
+                                                    <SelectItem key={'FinalProduct'}>Producto Final</SelectItem>
+                                                    <SelectItem key={'RawMaterial'}>Insumo</SelectItem>
+                                                </Select> */}
 
-                                            <Input
-                                                isRequired
-                                                name="productPrice"
-                                                label='Precio'
-                                                placeholder="Ingrese el precio de venta"
-                                                type="number"
-                                                variant="underlined"
-                                                // startContent={<SaleTag02Icon size={20}/>}
-                                                endContent="Bs."
-                                                min={0}
-                                                step="0.01"
-                                                defaultValue={product.price}
-                                            />
+                                                <Input
+                                                    isRequired
+                                                    name="productPrice"
+                                                    label='Precio'
+                                                    placeholder="Ingrese el precio de venta"
+                                                    type="number"
+                                                    variant="underlined"
+                                                    // startContent={<SaleTag02Icon size={20}/>}
+                                                    endContent="Bs."
+                                                    min={0}
+                                                    step="0.01"
+                                                    defaultValue={product.price}
+                                                />
 
-                                            <Select
-                                                isRequired
-                                                name="productUnitId"
-                                                label='Unidad de manejo'
-                                                placeholder="Selecciona la unidad de manejo"
-                                                variant="underlined"
-                                                defaultSelectedKeys={[product.unit.id]}
-                                            >
-                                                {
-                                                    handlingUnits.map(unit => (
-                                                        <SelectItem key={unit.id}>{unit.name}</SelectItem>
-                                                    ))
-                                                }
-                                            </Select>
+                                                <Select
+                                                    isRequired
+                                                    name="productUnitId"
+                                                    label='Unidad de manejo'
+                                                    placeholder="Selecciona la unidad de manejo"
+                                                    variant="underlined"
+                                                    defaultSelectedKeys={[product.unit.id]}
+                                                >
+                                                    {
+                                                        handlingUnits.map(unit => (
+                                                            <SelectItem key={unit.id}>{unit.name}</SelectItem>
+                                                        ))
+                                                    }
+                                                </Select>
 
-                                            <DatePicker
-                                                name="productLaunchDate"
-                                                granularity='day'
-                                                label="Fecha de lanzamiento"
-                                                variant="underlined"
-                                                defaultValue={product.launchDate ? parseAbsolute(product.launchDate.toISOString(), 'America/La_Paz') : undefined}
-                                            />
+                                                <DatePicker
+                                                    name="productLaunchDate"
+                                                    granularity='day'
+                                                    label="Fecha de lanzamiento"
+                                                    variant="underlined"
+                                                    defaultValue={product.launchDate ? parseAbsolute(product.launchDate.toISOString(), 'America/La_Paz') : undefined}
+                                                />
 
-                                            <DatePicker
-                                                name="productExpirationDate"
-                                                granularity='day'
-                                                label="Fecha de expiración"
-                                                variant="underlined"
-                                                defaultValue={product.expirationDate ? parseAbsolute(product.expirationDate.toISOString(), 'America/La_Paz') : undefined}
-                                            />
+                                                <DatePicker
+                                                    name="productExpirationDate"
+                                                    granularity='day'
+                                                    label="Fecha de expiración"
+                                                    variant="underlined"
+                                                    defaultValue={product.expirationDate ? parseAbsolute(product.expirationDate.toISOString(), 'America/La_Paz') : undefined}
+                                                />
 
-                                            <Input
-                                                name="productPurchasePrice"
-                                                label='Precio de compra'
-                                                placeholder="Ingrese el precio de compra"
-                                                type="number"
-                                                variant="underlined"
-                                                // startContent={<SaleTag02Icon size={20}/>}
-                                                endContent="Bs."
-                                                min={0}
-                                                step="0.01"
-                                                defaultValue={product.purchasePrice}
-                                            />
+                                                <Input
+                                                    name="productPurchasePrice"
+                                                    label='Precio de compra'
+                                                    placeholder="Ingrese el precio de compra"
+                                                    type="number"
+                                                    variant="underlined"
+                                                    // startContent={<SaleTag02Icon size={20}/>}
+                                                    endContent="Bs."
+                                                    min={0}
+                                                    step="0.01"
+                                                    defaultValue={product.purchasePrice}
+                                                />
 
-                                            <Select
-                                                isRequired
-                                                name="categoryIds"
-                                                label="Categoría(s)"
-                                                placeholder="Seleccione la categoría(s) del producto"
-                                                variant="underlined"
-                                                selectionMode="multiple"
-                                                defaultSelectedKeys={product.categories.map(category => category.id)}
-                                            >
-                                                {
-                                                    categories.map(category => (
-                                                        <SelectItem key={category.id}>{category.name}</SelectItem>
-                                                    ))
-                                                }
-                                            </Select>
-                                            <input type="hidden" name="productIsEnable" value={productIsEnable ? 'true' : 'false'} />
-                                            <Switch
-                                                className='pt-4'
-                                                defaultSelected
-                                                color="success"
-                                                size="sm"
-                                                isSelected={productIsEnable}
-                                                onValueChange={(value) => setProductIsEnable(value)}
-                                            >
-                                                Activo
-                                            </Switch>
+                                                <Select
+                                                    isRequired
+                                                    name="categoryIds"
+                                                    label="Categoría(s)"
+                                                    placeholder="Seleccione la categoría(s) del producto"
+                                                    variant="underlined"
+                                                    selectionMode="multiple"
+                                                    defaultSelectedKeys={product.categories.map(category => category.id)}
+                                                >
+                                                    {
+                                                        categories.map(category => (
+                                                            <SelectItem key={category.id}>{category.name}</SelectItem>
+                                                        ))
+                                                    }
+                                                </Select>
+                                                <input type="hidden" name="productIsEnable" value={productIsEnable ? 'true' : 'false'} />
+                                                <Switch
+                                                    className='pt-4'
+                                                    defaultSelected
+                                                    color="success"
+                                                    size="sm"
+                                                    isSelected={productIsEnable}
+                                                    onValueChange={(value) => setProductIsEnable(value)}
+                                                >
+                                                    Activo
+                                                </Switch>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -319,29 +333,7 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                         product={product}
                                     />
 
-                                    <div className="w-full gap-4 p-2">
-                                        <h2 className="font-semibold">Selecciona imagen</h2>
-                                        <Input
-                                            name="productImage"
-                                            label="Imagen"
-                                            placeholder="Selecciona una imagen del producto"
-                                            type="file"
-                                            variant="underlined"
-                                            onChange={handleImageChange}
-                                        />
 
-                                        {/* Previsualización de la imagen */}
-                                        <div className='relative mt-4 w-full h-[200px] flex items-center justify-center'>
-                                            <Image
-                                                src={imageError ? warning_error_image : previewImage || no_image}
-                                                alt='Vista previa'
-                                                fill
-                                                sizes="(max-width: 768px) 100vw, 50vw"
-                                                className='rounded-lg object-contain'
-                                                onError={() => setImageError(true)}
-                                            />
-                                        </div>
-                                    </div>
                                 </ModalBody>
 
                                 <ModalFooter>

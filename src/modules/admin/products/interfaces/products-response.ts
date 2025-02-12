@@ -15,7 +15,6 @@ export interface IProduct {
     name: string;
     description: string;
     slug: string;
-    type: string;
     price: string;
     imageUrl: null | string;
     lastSaleDate: Date | null;
@@ -28,6 +27,7 @@ export interface IProduct {
     createdAt: Date;
     updatedAt: Date;
     unit: Unit;
+    types: IProductTypes[];
     categories: IProductCategory[];
     branchProductInventory: IBranchProductInventory[];
 }
@@ -62,4 +62,10 @@ export interface Unit {
     abbreviation: string;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface IProductTypes {
+    id: string;
+    productId: string;
+    type: "RawMaterial" | "FinalProduct" | "Ingredient" | "Recipe";
 }

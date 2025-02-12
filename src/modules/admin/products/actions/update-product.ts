@@ -36,7 +36,7 @@ export const updateProduct = async (formData: FormData, productId: string) => {
     const data = {
         name: formData.get("productName"),
         description: formData.get("productDescription"),
-        type: formData.get("productType"),
+        typesProduct: formData.getAll("productType"),
         price: Number(formData.get("productPrice")).toFixed(2),
         unitId: formData.get("productUnitId"),
         ...(imageUrl && { imageUrl }),
