@@ -23,12 +23,11 @@ export interface IWarehouse {
     updatedAt: Date;
     deletedAt: Date | null;
     branches: IWarehouseBranch[];
-    usersAccess: UsersAccess[];
 }
 
 export interface IWarehouseBranch {
     branchId: string;
-    details: IWarehouseBranchDetails;
+    details: IWarehouseBranchDetails | null;
 }
 
 export interface IWarehouseBranchDetails {
@@ -44,9 +43,4 @@ export interface IWarehouseBranchDetails {
     isEnable: boolean;
     createdaAt: Date;
     updatedAt: Date;
-}
-
-export interface UsersAccess {
-    userId: string;
-    role: string;
 }

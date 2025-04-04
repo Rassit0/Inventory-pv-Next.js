@@ -3,7 +3,11 @@
 import { isApiError, valeryClient } from "@/lib/api"
 import { revalidatePath } from "next/cache"
 
-export const createHanldingUnit = async (formData: FormData) => {
+interface Props{
+    formData: FormData;
+    token: string;
+}
+export const createHanldingUnit = async ({formData,token}:Props) => {
     const data = {
         name: (formData.get("unitName") as string).trim(),
         abbreviation: (formData.get("unitAbbreviation") as string).trim(),
@@ -12,8 +16,9 @@ export const createHanldingUnit = async (formData: FormData) => {
     try {
         await valeryClient('/units', {
             method: 'POST',
-            headers:{
+            headers: {
                 'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
             },
             body: JSON.stringify(data)
         });
@@ -26,7 +31,7 @@ export const createHanldingUnit = async (formData: FormData) => {
             message: "Se guardo la unidad de manejo"
         }
     } catch (error) {
-        if(isApiError(error)){
+        if (isApiError(error)) {
             return {
                 error: true,
                 message: error.message,

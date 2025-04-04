@@ -27,10 +27,12 @@ export const CollapseItems = ({ items, title, ariaLabel, moduleIcon }: Props) =>
     const [selectedKeys, setSelectedKeys] = useState<any>([])
 
     useEffect(() => {
-        // Si no es igual al path no se va expandir
-        if (!items.some(item =>
+        // Si es igual al path se va expandir
+        if (items.some(item =>
             pathname === item.linkPath || pathname.includes(item.linkPath)
         )) {
+            setSelectedKeys([ariaLabel])
+        }else{
             setSelectedKeys([]);
         }
     }, [pathname])
@@ -75,7 +77,7 @@ export const CollapseItems = ({ items, title, ariaLabel, moduleIcon }: Props) =>
                                             variant='light'
                                             color='primary'
                                             onPress={() => router.push(item.linkPath)}
-                                            className={pathname === item.linkPath || pathname === item.linkPath + '/new' ? 'sidemenu__item--active' : 'sidemenu__item'}
+                                            className={pathname === item.linkPath || pathname === item.linkPath + '/new' || pathname.includes(item.linkPath) ? 'sidemenu__item--active' : 'sidemenu__item'}
                                             startContent={item.icon || null}
                                         >
                                             {item.label}

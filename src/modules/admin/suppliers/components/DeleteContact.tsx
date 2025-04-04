@@ -6,11 +6,12 @@ import { toast } from 'sonner';
 import { Delete01Icon } from 'hugeicons-react';
 
 interface Props {
+    isDisabled: boolean;
     contactId: number,
     onDelete: (id: number) => void; // Recibe una funcion
 }
 
-export const DeleteContact = ({ contactId, onDelete }: Props) => {
+export const DeleteContact = ({ isDisabled = false, contactId, onDelete }: Props) => {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +57,7 @@ export const DeleteContact = ({ contactId, onDelete }: Props) => {
     return (
         <>
             <Button
+                isDisabled={isDisabled}
                 onPress={onOpen}
                 isIconOnly
                 radius='full'

@@ -1,42 +1,31 @@
-import { Badge, Button, Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger, useDisclosure } from '@heroui/react'
-import { Notification02Icon } from 'hugeicons-react'
-import React, { Fragment, useState } from 'react'
+'use client'
+import { ButtonNotifications, getNotifications, INotification } from '@/modules/admin/notifications'
+import useSWR from 'swr';
 
-export const NavMenuAlert = () => {
-    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-    return (
-        <Dropdown isOpen={isOpen} onOpenChange={onOpenChange}>
-            <DropdownTrigger>
-                <div className='flex items-center'>
-                    <Badge className='mt-1 mr-1' color="danger" content="5" shape='circle'>
-                        <Button variant="light" isIconOnly radius='full' startContent={
-                            <Notification02Icon size={30} />
-                        } color='primary'
-                            onPress={() => isOpen ? onClose() : onOpen()}
-                        />
-                    </Badge>
-                </div>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Dropdown menu with shortcut" variant="flat">
-                <DropdownSection className='max-h-80 overflow-y-auto custom-scrollbar rounded-md'>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((notification, index) => (
-                        <Fragment key={index}>
-                            <DropdownItem key={"new" + index} shortcut="">
-                                EL producto se está quedando sin stock.
-                            </DropdownItem>
-                            <DropdownItem key={"copy" + index} shortcut="">
-                                EL producto se está quedando sin stock.
-                            </DropdownItem>
-                            <DropdownItem key={"edit" + index} shortcut="">
-                                EL producto se está quedando sin stock.
-                            </DropdownItem>
-                            <DropdownItem key={"delete" + index} className="text-danger" color="danger" shortcut="">
-                                EL producto se está quedando sin stock.
-                            </DropdownItem>
-                        </Fragment>
-                    ))}
-                </DropdownSection>
-            </DropdownMenu>
-        </Dropdown>
-    )
+interface Props {
+    token: string;
+}
+
+export const NavMenuAlert = ({ token }: Props) => {
+    // FUNCION PARA OBTENER NOTIFICACIONES
+    const fetchNotifications = async () => {
+        try {
+            return await getNotifications({ token });
+        } catch (error) {
+            console.error("Error al obtener notificaciones:", error);
+            return []; // En caso de error, retornar un array vacío
+        }
+    };
+
+    // Hook SWR para obtener y actualizar las notificaciones
+    const { data: notifications, error } = useSWR<INotification[]>('/notifications', fetchNotifications, {
+        refreshInterval: 5000, // Se actualiza cada 5 segundos
+        revalidateOnFocus: true, // Se actualiza cuando la página vuelve al foco
+    });
+
+    if (error) {
+        console.error("Error cargando notificaciones:", error);
+    }
+
+    return <ButtonNotifications notifications={notifications || []} />;
 }

@@ -1,10 +1,16 @@
+import { getAuthUser, hasModuleAccess } from "@/lib";
 import { CategoryForm, getCategories } from "@/modules/admin/categories";
 import { HeaderPage } from "@/modules/admin/shared";
+import { RoleModulePermission } from "@/modules/auth";
 import { LinkBackwardIcon } from "hugeicons-react";
+import { redirect } from "next/navigation";
 
-export default async function NewCategoryPage() {
+export default async function NewCategoryPage() {// Obtener usuario autenticado y token
+    const { user, authToken } = await getAuthUser();
+    // Verificar acceso al módulo "branches"
+    if (!hasModuleAccess({ user, moduleName: "PRODUCTS_CATEGORIES", permissions: [RoleModulePermission.Write] })) redirect("/403");
     // OBTENER CATEGORIAS
-    const categories = await getCategories();
+    const categories = await getCategories({ token: authToken });
     return (
         <>
             <HeaderPage
@@ -19,7 +25,7 @@ export default async function NewCategoryPage() {
                 delayPopover={1000}
             />
             <section className="container pt-8">
-                <CategoryForm categories={categories} />
+                <CategoryForm categories={categories} token={authToken} />
             </section>
         </>
     );

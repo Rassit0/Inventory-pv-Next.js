@@ -4,7 +4,10 @@ import { valeryClient } from "@/lib/api";
 import { ICategoriesResponse, ISimpleCategory } from "@/modules/admin/categories"
 import { toast } from "sonner";
 
-export const getCategories = async (token: string = "asdf"): Promise<ISimpleCategory[]> => {
+interface Props {
+    token: string;
+}
+export const getCategories = async ({token}:Props): Promise<ISimpleCategory[]> => {
 
     try {
         const response = await valeryClient<ICategoriesResponse>('/categories', {

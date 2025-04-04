@@ -9,7 +9,7 @@ interface IResponse {
     message: any;
     response?: any;
 }
-export const createBranch = async (formData: FormData): Promise<IResponse> => {
+export const createBranch = async (token: string, formData: FormData): Promise<IResponse> => {
     const file = formData.get("branchImage");
     let imageUrl: string | null = null;
 
@@ -38,7 +38,7 @@ export const createBranch = async (formData: FormData): Promise<IResponse> => {
         name: formData.get('branchName'),
         location: formData.get('branchLocation'),
         phone: formData.get('branchPhone'),
-        email: formData.get('branchEmail'),
+        email: formData.get('branchEmail') === '' ? undefined : formData.get('branchEmail'),
         managerId: formData.get('branchManagerId'),
         latitude: Number(formData.get('branchLatitude')),
         longitude: Number(formData.get('branchLongitude')),
@@ -52,6 +52,7 @@ export const createBranch = async (formData: FormData): Promise<IResponse> => {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
             },
             body: JSON.stringify(data),
         });

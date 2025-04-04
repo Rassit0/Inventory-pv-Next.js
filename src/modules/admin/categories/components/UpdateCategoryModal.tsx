@@ -1,6 +1,6 @@
 import React, { FormEvent, useEffect, useState } from 'react'
 import { ISimpleCategory } from '../interfaces/simple-category'
-import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, useDisclosure } from '@heroui/react';
+import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Textarea, useDisclosure } from '@heroui/react';
 import { toast } from 'sonner';
 import { updateCategory } from '../actions/update-category';
 import { PencilEdit01Icon } from 'hugeicons-react';
@@ -12,9 +12,10 @@ import { ImageUploaderInput } from '../../shared';
 interface Props {
   category: ISimpleCategory;
   categories: ISimpleCategory[];
+  token: string;
 }
 
-export const UpdateCategoryModal = ({ category, categories }: Props) => {
+export const UpdateCategoryModal = ({ category, categories, token }: Props) => {
   const [imageError, setImageError] = useState(false);
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -66,7 +67,7 @@ export const UpdateCategoryModal = ({ category, categories }: Props) => {
     }
 
     // EJECUTAR SERVER ACTIONS PARA GUARDAR
-    const { error, message, response } = await updateCategory(formData, category.id);
+    const { error, message, response } = await updateCategory({ formData, categoryId: category.id, token });
     if (error) {
       toast.warning("Ocurrió un error", {
         description: response ? response.message : message
@@ -107,7 +108,7 @@ export const UpdateCategoryModal = ({ category, categories }: Props) => {
                 <ModalBody className='w-full grid lg:grid-cols-3'>
                   <div className='lg:col-span-1 pb-6 w-full'>
                     <h2 className="font-semibold">Imagen de presentación</h2>
-                      <ImageUploaderInput name='image' imageDefault={previewImage || undefined} />
+                    <ImageUploaderInput name='image' imageDefault={previewImage || undefined} />
                   </div>
                   <div className='lg:col-span-2'>
                     <h2 className="font-semibold">Datos generales</h2>
@@ -128,9 +129,13 @@ export const UpdateCategoryModal = ({ category, categories }: Props) => {
                         }}
                       />
 
-                      <Input
+                      <Textarea
                         isRequired
                         name='categoryDescription'
+                        classNames={{
+                          // base: "max-w-xs",
+                          input: "resize-y min-h-[20px]",
+                        }}
                         label='Descripción'
                         placeholder='Agrega una descripción a la categoría'
                         variant='underlined'

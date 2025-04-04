@@ -15,9 +15,11 @@ export interface IProduct {
     name: string;
     description: string;
     slug: string;
-    price: string;
+    // price: string;
+    minimumStock: string,
+    reorderPoint: string,
     imageUrl: null | string;
-    lastSaleDate: Date | null;
+    // lastSaleDate: Date | null;
     launchDate: Date | null;
     expirationDate: Date | null;
     isEnable: boolean;
@@ -29,21 +31,30 @@ export interface IProduct {
     unit: Unit;
     types: IProductTypes[];
     categories: IProductCategory[];
-    branchProductInventory: IBranchProductInventory[];
+    branchProductStock: IBranchProductStock[];
+    warehouseProductStock: IWarehouseProductStock[];
+    suppliersProduct: ISupplierProduct[];
 }
 
-export interface IBranchProductInventory {
+export interface ISupplierProduct {
+    supplierId: string;
+}
+
+export interface IBranchProductStock {
     id?: string;
     productId?: string;
     branchId: string;
     stock: string;
     updatedAt?: Date;
-    minimumStock: string;
-    reorderPoint: string;
-    warehouseId?: null | string;
-    lastStockUpdate: Date;
-    purchasePriceOverride: null | string;
-    priceOverride: null;
+    nameBranch: string | null
+}
+export interface IWarehouseProductStock {
+    id?: string;
+    productId?: string;
+    warehouseId: string;
+    stock: string;
+    updatedAt?: Date;
+    nameWarehouse: string | null;
 }
 
 export interface IProductCategory {

@@ -8,7 +8,13 @@ interface IResponse {
     response?: any;
 }
 
-export const updateSupplier = async (formData: FormData, supplierId: string): Promise<IResponse> => {
+interface Props {
+    token: string;
+    formData: FormData;
+    supplierId: string;
+}
+
+export const updateSupplier = async ({ formData, supplierId, token }: Props): Promise<IResponse> => {
     const data = {
         name: formData.get('supplierName'),
         address: formData.get('supplierAddress'),
@@ -42,6 +48,7 @@ export const updateSupplier = async (formData: FormData, supplierId: string): Pr
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json', // Indicar que el cuerpo es un JSON
+                Authorization: 'Bearer ' + token,
             },
             body: JSON.stringify(data) // Convertir el objeto a una cadena JSON
         });

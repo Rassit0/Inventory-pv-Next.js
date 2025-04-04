@@ -12,11 +12,12 @@ import { toast } from 'sonner'
 import { createWarehouse } from '@/modules/admin/warehouses'
 
 interface Props {
+  token: string;
   usersResponse: IUsersResponse,
   branches: IBranch[]
 }
 
-export const CreateWarehouseForm = ({ branches, usersResponse }: Props) => {
+export const CreateWarehouseForm = ({ token, branches, usersResponse }: Props) => {
 
   const router = useRouter();
 
@@ -43,7 +44,7 @@ export const CreateWarehouseForm = ({ branches, usersResponse }: Props) => {
     //   dataArray.push({ key, value });
     // });
     // console.log(dataArray)
-    const { error, message, response } = await createWarehouse(formData);
+    const { error, message, response } = await createWarehouse({ formData, token });
 
     if (error) {
       if (response && Array.isArray(response.message)) {
@@ -80,27 +81,27 @@ export const CreateWarehouseForm = ({ branches, usersResponse }: Props) => {
       onSubmit={handleSubmit}
     >
       <h2 className="text-2xl font-semibold">Formulario</h2>
-      <div className='w-full grid grid-cols-1 2xl:grid-cols-3 gap-4'>
-        <div className="w-full">
-          <h2 className='font-semibold'>Datos del Almacén</h2>
-          <div className='p-2 rounded-lg grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-1 gap-4'>
-            <Input
-              isRequired
-              name='warehouseName'
-              label='Nombre'
-              placeholder='Agrega un nombre'
-              variant='underlined'
-            />
+      {/* <div className='w-full grid grid-cols-1 2xl:grid-cols-3 gap-4'> */}
+      <div className="w-full">
+        <h2 className='font-semibold'>Datos del Almacén</h2>
+        <div className='p-2 rounded-lg grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-1 gap-4'>
+          <Input
+            isRequired
+            name='warehouseName'
+            label='Nombre'
+            placeholder='Agrega un nombre'
+            variant='underlined'
+          />
 
-            <Input
-              isRequired
-              name='warehouseLocation'
-              label='Ubicación'
-              placeholder='Ingrese la ubicación'
-              variant='underlined'
-            />
+          <Input
+            isRequired
+            name='warehouseLocation'
+            label='Ubicación'
+            placeholder='Ingrese la ubicación'
+            variant='underlined'
+          />
 
-            {/* <Input
+          {/* <Input
             name='warehouseLatitude'
             label='Latitud'
             placeholder='Ingresar latitud'
@@ -116,34 +117,33 @@ export const CreateWarehouseForm = ({ branches, usersResponse }: Props) => {
             endContent={<div className='text-gray-500 mb-[4px]'><LongitudeIcon size={15} /></div>}
           /> */}
 
-            <Select
-              isRequired
-              className='md:col-span-2 2xl:col-span-1'
-              name='warehouseBranchIds'
-              aria-label='List branches'
-              label='Sucursal'
-              placeholder='Seleccione la(s) sucursal'
-              variant='underlined'
-              selectionMode='multiple'
-            >
-              {
-                branches.map(branch => (
-                  <SelectItem key={branch.id}>{branch.name}</SelectItem>
-                ))
-              }
-            </Select>
-          </div>
+          <Select
+            isRequired
+            className='md:col-span-2 2xl:col-span-1'
+            name='warehouseBranchIds'
+            aria-label='List branches'
+            label='Sucursal'
+            placeholder='Seleccione la(s) sucursal'
+            variant='underlined'
+            selectionMode='multiple'
+          >
+            {
+              branches.map(branch => (
+                <SelectItem key={branch.id}>{branch.name}</SelectItem>
+              ))
+            }
+          </Select>
         </div>
+      </div>
 
-        {/* Formulario de user access */}
-        <div className='w-full 2xl:col-span-2'>
+      {/* Formulario de user access */}
+      {/* <div className='w-full 2xl:col-span-2'>
           <h2 className='font-semibold'>Acceso de usuarios</h2>
           <div className='p-2'>
-            {/* <SelectUserAccessWarehouse usersResponse={usersResponse} /> */}
             <UserAccessWarehouseSelect usersResponse={usersResponse} isRequired />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* imagen */}
       <div className="w-full">

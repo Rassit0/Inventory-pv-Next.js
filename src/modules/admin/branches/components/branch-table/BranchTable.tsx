@@ -9,15 +9,18 @@ import Image from 'next/image';
 import { IUser } from '@/modules/admin/users';
 
 interface Props {
+    editBranch: boolean;
+    deleteBranch: boolean;
     branches: IBranch[];
     users: IUser[];
+    token: string;
 }
 
 type ImageErrors = {
     [key: string]: boolean;
 }
 
-export const BranchTable = ({ branches, users }: Props) => {
+export const BranchTable = ({ token, deleteBranch, editBranch, branches, users }: Props) => {
     const [imageErrors, setImageErrors] = useState<ImageErrors>({})
     useEffect(() => {
         setImageErrors({});
@@ -44,7 +47,7 @@ export const BranchTable = ({ branches, users }: Props) => {
                     <TableColumn>CORREO</TableColumn>
                     <TableColumn>GERENTE</TableColumn>
                     <TableColumn>CREACIÓN</TableColumn>
-                    <TableColumn>ACCIONES</TableColumn>
+                    <TableColumn hideHeader={!deleteBranch && !editBranch}>ACCIONES</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent={"¡Ups! No encontramos nada aquí."}>
                     {
@@ -66,13 +69,13 @@ export const BranchTable = ({ branches, users }: Props) => {
                                 <TableCell>{branch.name}</TableCell>
                                 <TableCell>{branch.location}</TableCell>
                                 <TableCell>{branch.phone}</TableCell>
-                                <TableCell>{branch.email}</TableCell>
-                                <TableCell>{branch.manager.email}</TableCell>
+                                <TableCell>{branch.email || <div className='text-default-400'>N/A</div>}</TableCell>
+                                <TableCell>{branch.manager ? branch.manager.email : <div className='text-default-400'>N/A</div>}</TableCell>
                                 <TableCell>{branch.createdaAt.toLocaleString()}</TableCell>
                                 <TableCell>
                                     <div className="flex">
-                                        <UpdateBranchFormModal branch={branch} users={users} />
-                                        <DeleteBranchModal branchId={branch.id} />
+                                        {editBranch && (<UpdateBranchFormModal token={token} branch={branch} users={users} />)}
+                                        {deleteBranch && (<DeleteBranchModal branchId={branch.id} token={token} />)}
                                     </div>
                                 </TableCell>
                             </TableRow>

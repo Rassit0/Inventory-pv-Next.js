@@ -1,8 +1,15 @@
+import { getAuthUser, hasModuleAccess, hasPermission } from "@/lib";
 import { HeaderPage } from "@/modules/admin/shared";
 import { CreateSupplierForm } from "@/modules/admin/suppliers";
+import { RoleModulePermission } from "@/modules/auth";
 import { LinkBackwardIcon } from "hugeicons-react";
+import { redirect } from "next/navigation";
 
-export default function NewSupplierPage() {
+export default async function NewSupplierPage() {
+    // Obtener usuario autenticado y token
+    const { user, authToken } = await getAuthUser();
+    // Verificar acceso al módulo "branches"
+    if (!hasModuleAccess({ user, moduleName: "SUPPLIERS_CONTACTS", permissions: [RoleModulePermission.Write] })) redirect("/403");
     return (
         <>
             <HeaderPage
@@ -18,7 +25,10 @@ export default function NewSupplierPage() {
             />
 
             <section className="container pt-8">
-                <CreateSupplierForm />
+                <CreateSupplierForm
+                    token={authToken}
+                    createContact={hasPermission(user, "SUPPLIERS_CONTACTS", RoleModulePermission.Write)}
+                />
             </section>
         </>
     );

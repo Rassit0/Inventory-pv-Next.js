@@ -1,9 +1,12 @@
 "use server"
 
 import { valeryClient } from "@/lib/api"
-import { IUserRole, IUserRolesResponse } from "@/modules/admin/user-roles"
+import { IRole, IUserRolesResponse } from "@/modules/admin/user-roles"
 
-export const getUserRoles = async (token: string = ''): Promise<IUserRole[] | null> => {
+interface Props {
+    token: string;
+}
+export const getUserRoles = async ({ token }: Props): Promise<IRole[] | null> => {
     try {
         const response = await valeryClient<IUserRolesResponse>('/auth/roles', {
             headers: {

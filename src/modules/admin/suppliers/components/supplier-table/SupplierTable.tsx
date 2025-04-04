@@ -6,10 +6,14 @@ import { ISupplier, SupplierDetailsModal, UpdateSupplierFormModal } from '@/modu
 import { DeleteSupplierModal } from '../DeleteSupplierModal';
 
 interface Props {
+    token: string;
+    editContact: boolean;
+    editSupplier: boolean;
+    deleteSupplier: boolean;
     suppliers: ISupplier[];
 }
 
-export const SupplierTable = ({ suppliers }: Props) => {
+export const SupplierTable = ({ token, editContact, editSupplier, deleteSupplier, suppliers }: Props) => {
     return (
         <section className='container pt-8'>
             <Table
@@ -23,7 +27,7 @@ export const SupplierTable = ({ suppliers }: Props) => {
                     <TableColumn>TELÉFONO</TableColumn>
                     <TableColumn>CORREO</TableColumn>
                     <TableColumn>ESTADO</TableColumn>
-                    <TableColumn>ACCIONES</TableColumn>
+                    <TableColumn hideHeader={!editSupplier && !deleteSupplier}>ACCIONES</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent={"¡Ups! No encontramos nada aquí."}>
                     {suppliers
@@ -46,8 +50,8 @@ export const SupplierTable = ({ suppliers }: Props) => {
                                     <TableCell>
                                         <div className="flex">
                                             <SupplierDetailsModal supplier={supplier} />
-                                            <UpdateSupplierFormModal supplier={supplier} />
-                                            <DeleteSupplierModal supplierId={supplier.id} />
+                                            {editSupplier && (<UpdateSupplierFormModal token={token} editContact={editContact} supplier={supplier} />)}
+                                            {deleteSupplier && (<DeleteSupplierModal supplierId={supplier.id} token={token} />)}
                                         </div>
                                     </TableCell>
                                 </TableRow>

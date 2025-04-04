@@ -6,9 +6,10 @@ import { Delete01Icon } from 'hugeicons-react';
 
 interface Props {
     unitId: string
+    token: string;
 }
 
-export const DeleteHandlingUnitModal = ({ unitId }: Props) => {
+export const DeleteHandlingUnitModal = ({ unitId, token }: Props) => {
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -16,7 +17,7 @@ export const DeleteHandlingUnitModal = ({ unitId }: Props) => {
         setIsLoading(true);
 
         // SERVER ACTION
-        const { error, message } = await deleteHandlingUnit(unitId);
+        const { error, message } = await deleteHandlingUnit({ id: unitId, token });
         if (error) {
             toast.error("Ocurrio un error", {
                 description: message
@@ -48,7 +49,7 @@ export const DeleteHandlingUnitModal = ({ unitId }: Props) => {
                         <>
                             <ModalHeader>Eliminar Unidad de Manejo</ModalHeader>
                             <ModalBody>
-                            <p>¿Está seguro de eliminar la unidad de manejo?</p>
+                                <p>¿Está seguro de eliminar la unidad de manejo?</p>
                             </ModalBody>
 
                             <ModalFooter>

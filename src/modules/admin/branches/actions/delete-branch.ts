@@ -9,12 +9,18 @@ interface IResponse {
     response?: any;
 }
 
-export const deleteBranch = async (id: string): Promise<IResponse> => {
+interface Props {
+    token: string;
+    id: string;
+}
+
+export const deleteBranch = async ({ id, token }: Props): Promise<IResponse> => {
     try {
         await valeryClient(`/branches/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-type': 'application/json',
+                Authorization: 'Bearer ' + token,
             },
         });
 

@@ -9,7 +9,13 @@ interface IResponse {
     response?: any;
 }
 
-export const updateWarehouse = async (formData: FormData, warehouseId: string): Promise<IResponse> => {
+interface Props {
+    token: string;
+    formData: FormData
+    warehouseId: string;
+}
+
+export const updateWarehouse = async ({ formData, token, warehouseId }: Props): Promise<IResponse> => {
     const file = formData.get("productImage");
     let imageUrl: string | null = null;
 
@@ -43,10 +49,10 @@ export const updateWarehouse = async (formData: FormData, warehouseId: string): 
         branches: formData.getAll('warehouseBranchIds').map(branchId => ({
             branchId: branchId
         })),
-        usersAccess: formData.getAll('userAccessIds').map(userId => ({
-            userId: userId,
-            role: formData.get(`userAccess[${userId}]`)
-        })),
+        // usersAccess: formData.getAll('userAccessIds').map(userId => ({
+        //     userId: userId,
+        //     role: formData.get(`userAccess[${userId}]`)
+        // })),
         ...(imageUrl && { imageUrl }),
     }
     console.log(data)
@@ -55,6 +61,7 @@ export const updateWarehouse = async (formData: FormData, warehouseId: string): 
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
             },
             body: JSON.stringify(data),
         });

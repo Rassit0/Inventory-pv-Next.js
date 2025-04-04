@@ -6,10 +6,12 @@ import { Delete01Icon, PencilEdit01Icon, PlusSignIcon } from 'hugeicons-react';
 import { toast } from 'sonner';
 
 interface Props {
+    token: string;
+    editContact: boolean;
     supplier: ISupplier;
 }
 
-export const UpdateSupplierFormModal = ({ supplier }: Props) => {
+export const UpdateSupplierFormModal = ({ token, editContact, supplier }: Props) => {
     const [supplierIsActive, setSupplierIsActive] = useState<boolean>(supplier.isActive);
     const [contacts, setContacts] = useState<ISupplierContactInfo[]>(supplier.contactInfo);
     const [isLoading, setIsLoading] = useState(false);
@@ -96,19 +98,21 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
         //     dataArray.push({ key, value });
         // });
         // console.log(dataArray)
-        const { error, message, response } = await updateSupplier(formData, supplier.id);
+        const { error, message, response } = await updateSupplier({ token, formData, supplierId: supplier.id });
         if (error) {
             toast.warning("Ocurrió un error", {
                 description: response ? response.message : message
             });
 
             setIsLoading(false);
+            onOpen();
             return;
         }
 
         // Si se guarda con éxito
         toast.success(message);
         setIsLoading(false);
+
 
         onClose();
     }
@@ -257,7 +261,7 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                                         </div>
                                     </div>
 
-                                    <div className="w-full">
+                                    {<div className="w-full">
                                         <h2 className='font-semibold'>Contacto(s)</h2>
                                         <div className='space-y-4 p-2'>
                                             {contacts.map((contact, index) => (
@@ -267,6 +271,7 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                                                     <input type="hidden" name="supplierIds" value={contact.id} />
                                                     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                                                         <Input
+                                                            isDisabled={!editContact}
                                                             isRequired
                                                             name={`contactName[${contact.id}]`}
                                                             label='Nombre'
@@ -282,6 +287,7 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                                                             }}
                                                         />
                                                         <Input
+                                                            isDisabled={!editContact}
                                                             isRequired
                                                             name={`contactLastname[${contact.id}]`}
                                                             label='Apellido'
@@ -297,6 +303,7 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                                                             }}
                                                         />
                                                         <Input
+                                                            isDisabled={!editContact}
                                                             name={`contactSecondLastname[${contact.id}]`}
                                                             label='Segundo Apellido'
                                                             placeholder='Ingrese el segundo apellido'
@@ -312,6 +319,7 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                                                         />
 
                                                         <Input
+                                                            isDisabled={!editContact}
                                                             type='email'
                                                             name={`contactEmail[${contact.id}]`}
                                                             label='Correo'
@@ -322,6 +330,7 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                                                         />
 
                                                         <Input
+                                                            isDisabled={!editContact}
                                                             // isRequired={contact.phoneType ? true : false}
                                                             isRequired
                                                             name={`contactPhoneNumber[${contact.id}]`}
@@ -363,6 +372,7 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                                                         </Select> */}
 
                                                         <Select
+                                                            isDisabled={!editContact}
                                                             isRequired
                                                             name={`contactPosition[${contact.id}]`}
                                                             label='Rol del contacto'
@@ -379,6 +389,7 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
 
                                                         <input type="hidden" name={`contactIsPrimary[${contact.id}]`} value={String(contact.isPrimary)} />
                                                         <Switch
+                                                            isDisabled={!editContact}
                                                             className='pt-4'
                                                             defaultSelected
                                                             color="success"
@@ -390,7 +401,10 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                                                         </Switch>
                                                     </div>
 
-                                                    <DeleteContact contactId={contact.id} onDelete={() => handleRemoveContactForm(contact.id)} />
+                                                    <DeleteContact
+                                                        isDisabled={!editContact}
+                                                        contactId={contact.id}
+                                                        onDelete={() => handleRemoveContactForm(contact.id)} />
                                                 </div>
                                             ))}
 
@@ -404,7 +418,7 @@ export const UpdateSupplierFormModal = ({ supplier }: Props) => {
                                                 onPress={() => handleAddContactForm()}
                                             />
                                         </div>
-                                    </div>
+                                    </div>}
                                 </ModalBody>
                                 <ModalFooter>
                                     <Button color='danger' variant='light' onPress={onClose}>Cancelar</Button>

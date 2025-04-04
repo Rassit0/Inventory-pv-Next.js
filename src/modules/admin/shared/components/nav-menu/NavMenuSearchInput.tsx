@@ -1,3 +1,4 @@
+"use client"
 // snnipet rafc
 import { Input } from '@heroui/react'
 import { Search01Icon } from 'hugeicons-react'

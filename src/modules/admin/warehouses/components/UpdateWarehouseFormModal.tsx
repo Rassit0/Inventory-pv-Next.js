@@ -12,10 +12,11 @@ import { toast } from 'sonner'
 interface Props {
   warehouse: IWarehouse
   usersResponse: IUsersResponse,
-  branches: IBranch[]
+  branches: IBranch[];
+  token: string;
 }
 
-export const UpdateWarehouseFormModal = ({ warehouse, branches, usersResponse }: Props) => {
+export const UpdateWarehouseFormModal = ({ warehouse, branches, usersResponse, token }: Props) => {
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -44,13 +45,13 @@ export const UpdateWarehouseFormModal = ({ warehouse, branches, usersResponse }:
     //   dataArray.push({ key, value });
     // });
     // console.log(dataArray)
-    const { error, message, response } = await updateWarehouse(formData, warehouse.id);
+    const { error, message, response } = await updateWarehouse({ formData, token, warehouseId: warehouse.id });
 
     if (error) {
       if (response && Array.isArray(response.message)) {
         // Itera sobre cada mensaje en response.message y muestra un toast para cada uno
         response.message.forEach((msg: string) => {  // Aquí se define el tipo de 'msg'
-          toast.warning("Ocurrió un error", {
+          toast.error("Ocurrió un error", {
             description: msg
           });
         });
@@ -88,67 +89,56 @@ export const UpdateWarehouseFormModal = ({ warehouse, branches, usersResponse }:
               <>
                 <ModalHeader>Editar Almacén</ModalHeader>
                 <ModalBody className='w-full'>
-                  <div className='w-full grid grid-cols-1 2xl:grid-cols-3 gap-4'>
-                    <div className="w-full">
-                      <h2 className='font-semibold'>Datos del Almacén</h2>
-                      <div className='p-2 rounded-lg grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-1 gap-4'>
-                        <Input
-                          isRequired
-                          name='warehouseName'
-                          label='Nombre'
-                          placeholder='Agrega un nombre'
-                          variant='underlined'
-                          defaultValue={warehouse.name}
-                        />
+                  <div className="w-full">
+                    <h2 className='font-semibold'>Datos del Almacén</h2>
+                    <div className='p-2 rounded-lg grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-1 gap-4'>
+                      <Input
+                        isRequired
+                        name='warehouseName'
+                        label='Nombre'
+                        placeholder='Agrega un nombre'
+                        variant='underlined'
+                        defaultValue={warehouse.name}
+                      />
 
-                        <Input
-                          isRequired
-                          name='warehouseLocation'
-                          label='Ubicación'
-                          placeholder='Ingrese la ubicación'
-                          variant='underlined'
-                          defaultValue={warehouse.location}
-                        />
+                      <Input
+                        isRequired
+                        name='warehouseLocation'
+                        label='Ubicación'
+                        placeholder='Ingrese la ubicación'
+                        variant='underlined'
+                        defaultValue={warehouse.location}
+                      />
 
-                        <Select
-                          isRequired
-                          className='md:col-span-2 2xl:col-span-1'
-                          name='warehouseBranchIds'
-                          aria-label='List branches'
-                          label='Sucursal'
-                          placeholder='Seleccione la(s) sucursal'
-                          variant='underlined'
-                          selectionMode='multiple'
-                          defaultSelectedKeys={warehouse.branches.map(branch => branch.branchId)}
-                        >
-                          {
-                            branches.map(branch => (
-                              <SelectItem key={branch.id}>{branch.name}</SelectItem>
-                            ))
-                          }
-                        </Select>
+                      <Select
+                        isRequired
+                        className='md:col-span-2 2xl:col-span-1'
+                        name='warehouseBranchIds'
+                        aria-label='List branches'
+                        label='Sucursal'
+                        placeholder='Seleccione la(s) sucursal'
+                        variant='underlined'
+                        selectionMode='multiple'
+                        defaultSelectedKeys={warehouse.branches.map(branch => branch.branchId)}
+                      >
+                        {
+                          branches.map(branch => (
+                            <SelectItem key={branch.id}>{branch.name}</SelectItem>
+                          ))
+                        }
+                      </Select>
 
-                        <input type="hidden" name="warehouseIsEnable" value={warehouseIsEnable ? 'true' : 'false'} />
-                        <Switch
-                          className='pt-4'
-                          defaultSelected
-                          color="success"
-                          size="sm"
-                          isSelected={warehouseIsEnable}
-                          onValueChange={(value) => setWarehouseIsEnable(value)}
-                        >
-                          Activo
-                        </Switch>
-                      </div>
-                    </div>
-
-                    {/* Formulario de user access */}
-                    <div className='w-full 2xl:col-span-2'>
-                      <h2 className='font-semibold'>Acceso de usuarios</h2>
-                      <div className='p-2'>
-                        {/* <SelectUserAccessWarehouse usersResponse={usersResponse} /> */}
-                        <UserAccessWarehouseSelect usersResponse={usersResponse} defaultUsersAccess={warehouse.usersAccess} isRequired />
-                      </div>
+                      <input type="hidden" name="warehouseIsEnable" value={warehouseIsEnable ? 'true' : 'false'} />
+                      <Switch
+                        className='pt-4'
+                        defaultSelected
+                        color="success"
+                        size="sm"
+                        isSelected={warehouseIsEnable}
+                        onValueChange={(value) => setWarehouseIsEnable(value)}
+                      >
+                        Activo
+                      </Switch>
                     </div>
                   </div>
 

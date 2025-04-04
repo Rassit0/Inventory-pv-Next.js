@@ -7,9 +7,10 @@ import { Delete01Icon } from 'hugeicons-react';
 
 interface Props {
     supplierId: string,
+    token: string;
 }
 
-export const DeleteSupplierModal = ({ supplierId }: Props) => {
+export const DeleteSupplierModal = ({ supplierId, token }: Props) => {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +19,7 @@ export const DeleteSupplierModal = ({ supplierId }: Props) => {
         setIsLoading(true);
 
         // SERVER ACTION
-        const { error, message, response } = await deleteSupplier(supplierId);
+        const { error, message, response } = await deleteSupplier({ id: supplierId, token });
         if (error) {
             if (response && Array.isArray(response.message)) {
                 // Itera sobre cada mensaje en response.message y muestra un toast para cada uno

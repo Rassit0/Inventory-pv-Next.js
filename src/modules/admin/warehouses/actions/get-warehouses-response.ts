@@ -5,7 +5,7 @@ import { IWarehousesResponse } from "../interfaces/warehouse-response"
 
 
 interface Props {
-    token?: string;
+    token: string;
     page?: number | null;
     limit?: number | null;
     search?: string | null;

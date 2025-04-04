@@ -14,7 +14,12 @@ interface Contact {
   phone?: string;
 }
 
-export const CreateSupplierForm = () => {
+interface Props {
+  token: string;
+  createContact: boolean;
+}
+
+export const CreateSupplierForm = ({ token, createContact }: Props) => {
   const router = useRouter();
 
   const [supplierIsActive, setSupplierIsActive] = useState<boolean>(true);
@@ -97,7 +102,7 @@ export const CreateSupplierForm = () => {
     //   dataArray.push({ key, value });
     // });
     // console.log(dataArray)
-    const { error, message, response } = await createSupplier(formData);
+    const { error, message, response } = await createSupplier({ token, formData });
     if (error) {
       if (response && Array.isArray(response.message)) {
         // Itera sobre cada mensaje en response.message y muestra un toast para cada uno
@@ -252,7 +257,7 @@ export const CreateSupplierForm = () => {
         </div>
       </div>
 
-      <div className="w-full">
+      {createContact && (<div className="w-full">
         <h2 className='font-semibold'>Contacto(s)</h2>
         <div className='space-y-4 p-2'>
           {contacts.map((contact, index) => (
@@ -340,7 +345,7 @@ export const CreateSupplierForm = () => {
                 // isInvalid={contact.phoneType ? undefined : contact.phoneNumber !== '' ? undefined : false}
                 />
 
-                  <input type="hidden" name={`contactPhoneType[${contact.id}]`} value='MOBILE' />
+                <input type="hidden" name={`contactPhoneType[${contact.id}]`} value='MOBILE' />
                 {/* <Select
                   isRequired={contact.phoneNumber && contact.phoneNumber !== '' ? true : false}
                   name={`contactPhoneType[${contact.id}]`}
@@ -407,7 +412,7 @@ export const CreateSupplierForm = () => {
             onPress={() => handleAddContactForm()}
           />
         </div>
-      </div>
+      </div>)}
 
       <Button
         type='submit'

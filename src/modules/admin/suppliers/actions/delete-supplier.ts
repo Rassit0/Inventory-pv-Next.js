@@ -9,12 +9,18 @@ interface IResponse {
     response?: any;
 }
 
-export const deleteSupplier = async (id: string): Promise<IResponse> => {
+interface Props {
+    id: string;
+    token: string;
+}
+
+export const deleteSupplier = async ({ id, token }: Props): Promise<IResponse> => {
     try {
-        await valeryClient(`/suppliers/${id}`,{
+        await valeryClient(`/suppliers/${id}`, {
             method: 'DELETE',
-            headers:{
+            headers: {
                 'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
             }
         });
 
@@ -25,8 +31,8 @@ export const deleteSupplier = async (id: string): Promise<IResponse> => {
             message: 'Se eliminó el proveedor',
         }
     } catch (error) {
-        if(isApiError(error)){
-            return{
+        if (isApiError(error)) {
+            return {
                 error: true,
                 message: error.message,
                 response: error.response

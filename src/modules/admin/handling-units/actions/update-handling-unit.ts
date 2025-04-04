@@ -3,8 +3,14 @@
 import { isApiError, valeryClient } from "@/lib/api"
 import { revalidatePath } from "next/cache"
 
-export const updateHandlingUnit = async (formData: FormData, unitId: string) => {
-    
+interface Props {
+    formData: FormData;
+    unitId: string;
+    token: string;
+}
+
+export const updateHandlingUnit = async ({ formData, token, unitId }: Props) => {
+
     // Preparar los datos para la solicitud
     const data = {
         name: (formData.get("unitName") as string).trim(),
@@ -14,10 +20,11 @@ export const updateHandlingUnit = async (formData: FormData, unitId: string) => 
 
     try {
         // Realizar la solicitud para crear la unidad de manejo
-        await valeryClient(`/units/${unitId}`,{
+        await valeryClient(`/units/${unitId}`, {
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
             },
             body: JSON.stringify(data)
         });
@@ -30,8 +37,8 @@ export const updateHandlingUnit = async (formData: FormData, unitId: string) => 
             message: "Se actualizó la unidad de manejo"
         }
     } catch (error) {
-        if(isApiError(error)){
-            return{
+        if (isApiError(error)) {
+            return {
                 error: true,
                 message: error.message,
                 response: error.response,

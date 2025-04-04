@@ -1,8 +1,20 @@
+import { getAuthUser, hasModuleAccess } from "@/lib";
+import { getProductions, ProductionChart } from "@/modules/admin/production";
+import { RoleModulePermission } from "@/modules/auth";
+import { redirect } from "next/navigation";
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Obtener usuario autenticado y token
+  const { user, authToken } = await getAuthUser();
+  
+  // Verificar acceso al módulo "branches"
+  if (!hasModuleAccess({ user, moduleName: "HOME", permissions: [RoleModulePermission.Read] })) redirect("/403");
+
+  const productionsResponse = await getProductions({ token: authToken })
+
   return (
     <div>
-      <h1>Home Page</h1>
+      <ProductionChart productions={productionsResponse.productions} />
     </div>
   );
 }

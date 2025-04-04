@@ -1,14 +1,16 @@
 "use client"
-import { Button, Form, Input, Select, SelectItem } from '@heroui/react'
+import { Button, Form, Input, Select, SelectItem, Textarea } from '@heroui/react'
 import React, { FormEvent, useState } from 'react'
-import { createCategory, ICategoriesResponse } from '@/modules/admin/categories'
+import { createCategory, ICategoriesResponse, ISimpleCategory } from '@/modules/admin/categories'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import Image from 'next/image'
-import no_image from '@/assets/no_image.png'
 import { ImageUploaderInput } from '../../shared'
 
-export const CategoryForm = ({ categories }: ICategoriesResponse) => {
+interface Props {
+    categories: ISimpleCategory[];
+    token: string;
+}
+export const CategoryForm = ({ categories, token }: Props) => {
     // const [errors, setErrors] = useState({});
     const router = useRouter();
 
@@ -17,16 +19,6 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
     // Form
     const [categoryName, setCategoryName] = useState('');
     const [categoryDescription, setCategoryDescription] = useState('');
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const fileURL = URL.createObjectURL(file);
-            setPreviewImage(fileURL);
-        } else {
-            setPreviewImage(null);
-        }
-    }
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -45,7 +37,6 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
         selectedParentIds.forEach(id => {
             formData.append("parentIds", id); // Añadir cada valor seleccionado
         });
-        console.log("adsf" + selectedParentIds)
 
         // Si la imagen tiene archivos seleccionados, se agrega
         if (image.files.length > 0) {
@@ -53,7 +44,7 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
         }
 
         // EJECUTAR SERVER ACTIONS PARA GUARDAR
-        const { error, message, response } = await createCategory(formData);
+        const { error, message, response } = await createCategory({ formData, token });
         if (error) {
             if (response && Array.isArray(response.message)) {
                 // Itera sobre cada mensaje en response.message y muestra un toast para cada uno
@@ -115,9 +106,13 @@ export const CategoryForm = ({ categories }: ICategoriesResponse) => {
                             }}
                         />
 
-                        <Input
+                        <Textarea
                             isRequired
                             name='categoryDescription'
+                            classNames={{
+                                // base: "max-w-xs",
+                                input: "resize-y min-h-[20px]",
+                            }}
                             label='Descripción'
                             placeholder='Agrega una descripción a la categoría'
                             variant='underlined'

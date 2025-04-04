@@ -1,32 +1,39 @@
 "use client"
-import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, SharedSelection, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react'
+import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, SharedSelection, Spinner, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react'
 import React, { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { DeleteProductModal, getProducts, IProduct, IProductsResponse, UpdateProductFormModal } from '@/modules/admin/products'
+import { DeleteProductModal, DetailsStockModal, getProducts, IProduct, IProductsResponse, UpdateProductFormModal } from '@/modules/admin/products'
 import Image from 'next/image'
 import no_image from '@/assets/no_image.png'
 import warning_error_image from '@/assets/warning_error.png'
 import { ISimpleCategory } from '@/modules/admin/categories'
 import { ISimpleHandlingUnit } from '@/modules/admin/handling-units'
-import { ArrowDown01Icon, Search01Icon } from 'hugeicons-react'
+import { ArrowDown01Icon, EyeIcon, Search01Icon } from 'hugeicons-react'
 import { HighlinghtedText } from '@/modules/admin/shared'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { IBranch } from '@/modules/admin/branches'
-import { IWarehouse } from '@/modules/admin/warehouses'
+import dynamic from 'next/dynamic'
+import useSWR from 'swr'
+import { ISupplier } from '@/modules/admin/suppliers'
 
+// Solo cargar el componente Table dinámicamente
+const Table = dynamic(() => import('@heroui/react').then((mod) => mod.Table), { ssr: false });
 
 interface Props {
+  token: string;
+  editProduct: boolean;
+  deleteProduct: boolean;
   productsResponse: IProductsResponse;
   categories: ISimpleCategory[];
   handlingUnits: ISimpleHandlingUnit[];
   branches: IBranch[];
-  warehouses: IWarehouse[];
+  suppliers: ISupplier[];
 }
 
 const columns = [
   { name: "IMAGEN", uid: "image" },
   { name: "NOMBRE", uid: "name", sortable: true },
   { name: "DESCRIPCIÓN", uid: "description", sortable: true },
-  { name: "PRECIO", uid: "price" },
+  // { name: "PRECIO", uid: "price" },
   { name: "FECHA DE CRECIÓN", uid: "createdAt", sortable: true },
   { name: "ESTADO", uid: "status" },
   { name: "ACCIONES", uid: "actions" },
@@ -51,7 +58,8 @@ type TSortDescriptor = {
 
 const INITIAL_VISIBLE_COLUMNS: string[] = ["image", "name", "description", "price", "status", "actions"];
 
-export const ProductTable = ({ productsResponse, categories, handlingUnits, branches, warehouses }: Props) => {
+export const ProductTable = ({ token, editProduct, deleteProduct, productsResponse, categories, handlingUnits, branches, suppliers }: Props) => {
+  const router = useRouter();
   const isMounted = useRef(false);
   const [productsFilteredResponse, setProductsFilteredresponse] = useState<IProductsResponse>(productsResponse)
   const [isLoading, setIsLoading] = useState(false);
@@ -75,7 +83,6 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
 
   const headerColumns = useMemo(() => {
     if (visibleColumns === "all") return columns;
-
     return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
   }, [visibleColumns])
 
@@ -92,7 +99,28 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
     }
   }, [pathname])
 
+  // --------------------------------------
   // FUNCION PARA ACTUALIZAR LOS PRODUCTOS CON FILTROS O SI SE ACTUALIZA UN PRODUCTO
+  const fetchProducts = async () => {
+    const response = await getProducts({
+      token,
+      limit: rowsPerPage,
+      page: page,
+      search: filterValue,
+      status: Array.from(statusFilter).length === statusOptions.length || statusFilter === "all" ? "all" : String(Array.from(statusFilter)[0]),
+      orderBy: sortDescriptor.direction === 'ascending' ? 'asc' : 'desc',
+      columnOrderBy: sortDescriptor.column ? sortDescriptor.column : undefined
+    });
+    // console.log(response)
+    setProductsFilteredresponse(response!);
+    setTotalPages(response!.meta.totalPages);
+    setIsLoading(false);
+    return response;
+  }
+  useSWR<IProductsResponse>('/products', fetchProducts, {
+    refreshInterval: 5000, // Actualiza cada 5 segundos (puedes ajustar el intervalo)
+    revalidateOnFocus: true, // Vuelve a validar los datos cuando la página vuelve al foco
+  });
   useEffect(() => {
     // Si esta en false no cargará de nuevo los productos
     if (!isMounted.current) {
@@ -100,23 +128,10 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
       return; // Saltar la ejecución inicial
     }
 
-    const fetchProducts = async () => {
-      const response = await getProducts({
-        limit: rowsPerPage,
-        page: page,
-        search: filterValue,
-        status: Array.from(statusFilter).length === statusOptions.length || statusFilter === "all" ? "all" : String(Array.from(statusFilter)[0]),
-        orderBy: sortDescriptor.direction === 'ascending' ? 'asc' : 'desc',
-        columnOrderBy: sortDescriptor.column ? sortDescriptor.column : undefined
-      });
-      // console.log(response)
-      setProductsFilteredresponse(response!);
-      setTotalPages(response!.meta.totalPages);
-      setIsLoading(false);
-    }
     setIsLoading(true);
     fetchProducts(); // Llama a la funcion que llama a los productos con filtros(params)
   }, [rowsPerPage, page, filterValue, productsResponse, statusFilter, sortDescriptor]);
+  //---------------------------------------------------
 
   // CONTROL DE LAS IMAGENES QUE TIENEN ERROR AL CARGAR
   const [imageErrors, setImageErrors] = useState<TImageErrors>({});
@@ -172,8 +187,6 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
             <HighlinghtedText text={product.description} highlight={filterValue} />
           </div>
         );
-      case "price":
-        return `${product.price} Bs.`;
       case "createdAt":
         return product.createdAt.toLocaleString();
       case "status":
@@ -184,14 +197,24 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
         )
       case "actions":
         return (
-          <div className="flex">
-            <UpdateProductFormModal
+          <div className="flex justify-center">
+            <Button
+              isIconOnly
+              color='success'
+              variant='light'
+              radius='full'
+              startContent={<EyeIcon />}
+              onPress={() => router.push(`/admin/products/${product.slug}`)}
+            />
+            <DetailsStockModal product={product} />
+            {editProduct && (<UpdateProductFormModal
               categories={categories}
               product={product}
               handlingUnits={handlingUnits}
               branches={branches}
-            />
-            <DeleteProductModal productId={product.id} />
+              suppliers={suppliers}
+            />)}
+            {deleteProduct && (<DeleteProductModal productId={product.id} token={token} />)}
           </div>
         );
 
@@ -367,6 +390,7 @@ export const ProductTable = ({ productsResponse, categories, handlingUnits, bran
               key={column.uid}
               align={column.uid === "actions" ? "center" : "start"}
               allowsSorting={column.sortable}
+              hideHeader={!editProduct && !deleteProduct && column.uid === 'actions'}
             >
               {column.name}
             </TableColumn>

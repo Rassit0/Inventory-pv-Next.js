@@ -5,14 +5,14 @@ import { IUsersResponse } from "@/modules/admin/users";
 import { IUser } from '../interfaces/users-response';
 
 interface Props {
-    token?: string;
+    token: string;
     page?: number | null;
     limit?: number | null;
     search?: string | null;
     status?: string | null;
 }
 
-export const getUsersResponse = async ({ token, limit, page, search, status }: Props = {}): Promise<IUsersResponse | null> => {
+export const getUsersResponse = async ({ token, limit, page, search, status }: Props): Promise<IUsersResponse | null> => {
     try {
         const searchParams = new URLSearchParams();
 

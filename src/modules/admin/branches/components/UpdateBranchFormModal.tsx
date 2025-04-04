@@ -14,9 +14,10 @@ import { useRouter } from 'next/navigation';
 interface Props {
     branch: IBranch;
     users: IUser[];
+    token: string;
 }
 
-export const UpdateBranchFormModal = ({ branch, users }: Props) => {
+export const UpdateBranchFormModal = ({ token, branch, users }: Props) => {
     const router = useRouter();
 
     const [imageError, setImageError] = useState(false);
@@ -51,7 +52,7 @@ export const UpdateBranchFormModal = ({ branch, users }: Props) => {
         setIsLoading(true);
         const formData = new FormData(e.currentTarget);
 
-        const { error, message, response } = await updateBranch(formData, branch.id);
+        const { error, message, response } = await updateBranch(token, formData, branch.id);
 
         if (error) {
             if (response && Array.isArray(response.message)) {

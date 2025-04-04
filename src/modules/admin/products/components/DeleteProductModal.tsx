@@ -7,9 +7,10 @@ import { Delete01Icon } from 'hugeicons-react';
 
 interface Props {
     productId: string,
+    token: string;
 }
 
-export const DeleteProductModal = ({ productId }: Props) => {
+export const DeleteProductModal = ({ productId, token }: Props) => {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false)
@@ -18,7 +19,7 @@ export const DeleteProductModal = ({ productId }: Props) => {
         setIsLoading(true);
 
         // SERVER ACTION
-        const { error, message } = await deleteProduct(productId);
+        const { error, message } = await deleteProduct({ id: productId, token });
 
         if (error) {
             toast.error("Ocurrio un error", {

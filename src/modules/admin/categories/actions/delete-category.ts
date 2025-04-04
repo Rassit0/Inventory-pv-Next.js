@@ -3,12 +3,18 @@
 import { isApiError, valeryClient } from "@/lib/api";
 import { revalidatePath } from "next/cache";
 
-export const deleteCategory = async (id: string) => {
+interface Props {
+    id: string;
+    token: string;
+}
+
+export const deleteCategory = async ({ id, token }: Props) => {
     try {
         await valeryClient(`/categories/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',  // Indicar que el cuerpo es un JSON
+                Authorization: 'Bearer ' + token
             }
         });
 

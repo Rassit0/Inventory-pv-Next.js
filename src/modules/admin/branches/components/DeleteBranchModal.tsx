@@ -7,9 +7,10 @@ import { toast } from 'sonner';
 
 interface Props {
     branchId: string;
+    token: string;
 }
 
-export const DeleteBranchModal = ({ branchId }: Props) => {
+export const DeleteBranchModal = ({ branchId, token }: Props) => {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +19,7 @@ export const DeleteBranchModal = ({ branchId }: Props) => {
         setIsLoading(true);
 
         // SERVER ACTION
-        const { error, message, response } = await deleteBranch(branchId);
+        const { error, message, response } = await deleteBranch({id:branchId, token});
 
         if (error) {
             if (response && Array.isArray(response.message)) {
@@ -61,7 +62,7 @@ export const DeleteBranchModal = ({ branchId }: Props) => {
                         <>
                             <ModalHeader>Eliminar Sucursal</ModalHeader>
                             <ModalBody>
-                                <p>¿Está seguro de eliminar el producto?</p>
+                                <p>¿Está seguro de eliminar la sucursal?</p>
                             </ModalBody>
 
                             <ModalFooter>

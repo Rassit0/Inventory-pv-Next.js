@@ -7,10 +7,11 @@ import { toast } from 'sonner';
 import { PencilEdit01Icon } from 'hugeicons-react';
 
 interface Props {
-    unit: ISimpleHandlingUnit
+    unit: ISimpleHandlingUnit;
+    token: string;
 }
 
-export const UpdateHanldingUnitModalForm = ({ unit }: Props) => {
+export const UpdateHanldingUnitModalForm = ({ unit, token }: Props) => {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +25,7 @@ export const UpdateHanldingUnitModalForm = ({ unit }: Props) => {
         const formData = new FormData(e.currentTarget);
 
         // EJECUTAR SERVER ACTIONS PARA GUARDAR
-        const { error, message, response } = await updateHandlingUnit(formData, unit.id);
+        const { error, message, response } = await updateHandlingUnit({formData, unitId: unit.id, token});
         if (error) {
             if (response && Array.isArray(response.message)) {
                 // Itera sobre cada mensaje en response.message y muestra un toast para cada uno

@@ -9,7 +9,12 @@ interface IResponse {
     response?: any;
 }
 
-export const createSupplier = async (formData: FormData): Promise<IResponse> => {
+interface Props {
+    token: string;
+    formData: FormData
+}
+
+export const createSupplier = async ({ token, formData }: Props): Promise<IResponse> => {
     const data = {
         name: formData.get('supplierName'),
         address: formData.get('supplierAddress'),
@@ -39,6 +44,7 @@ export const createSupplier = async (formData: FormData): Promise<IResponse> => 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
             },
             body: JSON.stringify(data),
         });

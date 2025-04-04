@@ -9,7 +9,12 @@ interface IResponse {
     message: any;
     response?: any;
 }
-export const createWarehouse = async (formData: FormData): Promise<IResponse> => {
+
+interface Props {
+    token: string;
+    formData: FormData
+}
+export const createWarehouse = async ({ token, formData }: Props): Promise<IResponse> => {
     const file = formData.get("warehouseImage")
     let imageUrl: string | null = null;
 
@@ -42,12 +47,12 @@ export const createWarehouse = async (formData: FormData): Promise<IResponse> =>
         branches: formData.getAll('warehouseBranchIds').map(branchId => ({
             branchId: branchId
         })),
-        usersAccess: formData.getAll('userAccessIds').map(userId => ({
-            userId: userId,
-            role: formData.get(`userAccess[${userId}]`)
-        })),
+        // usersAccess: formData.getAll('userAccessIds').map(userId => ({
+        //     userId: userId,
+        //     role: formData.get(`userAccess[${userId}]`)
+        // })),
         imageUrl: imageUrl
-        
+
     }
 
     console.log(data)
@@ -57,6 +62,7 @@ export const createWarehouse = async (formData: FormData): Promise<IResponse> =>
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
             },
             body: JSON.stringify(data),
         })

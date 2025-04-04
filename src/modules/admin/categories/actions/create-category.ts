@@ -3,14 +3,12 @@ import { ApiError, isApiError, valeryClient } from "@/lib/api"
 import { uploadFile } from "@/utils/upload-file"
 import { revalidatePath } from "next/cache"
 
-interface ICreateCategory {
-    name: string,
-    description: string,
-    parentId?: string | null,
-    image?: File | null
+interface Props {
+    token: string;
+    formData: FormData;
 }
 
-export const createCategory = async (formData: FormData) => {
+export const createCategory = async ({ formData, token }: Props) => {
 
     const file = formData.get("image");
     let imageUrl: string | null = null;
@@ -54,6 +52,7 @@ export const createCategory = async (formData: FormData) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',  // Indicar que el cuerpo es un JSON
+                Authorization: 'Bearer ' + token
             },
             body: JSON.stringify(data)  // Convertir el objeto a una cadena JSON
         });

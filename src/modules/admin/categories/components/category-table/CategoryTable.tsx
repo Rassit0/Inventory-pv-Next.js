@@ -8,14 +8,17 @@ import warning_error_image from '@/assets/warning_error.png'
 import { UpdateCategoryModal } from '../UpdateCategoryModal'
 
 interface Props {
-    categories: ISimpleCategory[]
+    editCategory: boolean;
+    deleteCategory: boolean;
+    categories: ISimpleCategory[];
+    token: string;
 }
 
 type ImageErrors = {
     [key: string]: boolean; // Claves como strings (IDs) y valores booleanos
 };
 
-export const CategoryTable = ({ categories }: Props) => {
+export const CategoryTable = ({ editCategory, deleteCategory, categories, token }: Props) => {
     const [imageErrors, setImageErrors] = useState<ImageErrors>({});
     useEffect(() => {
         setImageErrors({})
@@ -38,7 +41,7 @@ export const CategoryTable = ({ categories }: Props) => {
                     <TableColumn>NOMBRE</TableColumn>
                     <TableColumn>DECRIPCIÓN</TableColumn>
                     <TableColumn>FECHA DE CREACIÓN</TableColumn>
-                    <TableColumn>ACCIONES</TableColumn>
+                    <TableColumn hideHeader={!editCategory && !deleteCategory}>ACCIONES</TableColumn>
                 </TableHeader>
 
                 <TableBody emptyContent={"¡Ups! No encontramos nada aquí."}>
@@ -75,8 +78,8 @@ export const CategoryTable = ({ categories }: Props) => {
                                 <TableCell>{category.createdAt.toLocaleString()}</TableCell>
                                 <TableCell>
                                     <div className="flex">
-                                        <UpdateCategoryModal category={category} categories={categories} />
-                                        <DeleteCategoryModal categoryId={category.id} />
+                                        {editCategory && (<UpdateCategoryModal category={category} categories={categories} token={token} />)}
+                                        {deleteCategory && (<DeleteCategoryModal categoryId={category.id} token={token} />)}
                                     </div>
                                 </TableCell>
                             </TableRow>

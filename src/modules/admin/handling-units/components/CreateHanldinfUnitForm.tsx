@@ -5,7 +5,10 @@ import React, { FormEvent, useState } from 'react'
 import { createHanldingUnit } from '@/modules/admin/handling-units'
 import { toast } from 'sonner'
 
-export const CreateHanldinfUnitForm = () => {
+interface Props {
+    token: string;
+}
+export const CreateHanldinfUnitForm = ({ token }: Props) => {
 
     const router = useRouter();
 
@@ -18,7 +21,7 @@ export const CreateHanldinfUnitForm = () => {
         setIsLoading(true);
         const formData = new FormData(e.currentTarget);
 
-        const { error, message, response } = await createHanldingUnit(formData);
+        const { error, message, response } = await createHanldingUnit({ token, formData });
 
         if (error) {
             if (response && Array.isArray(response.message)) {

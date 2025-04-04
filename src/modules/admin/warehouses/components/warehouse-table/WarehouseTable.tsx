@@ -1,15 +1,18 @@
 "use client"
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { getWarehousesResponse, IWarehouse, IWarehousesResponse, UpdateWarehouseFormModal } from '@/modules/admin/warehouses'
+import { DeleteWarehouseModal, getWarehousesResponse, IWarehousesResponse, UpdateWarehouseFormModal } from '@/modules/admin/warehouses'
 import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, SharedSelection, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import Image from 'next/image';
 import no_image from '@/assets/no_image.png';
 import warning_error_image from '@/assets/warning_error.png'
 import { IUsersResponse } from '@/modules/admin/users';
 import { IBranch } from '@/modules/admin/branches';
-import { ArrowDown01Icon } from 'hugeicons-react';
+import { ArrowDown01Icon, Delete01Icon } from 'hugeicons-react';
 
 interface Props {
+    editWarehouse: boolean;
+    deleteWarehouse: boolean;
+    token: string;
     warehousesResponse: IWarehousesResponse;
     usersResponse: IUsersResponse;
     branches: IBranch[];
@@ -24,7 +27,7 @@ const statusOptions = [
     { name: "Inactivo", uid: "inactive" },
 ];
 
-export const WarehouseTable = ({ warehousesResponse, branches, usersResponse }: Props) => {
+export const WarehouseTable = ({ deleteWarehouse, editWarehouse, token, warehousesResponse, branches, usersResponse }: Props) => {
     console.log(warehousesResponse)
 
     const [imageErrors, setImageErrors] = useState<ImageErrors>({});
@@ -51,6 +54,7 @@ export const WarehouseTable = ({ warehousesResponse, branches, usersResponse }: 
 
         const fetchProducts = async () => {
             const response = await getWarehousesResponse({
+                token,
                 limit: rowsPerPage,
                 page: page,
                 search: filterValue,
@@ -174,7 +178,7 @@ export const WarehouseTable = ({ warehousesResponse, branches, usersResponse }: 
                     <TableColumn>UBICACIÓN</TableColumn>
                     <TableColumn>SUCURSAL</TableColumn>
                     <TableColumn>ESTADO</TableColumn>
-                    <TableColumn>ACCIONES</TableColumn>
+                    <TableColumn hideHeader={!deleteWarehouse && !editWarehouse}>ACCIONES</TableColumn>
                 </TableHeader>
 
                 <TableBody emptyContent={"¡Ups! No encontramos nada aquí."}>
@@ -195,15 +199,16 @@ export const WarehouseTable = ({ warehousesResponse, branches, usersResponse }: 
                             </TableCell>
                             <TableCell>{warehouse.name}</TableCell>
                             <TableCell>{warehouse.location}</TableCell>
-                            <TableCell>{warehouse.branches.map(branch => branch.details.name).join(', ')}</TableCell>
+                            <TableCell>{warehouse.branches.filter(branch => branch.details?.name).map(branch => branch.details?.name).join(', ') || 'N/A'}</TableCell>
                             <TableCell>
                                 <Chip color={warehouse.isEnable ? 'success' : 'danger'} size='sm' variant='flat'>
                                     {warehouse.isEnable ? 'Activo' : 'Inactivo'}
                                 </Chip>
                             </TableCell>
                             <TableCell>
-                                <div>
-                                    <UpdateWarehouseFormModal warehouse={warehouse} usersResponse={usersResponse} branches={branches} />
+                                <div className='flex'>
+                                    {editWarehouse && (<UpdateWarehouseFormModal warehouse={warehouse} usersResponse={usersResponse} branches={branches} token={token} />)}
+                                    {deleteWarehouse && (<DeleteWarehouseModal token={token} warehouseId={warehouse.id} />)}
                                 </div>
                             </TableCell>
                         </TableRow>

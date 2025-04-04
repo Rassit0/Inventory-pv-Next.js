@@ -7,4 +7,4 @@ export { createUserRole } from './actions/create-role';
 export { getUserRoles } from './actions/get-roles';
 
 // INTERFACES
-export type { IUserRolesResponse, IUser, IUserRole } from './interfaces/roles-response';
+export type { IUserRolesResponse, IUser, IModule, IRole, IRoleModule, IRoleModulePermission } from './interfaces/roles-response';

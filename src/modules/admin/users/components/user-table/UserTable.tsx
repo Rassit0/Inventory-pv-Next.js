@@ -1,17 +1,23 @@
 "use client"
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { IUser, IUsersResponse } from '@/modules/admin/users'
-import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, SharedSelection, SortDescriptor, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, Popover, PopoverContent, PopoverTrigger, SharedSelection, SortDescriptor, Spinner, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { usePathname } from 'next/navigation';
 import { getUsersResponse } from '@/modules/admin/users';
 import Image from 'next/image';
 import no_image from '@/assets/no_image.png'
 import warning_error_image from '@/assets/warning_error.png'
-import { ArrowDown01Icon, Search01Icon } from 'hugeicons-react';
+import { ArrowDown01Icon, Delete01Icon, PencilEdit01Icon, Search01Icon } from 'hugeicons-react';
 import { HighlinghtedText } from '@/modules/admin/shared';
+import dynamic from 'next/dynamic';
 
+// Solo cargar el componente Table dinámicamente
+const Table = dynamic(() => import('@heroui/react').then((mod) => mod.Table), { ssr: false });
 
 interface Props {
+    editUser: boolean;
+    deleteUser: boolean;
+    token: string;
     usersResponse: IUsersResponse
 }
 
@@ -30,6 +36,7 @@ const columns = [
     { name: "EMAIL", uid: "email", sortable: true },
     { name: "ESTADO", uid: "status" },
     { name: "ROL", uid: "role" },
+    { name: "SUCURSALES", uid: "userBranches" },
     { name: "CREADO", uid: "createdAt", sortable: true },
     { name: "ACTUALIZADO", uid: "updatedAt", sortable: true },
     { name: "ACCIONES", uid: "actions" },
@@ -44,9 +51,9 @@ function capitalize(s: string) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
 }
 
-const INITIAL_VISIBLE_COLUMNS: string[] = ["image", "name", "email", "status", "role", "createdAt", "updatedAt", "actions"];
+const INITIAL_VISIBLE_COLUMNS: string[] = ["image", "name", "email", "status", "role", "userBranches", "actions"];
 
-export const UserTable = ({ usersResponse }: Props) => {
+export const UserTable = ({ deleteUser, editUser, token, usersResponse }: Props) => {
     const isMounted = useRef(false);
     const [usersFilteredResponse, setUsersFilteredResponse] = useState<IUsersResponse>(usersResponse)
     const [isLoading, setIsLoading] = useState(false);
@@ -98,6 +105,7 @@ export const UserTable = ({ usersResponse }: Props) => {
 
         const fetchUsers = async () => {
             const response = await getUsersResponse({
+                token: token,
                 limit: itemsPerPage,
                 page: page,
                 search: searchValue,
@@ -171,15 +179,72 @@ export const UserTable = ({ usersResponse }: Props) => {
                     </div>
                 );
             case "status":
-                return user.isEnable ? 'Activo' : 'Inactivo';
+                return (
+                    <Chip color={user.isEnable ? 'success' : 'danger'} size='sm' variant='flat'>
+                        {user.isEnable ? 'Activo' : 'Inactivo'}
+                    </Chip>
+                );
             case "role":
-                return user.role.name;
+                return (
+                    <div>
+                        <div>{user.role.name}</div>
+                        {/* <div className='text-xs text-default-400'>{
+                            user.role.RolePermission.length > 0 ? user.role.RolePermission.map(roleP =>
+                                permissionMap[roleP.permission.name as keyof typeof permissionMap]).join(', ')
+                                :
+                                '[Sin permisos]'
+                        }
+                        </div> */}
+                    </div>
+                );
+            case "userBranches":
+                return (user.hasGlobalBranchesAccess ?
+                    <div className='text-center'>Acceso Global</div>
+                    :
+                    user.userBranches.length > 0 ?
+                        <div className='flex justify-center'>
+                            <Popover placement="left">
+                                <PopoverTrigger>
+                                    <Button color='primary' variant='light'>{user.userBranches.length}</Button>
+                                </PopoverTrigger>
+                                {user.userBranches.map(branch => (
+                                    <PopoverContent key={branch.branchId}>
+                                        <div className="px-1 py-2">
+                                            <div className="text-small font-bold">{branch.branch.name}</div>
+                                            {/* <div className="text-tiny">This is the popover content</div> */}
+                                        </div>
+                                    </PopoverContent>
+                                ))}
+                            </Popover>
+                        </div>
+                        :
+                        <div className='text-default-400 text-center'>N/A</div>
+                )
             case "createdAt":
                 return user.createdAt.toLocaleString();
             case "updatedAt":
                 return user.updatedAt.toLocaleString();
             case "actions":
-                return 'Actions';
+                return (
+                    <div className="flex justify-center">
+                        {true && (<Button
+                            // onPress={onOpen}
+                            isIconOnly
+                            color='warning'
+                            variant='light'
+                            radius='full'
+                            startContent={<PencilEdit01Icon />}
+                        />)}
+                        {true && (<Button
+                            // onPress={onOpen}
+                            isIconOnly
+                            color='danger'
+                            radius='full'
+                            variant='light'
+                            startContent={<Delete01Icon />}
+                        />)}
+                    </div>
+                )
         }
     }, [searchValue]);
 

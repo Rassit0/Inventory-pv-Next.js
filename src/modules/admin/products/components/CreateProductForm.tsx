@@ -1,7 +1,7 @@
 "use client"
-import { Badge, Button, Checkbox, CheckboxGroup, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Select, SelectItem, Switch } from "@heroui/react";
+import { Autocomplete, AutocompleteItem, Badge, Button, Checkbox, CheckboxGroup, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Select, SelectItem, Switch, Textarea } from "@heroui/react";
 import { ISimpleCategory } from "@/modules/admin/categories";
-import { IBranchProductInventory, IProduct } from "@/modules/admin/products";
+import { IBranchProductStock, IProduct } from "@/modules/admin/products";
 import { ISimpleHandlingUnit } from "@/modules/admin/handling-units";
 import { FormEvent, useState } from "react";
 import { createProduct } from "@/modules/admin/products";
@@ -12,13 +12,16 @@ import no_image from '@/assets/no_image.png'
 import { Delete01Icon, PlusMinus01Icon, PlusSignIcon } from "hugeicons-react";
 import { IBranch } from "@/modules/admin/branches";
 import { ImageUploaderInput } from "@/modules/admin/shared";
+import { useSessionStore } from "@/modules/auth";
+import { ISupplier } from "@/modules/admin/suppliers";
 
 
 interface Props {
     products: IProduct[],
     categories: ISimpleCategory[],
     handlingUnits: ISimpleHandlingUnit[],
-    branches: IBranch[]
+    branches: IBranch[];
+    suppliers: ISupplier[];
 }
 
 interface SelectedProduct {
@@ -26,17 +29,21 @@ interface SelectedProduct {
     quantity: number;
 }
 
-export const CreateProductForm = ({ products, categories, handlingUnits, branches }: Props) => {
+export const CreateProductForm = ({ products, categories, handlingUnits, branches, suppliers }: Props) => {
+
+    const { token } = useSessionStore();
 
     //Form
     const [productName, setProductName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [productIsEnable, setProductIsEnable] = useState(true);
+    const [handlingUnitId, setHandlingUnitId] = useState('');
+    const [selectedCategoriesIds, setSelectedCategoriesIds] = useState<string[]>([])
 
     const router = useRouter();
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
-    const [branchProductInventory, setBranchProductInventory] = useState<IBranchProductInventory[]>([])
+    const [branchProductStock, setBranchProductStock] = useState<IBranchProductStock[]>([])
     const [availableBranches, setAvailableBranches] = useState<IBranch[]>(branches); // Sucursales disponibles
 
     const [isLoading, setIsLoading] = useState(false);
@@ -51,8 +58,8 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
         }
     }
 
-    const handleBranchInventoryChange = (branchId: string, field: keyof IBranchProductInventory, value: string) => {
-        setBranchProductInventory((prev) => {
+    const handleBranchInventoryChange = (branchId: string, field: keyof IBranchProductStock, value: string) => {
+        setBranchProductStock((prev) => {
             const updatedInventory = [...prev];
             const inventoryIndex = updatedInventory.findIndex((inventory) => inventory.branchId === branchId);
             if (inventoryIndex >= 0) {
@@ -65,33 +72,27 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
         });
     };
 
-    const handleAddBranchForm = (branchId: string) => {
-        // Verificar que la sucursal no esté ya agregada
-        const isBranchAlreadyAdded = branchProductInventory.some((inventory) => inventory.branchId === branchId);
-        if (isBranchAlreadyAdded) return;
+    // const handleAddBranchForm = (branchId: string) => {
+    //     // Verificar que la sucursal no esté ya agregada
+    //     const isBranchAlreadyAdded = branchProductStock.some((inventory) => inventory.branchId === branchId);
+    //     if (isBranchAlreadyAdded) return;
 
-        // Agregar el inventario para la sucursal seleccionada
-        setBranchProductInventory((prev) => [
-            ...prev,
-            {
-                branchId,
-                stock: "",
-                minimumStock: "",
-                reorderPoint: "",
-                stockLocation: "",
-                lastStockUpdate: new Date(),
-                purchasePriceOverride: null,
-                priceOverride: null
-            }
-        ]);
+    //     // Agregar el inventario para la sucursal seleccionada
+    //     setBranchProductStock((prev) => [
+    //         ...prev,
+    //         {
+    //             branchId,
+    //             stock: "",
+    //         }
+    //     ]);
 
-        // Eliminar la sucursal seleccionada de la lista de sucursales disponibles
-        setAvailableBranches((prev) => prev.filter(branch => branch.id !== branchId));
-    };
+    //     // Eliminar la sucursal seleccionada de la lista de sucursales disponibles
+    //     setAvailableBranches((prev) => prev.filter(branch => branch.id !== branchId));
+    // };
 
     const handleRemoveBranchForm = (branchId: string) => {
         // Eliminar el formulario de sucursal de la lista de inventarios
-        setBranchProductInventory((prev) => {
+        setBranchProductStock((prev) => {
             const updatedInventory = prev.filter(inventory => inventory.branchId !== branchId);
             return updatedInventory;
         });
@@ -114,6 +115,10 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
 
         setIsLoading(true);
         const formData = new FormData(e.currentTarget);
+        // Agregar las categorías seleccionadas manualmente
+        selectedCategoriesIds.forEach(categoryId => {
+            formData.append("categoryIds", categoryId);
+        });
         // Convertir FormData a array (clave, valor)
         const dataArray: any[] = [];
         formData.forEach((value, key) => {
@@ -124,7 +129,7 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
         // console.log(JSON.stringify(dataArray, null, 2));
 
         // EJECUTAR SERVER ACTIONS PARA GUARDAR
-        const { error, message, response } = await createProduct(formData);
+        const { error, message, response } = await createProduct({ formData, token: token || '' });
         if (error) {
             if (response && Array.isArray(response.message)) {
                 // Itera sobre cada mensaje en response.message y muestra un toast para cada uno
@@ -166,11 +171,6 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                     <h2 className="font-semibold">Imagen de presentación</h2>
                     <div className='flex flex-col justify-between h-full pb-4'>
                         <ImageUploaderInput name='productImage' />
-                        <CheckboxGroup name='productType' defaultValue={["FinalProduct"]}>
-                            <Checkbox value="FinalProduct">Producto</Checkbox>
-                            <Checkbox value="RawMaterial">Insumo</Checkbox>
-                            <Checkbox value="Recipe">Receta/Servicio/Combo</Checkbox>
-                        </CheckboxGroup>
                     </div>
                 </div>
                 <div className="w-full md:col-span-2">
@@ -192,73 +192,6 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                             }}
                         />
 
-                        <Input
-                            isRequired
-                            name="productDescription"
-                            label="Descripción"
-                            placeholder="Agrega una descripción a el producto"
-                            variant="underlined"
-                            value={productDescription}
-                            onChange={(e) => setProductDescription(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === ' ' || e.key === 'Enter') setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
-                            }}
-                            onBlur={() => {
-                                setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
-                            }}
-                        />
-
-                        <Input
-                            isRequired
-                            name="productPrice"
-                            label='Precio'
-                            placeholder="Ingrese el precio de venta"
-                            type="number"
-                            variant="underlined"
-                            // startContent={<SaleTag02Icon size={20}/>}
-                            endContent="Bs."
-                            min={0}
-                            step="0.01"
-                        />
-
-                        <Select
-                            isRequired
-                            name="productUnitId"
-                            label='Unidad de manejo'
-                            placeholder="Selecciona la unidad de manejo"
-                            variant="underlined"
-                        >
-                            {
-                                handlingUnits.map(unit => (
-                                    <SelectItem key={unit.id}>{unit.name}</SelectItem>
-                                ))
-                            }
-                        </Select>
-
-                        <DatePicker
-                            name="productLaunchDate"
-                            label="Fecha de lanzamiento"
-                            variant="underlined"
-                        />
-
-                        <DatePicker
-                            name="productExpirationDate"
-                            label="Fecha de expiración"
-                            variant="underlined"
-                        />
-
-                        <Input
-                            name="productPurchasePrice"
-                            label='Precio de compra'
-                            placeholder="Ingrese el precio de compra"
-                            type="number"
-                            variant="underlined"
-                            // startContent={<SaleTag02Icon size={20}/>}
-                            endContent="Bs."
-                            min={0}
-                            step="0.01"
-                        />
-
                         <Select
                             isRequired
                             name="categoryIds"
@@ -274,129 +207,153 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                             }
                         </Select>
 
+                        {/* <Autocomplete
+                            isRequired
+                            className="max-w-xs"
+                            defaultItems={categories}
+                            label="Categoría(s)"
+                            placeholder="Seleccione la categoría(s)"
+                            variant="underlined"
+                            multiple
+                            onSelectionChange={(keys) => console.log(keys)}
+                        >
+                            {(item) => <AutocompleteItem key={item.id}>{item.name}</AutocompleteItem>}
+                        </Autocomplete> */}
+
+
+                        {/* <Input
+                            isRequired
+                            name="productPrice"
+                            label='Precio'
+                            placeholder="Ingrese el precio de venta"
+                            type="number"
+                            variant="underlined"
+                            // startContent={<SaleTag02Icon size={20}/>}
+                            endContent="Bs."
+                            min={0}
+                            step="0.01"
+                        /> */}
+
+                        <Select
+                            isRequired
+                            name="productUnitId"
+                            label='Unidad de manejo'
+                            placeholder="Selecciona la unidad de manejo"
+                            variant="underlined"
+                            selectedKeys={[handlingUnitId]}
+                            onChange={(e) => setHandlingUnitId(e.target.value)}
+                        >
+                            {
+                                handlingUnits.map(unit => (
+                                    <SelectItem key={unit.id}>{unit.name}</SelectItem>
+                                ))
+                            }
+                        </Select>
+
+                        <Select
+                            // isRequired
+                            name="supplierIds"
+                            label="Proveedor(s)"
+                            placeholder="Seleccione el proveedor(s) del producto"
+                            variant="underlined"
+                            selectionMode="multiple"
+                        >
+                            {
+                                suppliers.map(supplier => (
+                                    <SelectItem key={supplier.id}>{supplier.name}</SelectItem>
+                                ))
+                            }
+                        </Select>
+
+                        <Input
+                            isRequired
+                            min={1}
+                            name='minimumStockProduct'
+                            label="Stock minimo"
+                            type="number"
+                            variant="underlined"
+                            endContent={<div className="text-default-400">{handlingUnits.find(unit => unit.id === handlingUnitId)?.abbreviation}</div>}
+                        />
+
+                        <Input
+                            isRequired
+                            min={1}
+                            name='reorderPointProduct'
+                            label="Punto de reorden"
+                            type="number"
+                            variant="underlined"
+                            endContent={<div className="text-default-400">{handlingUnits.find(unit => unit.id === handlingUnitId)?.abbreviation}</div>}
+                        />
+
+                        {/* <Input
+                            isRequired
+                            name="productDescription"
+                            label="Descripción"
+                            placeholder="Agrega una descripción a el producto"
+                            variant="underlined"
+                            value={productDescription}
+                            onChange={(e) => setProductDescription(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === ' ' || e.key === 'Enter') setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                            }}
+                            onBlur={() => {
+                                setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                            }}
+                        /> */}
+                        <Textarea
+                            // key={productDescription}
+                            // disableAnimation
+                            // disableAutosize
+                            name="productDescription"
+                            classNames={{
+                                // base: "max-w-xs",
+                                input: "resize-y min-h-[20px]",
+                              }}
+                            label="Descripción"
+                            labelPlacement="outside"
+                            placeholder="Agrega una descripción"
+                            variant='underlined'
+                            value={productDescription}
+                            onChange={(e) => setProductDescription(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === ' ' || e.key === 'Enter') setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                            }}
+                            onBlur={() => {
+                                setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                            }}
+                        />
+                        {/* <DatePicker
+                            name="productLaunchDate"
+                            label="Fecha de ingreso"
+                            variant="underlined"
+                        />
+
+                        <DatePicker
+                            name="productExpirationDate"
+                            label="Fecha de expiración"
+                            variant="underlined"
+                        /> */}
+
                         <input type="hidden" name="productIsEnable" value={productIsEnable ? 'true' : 'false'} />
                         <div className="p-2">
-                        <Switch
-                            className='pt-4'
-                            defaultSelected
-                            color="success"
-                            size="sm"
-                            isSelected={productIsEnable}
-                            onValueChange={(value) => setProductIsEnable(value)}
-                        >
-                            Activo
-                        </Switch>
+                            <Switch
+                                className='pt-4'
+                                defaultSelected
+                                color="success"
+                                size="sm"
+                                isSelected={productIsEnable}
+                                onValueChange={(value) => setProductIsEnable(value)}
+                            >
+                                Activo
+                            </Switch>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Formulario de inventario por sucursal */}
-            <div className="w-full">
-                <h2 className="font-semibold">Inventario por Sucursal</h2>
-                <div className="space-y-4 p-2">
-                    {branchProductInventory.map((branchInventory, index) => (
-                        <div key={branchInventory.branchId} className="hover:bg-primary-50 rounded-lg p-4">
-                            {/* Contenedor de título e indicador */}
-                            <div className="flex justify-between items-center">
-                                <h3 className="font-semibold">
-                                    Sucursal: {branches.find(branch => branch.id === branchInventory.branchId)?.name || "Sucursal no encontrada"}
-                                </h3>
-                                {/* Punto verde para indicar que es nuevo */}
-                                <span className="min-w-3 h-3 bg-green-500 rounded-full"></span>
-                            </div>
-                            <input type="hidden" name="branchesIds" value={branchInventory.branchId} />
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <Input
-                                    isRequired
-                                    min={1}
-                                    name={`inventoryStock[${branchInventory.branchId}]`}
-                                    label="Stock"
-                                    type="number"
-                                    variant="underlined"
-                                    value={branchInventory.stock}
-                                    onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'stock', e.target.value)}
-                                />
-                                <Input
-                                    isRequired
-                                    min={1}
-                                    name={`inventoryMinimumStock[${branchInventory.branchId}]`}
-                                    label="Stock Mínimo"
-                                    type="number"
-                                    variant="underlined"
-                                    value={branchInventory.minimumStock}
-                                    onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'minimumStock', e.target.value)}
-                                />
-                                <Input
-                                    isRequired
-                                    min={1}
-                                    name={`inventoryReorderPoint[${branchInventory.branchId}]`}
-                                    label="Punto de Reorden"
-                                    type="number"
-                                    variant="underlined"
-                                    value={branchInventory.reorderPoint}
-                                    onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'reorderPoint', e.target.value)}
-                                />
-                                <Select
-                                    isRequired
-                                    name={`inventoryWarehouseId[${branchInventory.branchId}]`}
-                                    aria-label={`select-${branchInventory.id}`}
-                                    placeholder="Seleccione almacén"
-                                    variant='underlined'
-                                    selectedKeys={[branchInventory.warehouseId || '']}
-                                    onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'warehouseId', e.target.value)}
-                                >
-                                    {(branches.find(branch => branch.id === branchInventory.branchId)?.warehouses || []).map(warehouse => (
-                                        <SelectItem key={warehouse.id} value={warehouse.id}>
-                                            {warehouse.name}
-                                        </SelectItem>
-                                    ))}
-                                </Select>
-                                <Input
-                                    name={`inventoryPurchasePriceOverride[${branchInventory.branchId}]`}
-                                    label="Precio de Compra"
-                                    type="number"
-                                    variant="underlined"
-                                    // value={branchInventory.purchasePriceOverride || "0"}
-                                    onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'purchasePriceOverride', e.target.value)}
-                                />
-                                <Input
-                                    name={`inventoryPriceOverride[${branchInventory.branchId}]`}
-                                    label="Precio de Venta"
-                                    type="number"
-                                    variant="underlined"
-                                    // value={branchInventory.priceOverride || "0"}
-                                    onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'priceOverride', e.target.value)}
-                                />
-                            </div>
-
-                            <Button
-                                isIconOnly
-                                radius="full"
-                                size="sm"
-                                color="danger"
-                                onPress={() => handleRemoveBranchForm(branchInventory.branchId)}
-                                className="mt-4"
-                                startContent={<Delete01Icon />}
-                            />
-                        </div>
-                    ))}
-                    <Dropdown>
-                        <DropdownTrigger>
-                            <Button color="primary" radius="full" size="sm" isIconOnly variant="ghost" startContent={<PlusSignIcon />} />
-                        </DropdownTrigger>
-                        <DropdownMenu aria-label="Dynamic Actions" items={availableBranches}>
-                            {(item) => (
-                                <DropdownItem
-                                    key={item.id}
-                                    onPress={() => handleAddBranchForm(item.id)}
-                                >
-                                    {item.name}
-                                </DropdownItem>
-                            )}
-                        </DropdownMenu>
-                    </Dropdown>
+                    <CheckboxGroup className="p-4" orientation="horizontal" name='productType' defaultValue={["FinalProduct"]}>
+                        <Checkbox value="FinalProduct">Producto</Checkbox>
+                        <Checkbox value="Supply">Insumo</Checkbox>
+                        {/* <Checkbox value="RawMaterial">Materia</Checkbox> */}
+                        {/* <Checkbox value="Recipe">Receta/Servicio/Combo</Checkbox> */}
+                    </CheckboxGroup>
                 </div>
             </div>
 

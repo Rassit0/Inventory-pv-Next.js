@@ -1,11 +1,19 @@
 "use client"
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react'
 import React from 'react'
-import { IHandlingUnitResponse } from '@/modules/admin/handling-units'
+import { ISimpleHandlingUnit } from '@/modules/admin/handling-units'
 import { UpdateHanldingUnitModalForm } from '../UpdateHanldingUnitModalForm'
 import { DeleteHandlingUnitModal } from '../DeleteHandlingUnitModal'
 
-export const HanldinglUnitTable = ({ units }: IHandlingUnitResponse) => {
+
+interface Props {
+    editUnit: boolean;
+    deleteUnit: boolean;
+    units: ISimpleHandlingUnit[];
+    token: string;
+}
+
+export const HanldinglUnitTable = ({ deleteUnit, editUnit, units, token }: Props) => {
     return (
         <section className='container pt-8'>
             <Table
@@ -16,7 +24,7 @@ export const HanldinglUnitTable = ({ units }: IHandlingUnitResponse) => {
                     <TableColumn>NOMBRE</TableColumn>
                     <TableColumn>ABREVIACIÓN</TableColumn>
                     <TableColumn>CREADO</TableColumn>
-                    <TableColumn>ACCIONES</TableColumn>
+                    <TableColumn hideHeader={!deleteUnit && !editUnit}>ACCIONES</TableColumn>
                 </TableHeader>
 
                 <TableBody emptyContent={"¡Ups! No encontramos nada aquí."}>
@@ -28,8 +36,8 @@ export const HanldinglUnitTable = ({ units }: IHandlingUnitResponse) => {
                                 <TableCell>{unit.createdAt.toLocaleDateString()}</TableCell>
                                 <TableCell>
                                     <div className="flex">
-                                        <UpdateHanldingUnitModalForm unit={unit} />
-                                        <DeleteHandlingUnitModal unitId={unit.id} />
+                                        {editUnit && (<UpdateHanldingUnitModalForm unit={unit} token={token} />)}
+                                        {deleteUnit && (<DeleteHandlingUnitModal unitId={unit.id} token={token} />)}
                                     </div>
                                 </TableCell>
                             </TableRow>

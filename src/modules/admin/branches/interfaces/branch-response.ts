@@ -1,7 +1,13 @@
 export interface IBranchesResponse {
     branches: IBranch[];
+    meta: IBranchesResponseMeta;
 }
-
+export interface IBranchesResponseMeta {
+    totalItems: number;
+    itemsPerPage: number;
+    totalPages: number;
+    currentPage: number;
+}
 export interface IBranch {
     id: string;
     name: string;
@@ -15,7 +21,7 @@ export interface IBranch {
     isEnable: boolean;
     createdaAt: Date;
     updatedAt: Date;
-    manager: IBranchManager;
+    manager: null | IBranchManager;
     warehouses: IBranchWarehouse[];
 }
 

@@ -11,10 +11,11 @@ import { useRouter } from 'next/navigation'
 
 
 interface Props {
+  token: string;
   users: IUser[]
 }
 
-export const CreateBranchForm = ({ users }: Props) => {
+export const CreateBranchForm = ({ token, users }: Props) => {
 
   const router = useRouter();
 
@@ -22,6 +23,7 @@ export const CreateBranchForm = ({ users }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   // FORM
   const [branchName, setBranchName] = useState('');
+  const [branchLocation, setBranchLocation] = useState('');
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -43,7 +45,7 @@ export const CreateBranchForm = ({ users }: Props) => {
       dataArray.push({ key, value });
     });
     console.log(dataArray)
-    const { error, message, response } = await createBranch(formData);
+    const { error, message, response } = await createBranch(token, formData);
 
     if (error) {
       if (response && Array.isArray(response.message)) {
@@ -106,6 +108,14 @@ export const CreateBranchForm = ({ users }: Props) => {
               label='Ubicación'
               placeholder='Ingrese la ubicación de la Sucursal'
               variant='underlined'
+              value={branchLocation}
+              onChange={(e) => setBranchLocation(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') setBranchLocation(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+              }}
+              onBlur={() => {
+                setBranchLocation(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+              }}
             />
 
             <Input
@@ -115,6 +125,11 @@ export const CreateBranchForm = ({ users }: Props) => {
               placeholder='Agregue un número de telefono'
               variant='underlined'
               startContent={<span className='text-sm text-gray-500'>+591 </span>}
+              validate={(value) => {
+                if (value.length > 8) {
+                  return "El número debe tener 8 dígitos."
+                }
+              }}
             />
 
             <Input

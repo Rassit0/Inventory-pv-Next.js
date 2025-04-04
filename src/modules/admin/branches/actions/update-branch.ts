@@ -9,7 +9,7 @@ interface IResponse {
     message: any;
     response?: any;
 }
-export const updateBranch = async (formData: FormData, branchId: string): Promise<IResponse> => {
+export const updateBranch = async (token:string, formData: FormData, branchId: string): Promise<IResponse> => {
     const file = formData.get("branchImage");
     let imageUrl: string | null = null;
 
@@ -54,6 +54,7 @@ export const updateBranch = async (formData: FormData, branchId: string): Promis
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
             },
             body: JSON.stringify(data),
         });

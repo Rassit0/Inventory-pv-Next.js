@@ -2,25 +2,26 @@
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Select, SelectItem, Tooltip } from '@heroui/react';
 import React, { useState } from 'react'
 import { IBranch } from '@/modules/admin/branches';
-import { IBranchProductInventory, IProduct } from '@/modules/admin/products';
+import { IBranchProductStock, IProduct } from '@/modules/admin/products';
 import { ArrowTurnBackwardIcon, Delete01Icon, PlusSignIcon } from 'hugeicons-react';
 
 
 interface Props {
     branches: IBranch[];
-    branchProductInventory: IBranchProductInventory[]
-    setBranchProductInvetory: (obj: IBranchProductInventory[]) => void;
-    handleBranchInventoryChange: (branchId: string, field: keyof IBranchProductInventory, value: string) => void;
+    branchProductStock: IBranchProductStock[]
+    setBranchProductInvetory: (obj: IBranchProductStock[]) => void;
+    handleBranchInventoryChange: (branchId: string, field: keyof IBranchProductStock, value: string) => void;
     product: IProduct;
     handleRemoveBranchForm: (branchId: string) => void;
     handleAddBranchForm: (branchId: string) => void;
     availableBranches: IBranch[];
+    handlingUnitAbbreviation: string
 }
 
-export const InventoryByBranchForm = ({ branchProductInventory, branches, handleBranchInventoryChange, product, handleRemoveBranchForm, handleAddBranchForm, availableBranches, setBranchProductInvetory }: Props) => {
+export const InventoryByBranchForm = ({ branchProductStock, branches, handleBranchInventoryChange, product, handleRemoveBranchForm, handleAddBranchForm, availableBranches, setBranchProductInvetory, handlingUnitAbbreviation }: Props) => {
 
 
-    const [backupBranchProductInventory, setBackupBranchProductInventory] = useState<IBranchProductInventory[]>(product.branchProductInventory)
+    const [backupBranchProductInventory, setBackupBranchProductInventory] = useState<IBranchProductStock[]>(product.branchProductStock)
     const [countDeleteInventory, setCountDeleteInventory] = useState(0)
 
     const handleRemoveInventoryForm = (branchId: string) => {
@@ -31,7 +32,7 @@ export const InventoryByBranchForm = ({ branchProductInventory, branches, handle
     }
 
     const handleRestoreBackup = () => {
-        setBranchProductInvetory([...backupBranchProductInventory, ...branchProductInventory.filter(invetory =>
+        setBranchProductInvetory([...backupBranchProductInventory, ...branchProductStock.filter(invetory =>
             !backupBranchProductInventory.some(backup => backup.branchId === invetory.branchId)
         )]);
         setCountDeleteInventory(0);
@@ -51,7 +52,7 @@ export const InventoryByBranchForm = ({ branchProductInventory, branches, handle
                         </div>
                     )
                 )}
-                {branchProductInventory.map((branchInventory, index) => (
+                {branchProductStock.map((branchInventory, index) => (
                     <div key={branchInventory.branchId} className="hover:bg-primary-50 rounded-lg p-4">
                         {/* Contenedor de título e indicador */}
                         <div className="flex justify-between items-center">
@@ -60,12 +61,12 @@ export const InventoryByBranchForm = ({ branchProductInventory, branches, handle
                             </h3>
                             {/* Punto verde si hay cambios en los valores */}
                             {(() => {
-                                const originalInventory = product.branchProductInventory.find(inventory => inventory.branchId === branchInventory.branchId);
+                                const originalInventory = product.branchProductStock.find(inventory => inventory.branchId === branchInventory.branchId);
 
                                 if (!originalInventory) return <span className="min-w-3 h-3 bg-green-500 rounded-full"></span>;
 
                                 // Comparar dinámicamente todas las propiedades usando `keyof IBranchProductInventory`
-                                const hasChanges = (Object.keys(branchInventory) as (keyof IBranchProductInventory)[]).some((key) => {
+                                const hasChanges = (Object.keys(branchInventory) as (keyof IBranchProductStock)[]).some((key) => {
                                     const currentValue = branchInventory[key];
                                     const originalValue = originalInventory[key];
 
@@ -92,59 +93,7 @@ export const InventoryByBranchForm = ({ branchProductInventory, branches, handle
                                 variant="underlined"
                                 value={branchInventory.stock}
                                 onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'stock', e.target.value)}
-                            />
-                            <Input
-                                isRequired
-                                min={1}
-                                name={`inventoryMinimumStock[${branchInventory.branchId}]`}
-                                label="Stock Mínimo"
-                                type="number"
-                                variant="underlined"
-                                value={branchInventory.minimumStock}
-                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'minimumStock', e.target.value)}
-                            />
-                            <Input
-                                isRequired
-                                min={1}
-                                name={`inventoryReorderPoint[${branchInventory.branchId}]`}
-                                label="Punto de Reorden"
-                                type="number"
-                                variant="underlined"
-                                value={branchInventory.reorderPoint}
-                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'reorderPoint', e.target.value)}
-                            />
-                            <Select
-                                isRequired
-                                aria-label={`select-${branchInventory.id}`}
-                                name={`inventoryWarehouseId[${branchInventory.branchId}]`}
-                                variant='underlined'
-                                placeholder="Seleccione almacén"
-                                selectedKeys={[branchInventory.warehouseId || '']}
-                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'warehouseId', e.target.value)}
-                            >
-                                {(branches.find(branch => branch.id === branchInventory.branchId)?.warehouses || []).map(warehouse => (
-                                    <SelectItem key={warehouse.id} value={warehouse.id}>
-                                        {warehouse.name}
-                                    </SelectItem>
-                                ))}
-                            </Select>
-
-
-                            <Input
-                                name={`inventoryPurchasePriceOverride[${branchInventory.branchId}]`}
-                                label="Precio de Compra"
-                                type="number"
-                                variant="underlined"
-                                value={branchInventory.purchasePriceOverride || ""}
-                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'purchasePriceOverride', e.target.value)}
-                            />
-                            <Input
-                                name={`inventoryPriceOverride[${branchInventory.branchId}]`}
-                                label="Precio de Venta"
-                                type="number"
-                                variant="underlined"
-                                value={branchInventory.priceOverride || ""}
-                                onChange={(e) => handleBranchInventoryChange(branchInventory.branchId, 'priceOverride', e.target.value)}
+                                endContent={<div className="text-default-400">{handlingUnitAbbreviation}</div>}
                             />
                         </div>
 

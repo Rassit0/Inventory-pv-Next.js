@@ -10,7 +10,13 @@ interface ICreateCategory {
     image?: File | null
 }
 
-export const updateCategory = async (formData: FormData, categoryId: string) => {
+interface Props {
+    formData: FormData;
+    categoryId: string;
+    token: string;
+}
+
+export const updateCategory = async ({ formData, categoryId, token }: Props) => {
 
     const file = formData.get("image");
     let imageUrl: string | null = null;
@@ -54,6 +60,7 @@ export const updateCategory = async (formData: FormData, categoryId: string) => 
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',  // Indicar que el cuerpo es un JSON
+                Authorization: 'Bearer ' + token
             },
             body: JSON.stringify(data)  // Convertir el objeto a una cadena JSON
         });

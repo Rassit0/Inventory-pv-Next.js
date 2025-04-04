@@ -3,12 +3,17 @@
 import { isApiError, valeryClient } from "@/lib/api"
 import { revalidatePath } from "next/cache";
 
-export const deleteProduct = async (id: string) => {
+interface Props {
+    id: string;
+    token: string;
+}
+export const deleteProduct = async ({ id, token }: Props) => {
     try {
         await valeryClient(`/products/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',  // Indicar que el cuerpo es un JSON
+                Authorization: 'Bearer ' + token,
             }
         });
 
@@ -19,7 +24,7 @@ export const deleteProduct = async (id: string) => {
             message: "Se eliminó el producto"
         }
     } catch (error) {
-        if(isApiError(error)){
+        if (isApiError(error)) {
             return {
                 error: true,
                 message: error.message,

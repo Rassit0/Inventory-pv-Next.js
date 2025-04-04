@@ -34,7 +34,7 @@
     }
 
     .sidemenu {
-        @apply absolute z-30 -left-[100%] lg:relative lg:left-0 h-screen flex flex-col pb-8 bg-white px-8 max-w-[340px] w-full border-r border-gray-300 transition-all
+        @apply absolute z-30 -left-[100%] lg:relative lg:left-0 h-screen flex flex-col pb-8 bg-white px-8 max-w-[280px] w-full border-r border-gray-300 transition-all
     }
 
     .sidemenu-show {
@@ -91,6 +91,7 @@
     }
 
     .header {
-        @apply container pt-8 flex flex-col md:flex-row justify-between md:items-center
+        @apply container pt-8 flex flex-row justify-between md:items-center
+        /* @apply container pt-8 flex flex-col md:flex-row justify-between md:items-center */
     }
 }

@@ -3,7 +3,13 @@
 import { valeryClient } from "@/lib/api"
 import { ISupplier, ISupplierResponse } from "@/modules/admin/suppliers";
 
-export const getSuppliers = async (token: string = 'sdf'): Promise<ISupplier[] | null> => {
+interface Props {
+    token: string;
+    page?: number | null;
+    limit?: number | null;
+    search?: string | null;
+}
+export const getSuppliers = async ({token}:Props): Promise<ISupplier[] | null> => {
     try {
         const response = await valeryClient<ISupplierResponse>('/suppliers', {
             headers: {
