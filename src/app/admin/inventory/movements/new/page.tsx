@@ -1,6 +1,7 @@
 import { getAuthUser, hasModuleAccess } from "@/lib";
 import { getBranches } from "@/modules/admin/branches";
-import { CreateTransactionForm } from "@/modules/admin/inventory";
+import { CreateMovementInventoryForm } from "@/modules/admin/inventory";
+import { getPersonsResponse } from "@/modules/admin/persons";
 import { getProducts } from "@/modules/admin/products";
 import { HeaderPage } from "@/modules/admin/shared";
 import { getWarehousesResponse } from "@/modules/admin/warehouses";
@@ -17,6 +18,7 @@ export default async function NewTransactionPage() {
   const productsResponse = await getProducts({ token: authToken, limit: 5, status: 'active' });
   const branchesResponse = await getBranches({ token: authToken });
   const warehousesResponse = await getWarehousesResponse({ token: authToken });
+  const personsResponse = await getPersonsResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
   return (
     <>
       <HeaderPage
@@ -32,11 +34,12 @@ export default async function NewTransactionPage() {
       />
 
       <section className="container pt-8">
-        <CreateTransactionForm
+        <CreateMovementInventoryForm
           token={authToken}
           productsResponse={productsResponse}
           branches={branchesResponse?.branches || []}
           warehouses={warehousesResponse?.warehouses || []}
+          personsResponse={personsResponse || { persons: [], meta: { currentPage: 0, itemsPerPage: 0, totalItems: 0, totalPages: 0 } }}
         />
       </section>
     </>

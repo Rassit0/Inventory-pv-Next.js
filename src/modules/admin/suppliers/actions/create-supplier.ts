@@ -2,11 +2,13 @@
 
 import { isApiError, valeryClient } from "@/lib/api";
 import { revalidatePath } from "next/cache";
+import { ISupplier } from "@/modules/admin/suppliers";
 
 interface IResponse {
     error: boolean;
     message: any;
     response?: any;
+    supplier?: ISupplier;
 }
 
 interface Props {
@@ -16,7 +18,9 @@ interface Props {
 
 export const createSupplier = async ({ token, formData }: Props): Promise<IResponse> => {
     const data = {
-        name: formData.get('supplierName'),
+        type: formData.get('supplierType'),
+        personId: formData.get('supplierPersonId') || undefined,
+        name: formData.get('supplierName') || undefined,
         address: formData.get('supplierAddress'),
         city: formData.get('supplierCity'),
         state: formData.get('supplierState'),
@@ -40,7 +44,7 @@ export const createSupplier = async ({ token, formData }: Props): Promise<IRespo
 
     try {
         // Realizar la solicitud para crear el proveedor
-        await valeryClient('/suppliers', {
+        const response = await valeryClient<{ message: string, supplier: ISupplier }>('/suppliers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -55,6 +59,7 @@ export const createSupplier = async ({ token, formData }: Props): Promise<IRespo
         return {
             error: false,
             message: 'Se guardo el proveedor.',
+            supplier: response.supplier
         }
     } catch (error) {
         if (isApiError(error)) {

@@ -16,7 +16,9 @@ interface Props {
 
 export const updateSupplier = async ({ formData, supplierId, token }: Props): Promise<IResponse> => {
     const data = {
-        name: formData.get('supplierName'),
+        type: formData.get('supplierType'),
+        personId: formData.get('supplierPersonId')||undefined,
+        name: formData.get('supplierName') || undefined,
         address: formData.get('supplierAddress'),
         city: formData.get('supplierCity'),
         state: formData.get('supplierState'),

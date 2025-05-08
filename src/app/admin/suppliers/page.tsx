@@ -1,6 +1,7 @@
 import { getAuthUser, hasModuleAccess, hasPermission } from "@/lib";
+import { getPersonsResponse } from "@/modules/admin/persons";
 import { HeaderPage } from "@/modules/admin/shared";
-import { getSuppliers, SupplierTable } from "@/modules/admin/suppliers";
+import { getSuppliersResponse, SupplierTable } from "@/modules/admin/suppliers";
 import { RoleModulePermission } from "@/modules/auth";
 import { Add01Icon } from "hugeicons-react";
 import { redirect } from "next/navigation";
@@ -12,7 +13,8 @@ export default async function SuppliersPage() {
     // Verificar acceso al módulo "branches"
     if (!hasModuleAccess({ user, moduleName: "SUPPLIERS", permissions: [RoleModulePermission.Read] })) redirect("/403");
 
-    const suppliers = await getSuppliers({ token: authToken });
+    const suppliersResponse = await getSuppliersResponse({ token: authToken, limit: 10 });
+        const personsResponse = await getPersonsResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
     return (
         <>
             <HeaderPage
@@ -34,13 +36,14 @@ export default async function SuppliersPage() {
             />
 
             {/* TABLA PROVEEDORES */}
-            <SupplierTable
+            {suppliersResponse && (<SupplierTable
                 token={authToken}
                 editContact={hasPermission(user, "SUPPLIERS_CONTACTS", RoleModulePermission.Edit)}
                 editSupplier={hasPermission(user, "SUPPLIERS", RoleModulePermission.Edit)}
                 deleteSupplier={hasPermission(user, "SUPPLIERS", RoleModulePermission.Delete)}
-                suppliers={suppliers || []}
-            />
+                itemsResponse={suppliersResponse}
+                personsResponse={personsResponse || { persons: [], meta: { currentPage: 0, itemsPerPage: 0, totalItems: 0, totalPages: 0 } }}
+            />)}
         </>
     );
 }

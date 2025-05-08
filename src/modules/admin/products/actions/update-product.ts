@@ -55,9 +55,9 @@ export const updateProduct = async ({ formData, productId, token }: Props) => {
         categories: formData.getAll("categoryIds").map(categoryId => (
             { id: categoryId }
         )),
-        suppliersProduct: formData.getAll("supplierIds").map(supplierId => (
-            { supplierId: supplierId }
-        )),
+        // suppliersProduct: formData.getAll("supplierIds").map(supplierId => (
+        //     { supplierId: supplierId }
+        // )),
         // branchProductInventory: formData.getAll("branchesIds").map(branchId => ({
         //     branchId: branchId,
         //     stock: Number(formData.get(`inventoryStock[${branchId}]`)).toFixed(2),

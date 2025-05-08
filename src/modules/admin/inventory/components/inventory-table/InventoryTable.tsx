@@ -1,6 +1,6 @@
 'use client'
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ChangeStatusModal, DetailsModal, getMovementsResponse, ITransaction, IMovementsResponse } from '@/modules/admin/inventory';
+import { ChangeStatusModal, DetailsModal, EMovementStatus, EMovementType, getMovementsResponse, IMovement, IMovementsResponse } from '@/modules/admin/inventory';
 import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, SharedSelection, SortDescriptor, Spinner, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { usePathname } from 'next/navigation';
 import { ArrowDown01Icon, Search01Icon } from 'hugeicons-react';
@@ -86,7 +86,7 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
     const [visibleColumns, setVisibleColumns] = useState<SharedSelection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState<SharedSelection>("all")
     const [movementFilter, setMovementFilter] = useState<SharedSelection>(new Set(['INCOME']))
-    const [itemsPerPage, setItemsPerPage] = useState<number>(movementsResponse.transactions.length);
+    const [itemsPerPage, setItemsPerPage] = useState<number>(movementsResponse.movements.length);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(movementsResponse.meta.totalPages);
     const headerColumns = useMemo(() => {
@@ -129,10 +129,10 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
                 page: page,
                 status: Array.from(statusFilter).length === statusOptions.length || statusFilter === "all"
                     ? null
-                    : (Array.from(statusFilter) as ("PENDING" | "ACCEPTED" | "CANCELED" | "COMPLETED")[]),
+                    : (Array.from(statusFilter) as EMovementStatus[]),
                 movementType: Array.from(movementFilter).length === movementOptions.length || movementFilter === "all"
                     ? null
-                    : (Array.from(movementFilter) as ("INCOME" | "OUTCOME" | "ADJUSTMENT" | "TRANSFER")[]),
+                    : (Array.from(movementFilter) as EMovementType[]),
                 orderBy: sortDescriptor.direction === 'ascending' ? 'asc' : 'desc',
                 columnOrderBy: sortDescriptor.column ? sortDescriptor.column as 'createdAt' | 'updatedAt' | null : undefined
             });
@@ -271,7 +271,7 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
                         <select
                             className="bg-transparent outline-none text-default-400 text-small"
                             onChange={onRowsPerPageChange}
-                            defaultValue={transactionsFilteredResponse.transactions.length}
+                            defaultValue={transactionsFilteredResponse.movements.length}
                         >
                             <option value="5">5</option>
                             <option value="10">10</option>
@@ -287,7 +287,7 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
         movementFilter,
         visibleColumns,
         onRowsPerPageChange,
-        transactionsFilteredResponse.transactions.length,
+        transactionsFilteredResponse.movements.length,
         onSearchChange,
         hasSearchFilter,
     ]);
@@ -296,7 +296,7 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
         return (
             <div className="py-2 px-2 flex justify-between items-center">
                 <span className="w-[30%] text-small text-default-400">
-                    {`${transactionsFilteredResponse.transactions.length} de ${transactionsFilteredResponse.meta.totalItems} transacciones`}
+                    {`${transactionsFilteredResponse.movements.length} de ${transactionsFilteredResponse.meta.totalItems} movimientos`}
                 </span>
                 <Pagination
                     isCompact
@@ -320,28 +320,28 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
     }, [transactionsFilteredResponse, page, totalPages, hasSearchFilter]);
 
     // RENDERIZAR CELDA
-    const renderCell = useCallback((transaction: ITransaction, columnKey: keyof ITransaction) => {
+    const renderCell = useCallback((movement: IMovement, columnKey: keyof IMovement) => {
 
         switch (columnKey as string) {
             case "entryDate":
-                return transaction.entryDate ? transaction.entryDate.toLocaleString() : <div className='text-default-400'>N/A</div>;
+                return movement.deliveryDate ? movement.deliveryDate.toLocaleString() : <div className='text-default-400'>N/A</div>;
             case "createdAt":
-                return transaction.createdAt.toLocaleString();
+                return movement.createdAt.toLocaleString();
             case "movementType":
-                return transaction.movementType !== 'ADJUSTMENT' ? movementTypeMap[transaction.movementType] : movementTypeMap[transaction.movementType]+' de '+movementTypeMap[transaction.adjustmentType!];
+                return movement.movementType !== 'ADJUSTMENT' ? movementTypeMap[movement.movementType] : movementTypeMap[movement.movementType]+' de '+movementTypeMap[movement.adjustment!.adjustmentType];
             case "status":
                 return (
                     <ChangeStatusModal
                         token={token}
-                        colorButton={statusColorMap[transaction.status] ?? 'default'}
-                        title={statusOptions.find(status => status.uid === transaction.status)?.name || ''}
-                        transaction={transaction}
+                        colorButton={statusColorMap[movement.status] ?? 'default'}
+                        title={statusOptions.find(status => status.uid === movement.status)?.name || ''}
+                        movement={movement}
                     />
                 )
             case "actions":
                 return (
                     <div className="flex justify-center">
-                        <DetailsModal transaction={transaction} />
+                        <DetailsModal movement={movement} />
                     </div>
                 );
 
@@ -375,10 +375,10 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
                     )}
                 </TableHeader>
 
-                <TableBody loadingContent={<Spinner />} loadingState={isLoading ? 'loading' : 'filtering'} emptyContent={"¡Ups! No encontramos nada aquí."} items={transactionsFilteredResponse.transactions}>
+                <TableBody loadingContent={<Spinner />} loadingState={isLoading ? 'loading' : 'filtering'} emptyContent={"¡Ups! No encontramos nada aquí."} items={transactionsFilteredResponse.movements}>
                     {(items) => (
                         <TableRow key={items.id}>
-                            {(columnKey) => <TableCell>{renderCell(items, columnKey as keyof ITransaction)}</TableCell>}
+                            {(columnKey) => <TableCell>{renderCell(items, columnKey as keyof IMovement)}</TableCell>}
                         </TableRow>
                     )}
                 </TableBody>

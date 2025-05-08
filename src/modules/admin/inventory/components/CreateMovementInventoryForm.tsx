@@ -1,6 +1,6 @@
 "use client"
 import { Button, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, Select, SelectItem, SharedSelection, Switch, Textarea, Tooltip, useDisclosure } from '@heroui/react'
-import React, { FormEvent, useEffect, useState } from 'react'
+import React, { FormEvent, useEffect, useRef, useState } from 'react'
 import { ISupplierContactInfo } from '@/modules/admin/suppliers';
 import { Add01Icon, ArrowDown01Icon, CheckmarkCircle01Icon, Delete01Icon, PlusSignIcon } from 'hugeicons-react';
 import { toast } from 'sonner';
@@ -11,7 +11,8 @@ import { IWarehouse, SelectAutocompleteWarehouses } from '@/modules/admin/wareho
 import Image from 'next/image';
 import no_image from '@/assets/no_image.png';
 import warning_error_image from '@/assets/warning_error.png';
-import { createTransaction } from '@/modules/admin/inventory';
+import { createMovement } from '@/modules/admin/inventory';
+import { IPersonsResponse, SelectPersonAndCreate } from '@/modules/admin/persons';
 
 
 interface Contact {
@@ -25,11 +26,13 @@ interface Props {
     productsResponse: IProductsResponse
     branches: IBranch[];
     warehouses: IWarehouse[];
+    personsResponse: IPersonsResponse
 }
 
-export const CreateTransactionForm = ({ token, productsResponse, branches, warehouses }: Props) => {
+export const CreateMovementInventoryForm = ({ token, productsResponse, branches, warehouses, personsResponse }: Props) => {
     const router = useRouter();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const formRef = useRef<HTMLFormElement>(null);
 
     // CONTROL DE LAS IMAGENES QUE TIENEN ERROR AL CARGAR
     const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
@@ -48,7 +51,8 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
     const [contacts, setContacts] = useState<ISupplierContactInfo[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     // FORM
-    const [transactionType, setTransactionType] = useState<string>("INCOME");
+    const [movementType, setTransactionType] = useState<string>("INCOME");
+    const [managerDeliveryType, setManagerDeliveryType] = useState<string>("supplier");
     const [adjustmentType, setAdjustmentType] = useState<string>("");
     const [selectOrigin, setSelectOrigin] = useState<string>('')
     const [selectDestiny, setSelectDestiny] = useState<string>('')
@@ -61,31 +65,32 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
     useEffect(() => {
         setSelectDestiny('');
         setSelectOrigin('');
-        if (transactionType === 'OUTCOME') {
+        if (movementType === 'OUTCOME') {
             setSelectOrigin('branch');
         }
-        if (transactionType !== 'ADJUSTMENT') {
+        if (movementType !== 'ADJUSTMENT') {
             setAdjustmentType('')
         }
         setSelectedBranchOrigin(null)
         setSelectedWarehouseOrigin(null)
         setSelectedBranchDestiny(null)
         setSelectedWarehouseDestiny(null)
-    }, [transactionType])
+    }, [movementType])
 
 
 
     // useEffect(() => {
-    //     if (transactionType !== 'ADJUSTMENT') {
+    //     if (movementType !== 'ADJUSTMENT') {
     //         setAdjustmentType('')
     //     }
-    // }, [transactionType])
+    // }, [movementType])
 
     // Form de stock por products
     // Productos removidos de la tabla
     const [removedProductsTable, setRemovedProductsTable] = useState<IProduct[]>([]);
 
     useEffect(() => {
+        console.log(selectedWarehouseOrigin)
         /// Filtrar productos solo si hay sucursal o almacén seleccionado
         const filteredProducts = removedProductsTable.filter(p => {
             const hasBranchStock = selectedBranchOrigin ?
@@ -108,8 +113,8 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
 
     }, [selectOrigin])
 
-    const handleOpenModatProductsTable = () =>{
-        if(!selectedBranchOrigin&&!selectedWarehouseOrigin&&(transactionType==='TRANSFER'||(adjustmentType==='OUTCOME'))){
+    const handleOpenModatProductsTable = () => {
+        if (!selectedBranchOrigin && !selectedWarehouseOrigin && (movementType === 'TRANSFER' || (adjustmentType === 'OUTCOME'))) {
             toast.error("Debe seleccionar una sucursal o almacén de origen");
             return
         }
@@ -122,9 +127,11 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
         setRemovedProductsTable((prev) => prev.filter((p) => p.id !== productId)); // Quita de eliminados
     };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async () => {
+        // e.preventDefault();
 
+        if (!formRef.current) return;
         setIsLoading(true);
 
         if (removedProductsTable.length <= 0) {
@@ -141,12 +148,12 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
 
         let hasError = false;
         removedProductsTable.forEach(p => {
-            if (!selectDestiny && (transactionType === 'INCOME' || transactionType === 'TRANSFER' || (transactionType === 'ADJUSTMENT' && adjustmentType === 'INCOME'))) {
+            if (!selectDestiny && (movementType === 'INCOME' || movementType === 'TRANSFER' || (movementType === 'ADJUSTMENT' && adjustmentType === 'INCOME'))) {
                 toast.error(`Debe seleccionar el destino del producto: ${p.name}`)
                 hasError = true;
             }
 
-            if (!selectOrigin && (transactionType === 'ADJUSTMENT' && adjustmentType === 'OUTCOME' || transactionType === 'TRANSFER')) {
+            if (!selectOrigin && (movementType === 'ADJUSTMENT' && adjustmentType === 'OUTCOME' || movementType === 'TRANSFER')) {
                 toast.error(`Debe seleccionar el origen del producto: ${p.name}`)
                 hasError = true;
             }
@@ -160,14 +167,14 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
 
         setIsLoading(false);
 
-        const formData = new FormData(e.currentTarget);
-        // const dataArray: any[] = [];
-        // formData.forEach((value, key) => {
-        //     dataArray.push({ key, value });
-        // });
-        // console.log(dataArray)
+        const formData = new FormData(formRef.current);
+        const dataArray: any[] = [];
+        formData.forEach((value, key) => {
+            dataArray.push({ key, value });
+        });
+        console.log(dataArray)
         // return;
-        const { error, message, response } = await createTransaction({ token, formData });
+        const { error, message, response } = await createMovement({ token, formData });
         if (error) {
             if (response && Array.isArray(response.message)) {
                 // Itera sobre cada mensaje en response.message y muestra un toast para cada uno
@@ -196,6 +203,7 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
     }
     return (
         <Form
+            ref={formRef}
             validationBehavior='native'
             className="bg-white px-6 pt-8 pb-12 shadow-md hover:shadow-lg rounded space-y-6"
             onSubmit={handleSubmit}
@@ -208,21 +216,42 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
                     startContent={<Add01Icon />}
                     radius='full'
                     variant='light'
-                    // isDisabled={(transactionType === 'TRANSFER' || adjustmentType === 'OUTCOME') && (selectedBranchOrigin === null && selectedWarehouseOrigin === null) ? true : false}
+                // isDisabled={(movementType === 'TRANSFER' || adjustmentType === 'OUTCOME') && (selectedBranchOrigin === null && selectedWarehouseOrigin === null) ? true : false}
                 ><div className='hidden sm:flex'>Producto</div></Button>
             </div>
 
             {/* <div className='w-full grid grid-cols-1 md:grid-cols-2 gap-4'> */}
             <div className='w-full grid grid-cols-1 gap-4'>
                 <div className="w-full">
-                    <h2 className='font-semibold'>Datos generales</h2>
+                    {/* <h2 className='font-semibold'>Datos generales</h2> */}
 
                     <div className="grid grid-cols-1 gap-4">
                         <div className='w-full'>
                             <RadioGroup
                                 isRequired
-                                name='movementTypeTransaction'
-                                value={transactionType}
+                                name='managerDeliveryType'
+                                value={managerDeliveryType}
+                                onValueChange={setManagerDeliveryType}
+                                classNames={{
+                                    label: "text-small"
+                                }}
+                                size='sm' label="Tipo de transacción" orientation="horizontal">
+                                <Radio value="supplier">Proveedor</Radio>
+                                {/* <Radio value="OUTCOME">Salida</Radio> */}
+                                <Radio value="person">Persona</Radio>
+                            </RadioGroup>
+                            {
+                                managerDeliveryType === 'supplier' ?
+                                    <></>
+                                    :
+                                    <SelectPersonAndCreate token={token} name='selectPerson' personsResponse={personsResponse} />
+                            }
+                        </div>
+                        <div className='w-full'>
+                            <RadioGroup
+                                isRequired
+                                name='movementType'
+                                value={movementType}
                                 onValueChange={setTransactionType}
                                 classNames={{
                                     label: "text-small"
@@ -234,11 +263,11 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
                                 <Radio value="TRANSFER">Transferencia</Radio>
                             </RadioGroup>
                         </div>
-                        {transactionType === 'ADJUSTMENT' && (<div className='w-full'>
+                        {movementType === 'ADJUSTMENT' && (<div className='w-full'>
                             <RadioGroup
                                 isRequired
                                 color='success'
-                                name='adjustmentTypeTransaction'
+                                name='movementAdjustmentType'
                                 value={adjustmentType}
                                 onValueChange={setAdjustmentType}
                                 classNames={{
@@ -253,7 +282,7 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
                         <div className='w-full bg-primary-50 rounded-lg'>
                             <div className='flex justify-between'>
                                 <div>
-                                    {(transactionType === 'TRANSFER' || adjustmentType === 'OUTCOME') && (<Dropdown
+                                    {(movementType === 'TRANSFER' || adjustmentType === 'OUTCOME') && (<Dropdown
                                         size='sm'
                                     >
                                         <DropdownTrigger className="flex">
@@ -279,7 +308,7 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
                                     </Dropdown>)}
                                 </div>
                                 <div>
-                                    {(transactionType === 'TRANSFER' || transactionType === 'INCOME' || transactionType === 'ADJUSTMENT' && adjustmentType === 'INCOME') && (<Dropdown
+                                    {(movementType === 'TRANSFER' || movementType === 'INCOME' || movementType === 'ADJUSTMENT' && adjustmentType === 'INCOME') && (<Dropdown
                                         size='sm'
                                     >
                                         <DropdownTrigger className="flex">
@@ -305,15 +334,15 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
                                     </Dropdown>)}
                                 </div>
                             </div>
-                            <div className='grid grid-cols-1 md:grid-cols-2 mt-1'>
-                                {(transactionType === "TRANSFER" || transactionType === "OUTCOME" || adjustmentType === 'OUTCOME') && (
+                            <div className='grid grid-cols-1 md:grid-cols-2 mt-1 md:gap-4'>
+                                {(movementType === "TRANSFER" || movementType === "OUTCOME" || adjustmentType === 'OUTCOME') && (
                                     <>
 
                                         {selectOrigin === "warehouse" && (
-                                            <div className={transactionType === "OUTCOME" || adjustmentType === 'OUTCOME' ? 'col-span-full' : ''}>
+                                            <div className={movementType === "OUTCOME" || adjustmentType === 'OUTCOME' ? 'col-span-full' : ''}>
                                                 <SelectAutocompleteWarehouses
                                                     label="Almacén Origen"
-                                                    name="warehouseOriginIdTransaction"
+                                                    name="movementWarehouseOriginId"
                                                     isRequired={true}
                                                     warehouses={warehouses}
                                                     selectedWarehouse={selectedWarehouseOrigin}
@@ -323,10 +352,10 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
                                         )}
 
                                         {selectOrigin === "branch" && (
-                                            <div className={transactionType === "OUTCOME" || adjustmentType === 'OUTCOME' ? 'col-span-full' : ''}>
+                                            <div className={movementType === "OUTCOME" || adjustmentType === 'OUTCOME' ? 'col-span-full' : ''}>
                                                 <SelectAutocompleteBranches
                                                     label="Sucursal Origen"
-                                                    name="branchOriginIdTransaction"
+                                                    name="movementBranchOriginId"
                                                     isRequired
                                                     branches={branches}
                                                     selectedBranch={selectedBranchOrigin}
@@ -337,13 +366,13 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
                                     </>
                                 )}
 
-                                {(transactionType === 'TRANSFER' || transactionType === 'INCOME' || transactionType === 'ADJUSTMENT' && adjustmentType === 'INCOME') && (
+                                {(movementType === 'TRANSFER' || movementType === 'INCOME' || movementType === 'ADJUSTMENT' && adjustmentType === 'INCOME') && (
                                     <>
                                         {selectDestiny === "warehouse" && (
-                                            <div className={transactionType === 'INCOME' || adjustmentType === 'INCOME' ? 'col-span-full' : ''}>
+                                            <div className={movementType === 'INCOME' || adjustmentType === 'INCOME' ? 'col-span-full' : ''}>
                                                 <SelectAutocompleteWarehouses
                                                     label="Almacén Destino"
-                                                    name="warehouseDestinyIdTransaction"
+                                                    name="movementDestinationWarehouseId"
                                                     isRequired={true}
                                                     warehouses={warehouses}
                                                     selectedWarehouse={selectedWarehouseDestiny}
@@ -353,10 +382,10 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
                                         )}
 
                                         {selectDestiny === "branch" && (
-                                            <div className={transactionType === 'INCOME' || adjustmentType === 'INCOME' ? 'col-span-full' : ''}>
+                                            <div className={movementType === 'INCOME' || adjustmentType === 'INCOME' ? 'col-span-full' : ''}>
                                                 <SelectAutocompleteBranches
                                                     label="Sucursal Destino"
-                                                    name="branchDestinyIdTransaction"
+                                                    name="movementDestinationBranchId"
                                                     isRequired
                                                     branches={branches}
                                                     selectedBranch={selectedBranchDestiny}
@@ -370,24 +399,24 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
                             </div>
                         </div>
 
-                        {(transactionType === 'INCOME' || transactionType === 'TRANSFER' || adjustmentType === 'INCOME') && (
+                        {(movementType === 'INCOME' || movementType === 'TRANSFER' || adjustmentType === 'INCOME') && (
                             <DatePicker
                                 isRequired
-                                name="entryDateTransaction"
+                                name="movementDeliveryDate"
                                 label="Fecha de ingreso"
                                 variant="underlined"
                             />
                         )}
 
                         <Textarea
-                            key={transactionType}
-                            isRequired={transactionType === 'ADJUSTMENT'}
-                            name='descriptionTransaction'
+                            key={movementType}
+                            isRequired={movementType === 'ADJUSTMENT'}
+                            name='movementDescription'
                             disableAnimation
                             disableAutosize
                             variant='underlined'
                             label='Descripción'
-                            errorMessage={transactionType === 'ADJUSTMENT' ? 'La descripción es obligatoria para ajustes de inventario' : ''}
+                            errorMessage={movementType === 'ADJUSTMENT' ? 'La descripción es obligatoria para ajustes de inventario' : ''}
                         />
 
                         <div className='space-y-4'>
@@ -466,7 +495,8 @@ export const CreateTransactionForm = ({ token, productsResponse, branches, wareh
             </div>
 
             <Button
-                type='submit'
+                type='button'
+                onPress={handleSubmit}
                 color='primary'
                 isLoading={isLoading}
                 isDisabled={isLoading}

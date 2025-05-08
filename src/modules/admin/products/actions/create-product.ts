@@ -43,7 +43,7 @@ export const createProduct = async ({ formData, token }: Props) => {
         typesProduct: formData.getAll("productType"),
         // price: Number(formData.get("productPrice")).toFixed(2),
         unitId: formData.get("productUnitId"),
-        imageUrl: imageUrl,
+        imageUrl,
         // lastSaleDate: null,
         minimumStock: Number(formData.get('minimumStockProduct')).toFixed(2),
         reorderPoint: Number(formData.get('reorderPointProduct')).toFixed(2),
@@ -53,9 +53,9 @@ export const createProduct = async ({ formData, token }: Props) => {
         categories: formData.getAll("categoryIds").map(categoryId => (
             { id: categoryId }
         )),
-        suppliersProduct: formData.getAll("supplierIds").map(supplierId => (
-            { supplierId: supplierId }
-        )),
+        // suppliersProduct: formData.getAll("supplierIds").map(supplierId => (
+        //     { supplierId: supplierId }
+        // )),
         // branchProductInventory: formData.getAll("branchesIds").map(branchId => ({
         //     branchId: branchId,
         //     stock: Number(formData.get(`inventoryStock[${branchId}]`)).toFixed(2),

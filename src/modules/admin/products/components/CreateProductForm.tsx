@@ -14,14 +14,17 @@ import { IBranch } from "@/modules/admin/branches";
 import { ImageUploaderInput } from "@/modules/admin/shared";
 import { useSessionStore } from "@/modules/auth";
 import { ISupplier } from "@/modules/admin/suppliers";
+import { IPersonsResponse, SelectMultipleSearchPersonsAndCreate } from "@/modules/admin/persons";
 
 
 interface Props {
-    products: IProduct[],
-    categories: ISimpleCategory[],
-    handlingUnits: ISimpleHandlingUnit[],
+    token: string;
+    products: IProduct[];
+    categories: ISimpleCategory[];
+    handlingUnits: ISimpleHandlingUnit[];
     branches: IBranch[];
     suppliers: ISupplier[];
+    personsResponse: IPersonsResponse
 }
 
 interface SelectedProduct {
@@ -29,9 +32,7 @@ interface SelectedProduct {
     quantity: number;
 }
 
-export const CreateProductForm = ({ products, categories, handlingUnits, branches, suppliers }: Props) => {
-
-    const { token } = useSessionStore();
+export const CreateProductForm = ({ token, products, categories, handlingUnits, branches, suppliers, personsResponse }: Props) => {
 
     //Form
     const [productName, setProductName] = useState('');
@@ -166,7 +167,7 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
         >
             <h2 className="text-2xl font-semibold">Formulario</h2>
 
-            <div className="grid md:grid-cols-3 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-3 w-full">
                 <div className="w-full gap-4 p-2 md:col-span-1">
                     <h2 className="font-semibold">Imagen de presentación</h2>
                     <div className='flex flex-col justify-between h-full pb-4'>
@@ -175,7 +176,7 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                 </div>
                 <div className="w-full md:col-span-2">
                     <h2 className="font-semibold">Datos generales</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2 w-full">
                         <Input
                             isRequired
                             name="productName"
@@ -250,7 +251,7 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                             }
                         </Select>
 
-                        <Select
+                        {/* <Select
                             // isRequired
                             name="supplierIds"
                             label="Proveedor(s)"
@@ -263,7 +264,7 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                                     <SelectItem key={supplier.id}>{supplier.name}</SelectItem>
                                 ))
                             }
-                        </Select>
+                        </Select> */}
 
                         <Input
                             isRequired
@@ -300,28 +301,41 @@ export const CreateProductForm = ({ products, categories, handlingUnits, branche
                                 setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
                             }}
                         /> */}
-                        <Textarea
-                            // key={productDescription}
-                            // disableAnimation
-                            // disableAutosize
-                            name="productDescription"
-                            classNames={{
-                                // base: "max-w-xs",
-                                input: "resize-y min-h-[20px]",
-                              }}
-                            label="Descripción"
-                            labelPlacement="outside"
-                            placeholder="Agrega una descripción"
-                            variant='underlined'
-                            value={productDescription}
-                            onChange={(e) => setProductDescription(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === ' ' || e.key === 'Enter') setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
-                            }}
-                            onBlur={() => {
-                                setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
-                            }}
-                        />
+                        <div className="md:col-span-3">
+                            <Textarea
+                                // key={productDescription}
+                                // disableAnimation
+                                // disableAutosize
+                                name="productDescription"
+                                classNames={{
+                                    // base: "max-w-xs",
+                                    input: "resize-y min-h-[20px]",
+                                }}
+                                label="Descripción"
+                                labelPlacement="outside"
+                                placeholder="Agrega una descripción"
+                                variant='underlined'
+                                value={productDescription}
+                                onChange={(e) => setProductDescription(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === ' ' || e.key === 'Enter') setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+                                }}
+                                onBlur={() => {
+                                    setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+                                }}
+                            />
+                        </div>
+                        <div className="md:col-span-3">
+                            <SelectMultipleSearchPersonsAndCreate
+                                isRequired
+                                personsResponse={personsResponse}
+                                token={token}
+                                label='Proveedor personal'
+                                autoFocus={false}
+                                create={true}
+                                name='productPersonSuppliers'
+                            />
+                        </div>
                         {/* <DatePicker
                             name="productLaunchDate"
                             label="Fecha de ingreso"

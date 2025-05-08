@@ -1,14 +1,14 @@
 "use server"
 
 import { valeryClient } from "@/lib/api"
-import { ITransaction, IMovementsResponse } from "@/modules/admin/inventory";
+import { EMovementStatus, EMovementType, IMovement, IMovementsResponse } from "@/modules/admin/inventory";
 
 interface Props {
     token: string;
     page?: number | null;
     limit?: number | null;
-    status?: ("PENDING" | "ACCEPTED" | "CANCELED" | "COMPLETED")[] | null;
-    movementType?: ("INCOME" | "OUTCOME" | "ADJUSTMENT" | "TRANSFER")[] | null;
+    status?: EMovementStatus[] | null;
+    movementType?: EMovementType[] | null;
     orderBy?: 'asc' | 'desc' | null
     columnOrderBy?: 'createdAt' | 'updatedAt' | null
 }
@@ -34,10 +34,8 @@ export const getMovementsResponse = async ({ token, limit, page, status, columnO
         if (columnOrderBy) searchParams.append('columnOrderBy', columnOrderBy);
 
         // Construir la URL con los parámetros de consulta
-        const url = '/inventory/transaction?' + searchParams.toString();
+        const url = '/inventory/movements?' + searchParams.toString();
         
-        console.log(url)
-
         const response = await valeryClient<IMovementsResponse>(url, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -45,21 +43,21 @@ export const getMovementsResponse = async ({ token, limit, page, status, columnO
         });
 
         // COnvertir las fechas a objeros Date
-        const transactions = response.transactions.map((transaction: ITransaction) => ({
-            ...transaction,
-            ...(transaction.entryDate && { entryDate: new Date(transaction.entryDate) }),
-            createdAt: new Date(transaction.createdAt),
-            updatedAt: new Date(transaction.updatedAt)
+        const movements = response.movements.map((movement: IMovement) => ({
+            ...movement,
+            ...(movement.deliveryDate && { deliveryDate: new Date(movement.deliveryDate) }),
+            createdAt: new Date(movement.createdAt),
+            updatedAt: new Date(movement.updatedAt)
         }));
 
         return {
-            transactions,
+            movements,
             meta: response.meta
         };
     } catch (error) {
         console.log(error);
         return {
-            transactions: [],
+            movements: [],
             meta: {
                 currentPage: 1,
                 itemsPerPage: 0,

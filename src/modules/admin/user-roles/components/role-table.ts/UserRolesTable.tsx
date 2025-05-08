@@ -13,8 +13,10 @@ export const UserRolesTable = ({ roles }: Props) => {
         'READ': 'leer',
         'WRITE': 'escribir',
         'EDIT': 'editar',
-        'DELETE': 'eliminar',
+        'DELETE': 'eliminar (lógico)',
         'MANAGE': 'gestionar',
+        'RESTORE': 'restaurar',
+        'DELETE_PHYSICAL': 'eliminar (físico)',
     };
 
     const moduleMap = {
@@ -41,6 +43,8 @@ export const UserRolesTable = ({ roles }: Props) => {
         'HOME': 'Inicio',
         'NOTIFICATIONS': 'Notificaciones',
         'NOTIFICATIONS_LOW_STOCK': 'Stock Bajo',
+        'PERSONS': 'Personas',
+        'PRODUCTION_ORDERS': 'Ordenes de Producción'
     };
     return (
         <section className='container pt-8'>

@@ -28,16 +28,13 @@ export const NavMenuUser = () => {
             <Dropdown placement="bottom-start">
                 <DropdownTrigger>
                     <div className="flex gap-2 items-center cursor-pointer">
-                        <div className='min-w-10'>
+                        <div className='min-w-10 w-[35px] h-[35px] relative'>
                             <Image
+                                fill
                                 src={imageError ? warning_error_image : previewImage || no_image}
                                 alt='Vista previa'
                                 sizes="35px"
-                                style={{
-                                    width: '100%',
-                                    height: 'auto',
-                                }}
-                                className='rounded-lg object-contain'
+                                className='rounded-full object-contain'
                                 onError={() => setImageError(true)}
                             />
                         </div>

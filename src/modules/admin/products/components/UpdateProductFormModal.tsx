@@ -251,7 +251,7 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                                     }
                                                 </Select>
 
-                                                <Select
+                                                {/* <Select
                                                     // isRequired
                                                     name="supplierIds"
                                                     label="Proveedor(s)"
@@ -265,7 +265,7 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                                             <SelectItem key={supplier.id}>{supplier.name}</SelectItem>
                                                         ))
                                                     }
-                                                </Select>
+                                                </Select> */}
 
                                                 <Input
                                                     isRequired

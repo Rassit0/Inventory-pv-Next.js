@@ -5,7 +5,7 @@ import { getCategories } from "@/modules/admin/categories";
 import { getHandlingUnits } from "@/modules/admin/handling-units";
 import { getProducts, ProductTable } from "@/modules/admin/products";
 import { HeaderPage } from "@/modules/admin/shared";
-import { getSuppliers } from "@/modules/admin/suppliers";
+import { getSuppliersResponse } from "@/modules/admin/suppliers";
 import { getWarehousesResponse } from "@/modules/admin/warehouses";
 import { RoleModulePermission } from "@/modules/auth";
 import { Add01Icon } from "hugeicons-react";
@@ -22,7 +22,7 @@ export default async function ProductsPage() {
   const categories = await getCategories({ token: authToken });
   const handlingUnits = await getHandlingUnits({ token: authToken });
   const branchesResponse = await getBranches({ token: authToken });
-  const suppliers = await getSuppliers({ token: authToken });
+  const suppliers = await getSuppliersResponse({ token: authToken });
 
 
 

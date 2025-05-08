@@ -1,17 +1,17 @@
 
 // ACTIONS
 export { createSupplier } from '../suppliers/actions/create-supplier';
-export { changeStatusTransaction } from './actions/change-status-transaction';
+export { changeStatusMovement } from './actions/change-status-movement';
 export { getMovementsResponse } from './actions/get-movements-response';
-
 // COMPONENTS
 export { ChangeStatusModal } from './components/inventory-table/ChangeStatusModal';
-export { createTransaction } from './actions/create-transaction';
-export { CreateTransactionForm } from './components/CreateTransactionForm';
+export { ConfirmQuantitiesChecked } from './components/inventory-table/ConfirmQuantitiesChecked';
+export { createMovement } from './actions/create-movement';
+export { CreateMovementInventoryForm } from './components/CreateMovementInventoryForm';
+export { ConfirmQuantities } from './components/inventory-table/ConfirmQuantities';
 export { DetailsModal } from './components/inventory-table/DetailsModal';
 export { InventoryMovementsTable } from './components/inventory-table/InventoryTable';
 
 // INTERFACES
-export { ITransactionMovementType } from './interfaces/movements-response';
-export type { IMovementsResponse, Branch, ITransaction, IMovementsResponseMeta, InventoryMovementProduct } from './interfaces/movements-response';
-export { Status } from './interfaces/movements-response';
+export { EAdjustmentType, EDeliveryStatusDetail, EMovementStatus, EMovementType } from './interfaces/movements-response';
+export type { IMovementsResponse, IMovement, IMovementAdjustment, IMovementBranchOrWarehouse, IMovementDetail, IMovementsResponseMeta, IMovmentDetailProduct } from './interfaces/movements-response';

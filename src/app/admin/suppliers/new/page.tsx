@@ -1,4 +1,5 @@
 import { getAuthUser, hasModuleAccess, hasPermission } from "@/lib";
+import { getPersonsResponse } from "@/modules/admin/persons";
 import { HeaderPage } from "@/modules/admin/shared";
 import { CreateSupplierForm } from "@/modules/admin/suppliers";
 import { RoleModulePermission } from "@/modules/auth";
@@ -10,6 +11,7 @@ export default async function NewSupplierPage() {
     const { user, authToken } = await getAuthUser();
     // Verificar acceso al módulo "branches"
     if (!hasModuleAccess({ user, moduleName: "SUPPLIERS_CONTACTS", permissions: [RoleModulePermission.Write] })) redirect("/403");
+    const personsResponse = await getPersonsResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
     return (
         <>
             <HeaderPage
@@ -28,6 +30,7 @@ export default async function NewSupplierPage() {
                 <CreateSupplierForm
                     token={authToken}
                     createContact={hasPermission(user, "SUPPLIERS_CONTACTS", RoleModulePermission.Write)}
+                    personsResponse={personsResponse || { persons: [], meta: { currentPage: 0, itemsPerPage: 0, totalItems: 0, totalPages: 0 } }}
                 />
             </section>
         </>

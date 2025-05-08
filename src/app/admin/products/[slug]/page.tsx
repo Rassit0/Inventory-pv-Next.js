@@ -42,8 +42,9 @@ export default async function ProductsPage({
         delayPopover={1000}
       />
 
-
-      <ViewProduct product={product} term={slug} token={authToken} />
+      <section className="container pt-8">
+        <ViewProduct product={product} term={slug} token={authToken} />
+      </section>
     </>
   );
 }

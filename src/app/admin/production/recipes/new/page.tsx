@@ -1,6 +1,6 @@
 import { getAuthUser, hasModuleAccess } from "@/lib";
 import { getBranches } from "@/modules/admin/branches";
-import { CreateTransactionForm } from "@/modules/admin/inventory";
+import { CreateMovementInventoryForm } from "@/modules/admin/inventory";
 import { CreateRecipeForm } from "@/modules/admin/production-recipes";
 import { getProducts } from "@/modules/admin/products";
 import { HeaderPage } from "@/modules/admin/shared";

@@ -1,22 +1,25 @@
 "use client"
-import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Switch, useDisclosure } from '@heroui/react'
+import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Radio, RadioGroup, Select, SelectItem, Switch, useDisclosure } from '@heroui/react'
 import React, { FormEvent, useEffect, useState } from 'react'
 import { DeleteContact, ISupplier, ISupplierContactInfo, updateSupplier } from '@/modules/admin/suppliers';
 import { Delete01Icon, PencilEdit01Icon, PlusSignIcon } from 'hugeicons-react';
 import { toast } from 'sonner';
+import { IPersonsResponse, SelectSearchPersonAndCreate } from '@/modules/admin/persons';
 
 interface Props {
     token: string;
     editContact: boolean;
     supplier: ISupplier;
+    personsResponse: IPersonsResponse;
 }
 
-export const UpdateSupplierFormModal = ({ token, editContact, supplier }: Props) => {
+export const UpdateSupplierFormModal = ({ token, editContact, supplier, personsResponse }: Props) => {
     const [supplierIsActive, setSupplierIsActive] = useState<boolean>(supplier.isActive);
     const [contacts, setContacts] = useState<ISupplierContactInfo[]>(supplier.contactInfo);
     const [isLoading, setIsLoading] = useState(false);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     // FORM
+    const [supplierType, setSupplierType] = useState<string>(supplier.type);
     const [supplierName, setSupplierName] = useState(supplier.name);
     const [supplierAddress, setSupplierAddress] = useState(supplier.address || '');
     const [supplierCity, setSupplierCity] = useState(supplier.city || '');
@@ -26,6 +29,13 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier }: Props)
     useEffect(() => {
         setContacts(supplier.contactInfo);
         setSupplierIsActive(supplier.isActive);
+        // Reiniciar los usestates al cerrar el modal
+        setSupplierType(supplier.type);
+        setSupplierName(supplier.name);
+        setSupplierAddress(supplier.address || '');
+        setSupplierCity(supplier.city || '');
+        setSupplierState(supplier.state || '');
+        setSupplierCountry(supplier.country || '');
     }, [isOpen])
 
 
@@ -116,6 +126,7 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier }: Props)
 
         onClose();
     }
+
     return (
         <>
             <Button
@@ -141,8 +152,38 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier }: Props)
                                     <div className="w-full">
                                         <h2 className='font-semibold'>Datos generales</h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-                                            <Input
+                                            <div className='md:col-span-2 lg:col-span-3'>
+                                                <RadioGroup
+                                                    isRequired
+                                                    name='supplierType'
+                                                    value={supplierType}
+                                                    onValueChange={setSupplierType}
+                                                    classNames={{
+                                                        label: "text-small"
+                                                    }}
+                                                    size='sm' label="Tipo de transacción" orientation="horizontal">
+                                                    <Radio value="COMPANY">Empresa</Radio>
+                                                    {/* <Radio value="OUTCOME">Salida</Radio> */}
+                                                    <Radio value="INDIVIDUAL">Individual</Radio>
+                                                </RadioGroup>
+                                                {
+                                                    supplierType === 'INDIVIDUAL' && (
+                                                        <SelectSearchPersonAndCreate
+                                                            isRequired
+                                                            personsResponse={personsResponse}
+                                                            token={token}
+                                                            label='Proveedor personal'
+                                                            autoFocus={false}
+                                                            create={true}
+                                                            name='supplierPersonId'
+                                                            selectionMode='single'
+                                                            defaultSelectedPersonIds={supplier.personId ? [supplier.personId] : undefined}
+                                                        // onPersonsSelectedChange={}
+                                                        />
+                                                    )
+                                                }
+                                            </div>
+                                            {supplierType === 'COMPANY' && (<Input
                                                 isRequired
                                                 name='supplierName'
                                                 label='Nombre'
@@ -156,7 +197,7 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier }: Props)
                                                 onBlur={() => {
                                                     setSupplierName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
                                                 }}
-                                            />
+                                            />)}
 
                                             <Input
                                                 isRequired
@@ -236,6 +277,7 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier }: Props)
                                                 placeholder='Ingrese el nombre del contacto'
                                                 variant='underlined'
                                                 defaultValue={supplier.taxId || ''}
+                                                isRequired={supplierType === 'COMPANY'}
                                             />
 
                                             <Input

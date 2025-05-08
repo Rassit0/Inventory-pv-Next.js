@@ -1,11 +1,12 @@
 "use client"
-import { Button, Form, Input, Select, SelectItem, Switch } from '@heroui/react'
+import { Button, Form, Input, Radio, RadioGroup, Select, SelectItem, Switch } from '@heroui/react'
 import React, { FormEvent, useState } from 'react'
 import { ISupplierContactInfo } from '../interfaces/supplier-response';
 import { CheckmarkCircle01Icon, Delete01Icon, PlusSignIcon } from 'hugeicons-react';
 import { createSupplier } from '../actions/create-supplier';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { IPersonsResponse, SelectMultipleSearchPersonsAndCreate, SelectSearchPersonAndCreate } from '@/modules/admin/persons';
 
 
 interface Contact {
@@ -17,9 +18,10 @@ interface Contact {
 interface Props {
   token: string;
   createContact: boolean;
+  personsResponse: IPersonsResponse;
 }
 
-export const CreateSupplierForm = ({ token, createContact }: Props) => {
+export const CreateSupplierForm = ({ token, createContact, personsResponse }: Props) => {
   const router = useRouter();
 
   const [supplierIsActive, setSupplierIsActive] = useState<boolean>(true);
@@ -34,6 +36,7 @@ export const CreateSupplierForm = ({ token, createContact }: Props) => {
   const [contactName, setContactName] = useState<Record<number, Contact>>();
 
   const handleContactChange = (id: number, field: keyof ISupplierContactInfo, value: string) => {
+
     setContacts((prev) => {
       const updatedContact = [...prev];
       const contactIndex = updatedContact.findIndex((contact) => contact.id === id);
@@ -97,11 +100,11 @@ export const CreateSupplierForm = ({ token, createContact }: Props) => {
 
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
-    // const dataArray: any[] = [];
-    // formData.forEach((value, key) => {
-    //   dataArray.push({ key, value });
-    // });
-    // console.log(dataArray)
+    const dataArray: any[] = [];
+    formData.forEach((value, key) => {
+      dataArray.push({ key, value });
+    });
+    console.log(dataArray)
     const { error, message, response } = await createSupplier({ token, formData });
     if (error) {
       if (response && Array.isArray(response.message)) {
@@ -129,6 +132,10 @@ export const CreateSupplierForm = ({ token, createContact }: Props) => {
 
     return;
   }
+
+  // usestate Form
+
+  const [supplierType, setSupplierType] = useState<string>("COMPANY");
   return (
     <Form
       validationBehavior='native'
@@ -137,25 +144,60 @@ export const CreateSupplierForm = ({ token, createContact }: Props) => {
     >
       <h2 className='text-2xl font-semibold'>Formulario</h2>
 
+      <div className='w-full'>
+
+      </div>
+
       <div className="w-full">
         <h2 className='font-semibold'>Datos generales</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-          <Input
-            isRequired
-            name='supplierName'
-            label='Nombre'
-            placeholder='Ingrese el nombre del contacto'
-            variant='underlined'
-            value={supplierName}
-            onChange={(e) => setSupplierName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === ' ' || e.key === 'Enter') setSupplierName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
-            }}
-            onBlur={() => {
-              setSupplierName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
-            }}
-          />
+          <div className='md:col-span-2 lg:col-span-3'>
+            <RadioGroup
+              isRequired
+              name='supplierType'
+              value={supplierType}
+              onValueChange={setSupplierType}
+              classNames={{
+                label: "text-small"
+              }}
+              size='sm' label="Tipo de transacción" orientation="horizontal">
+              <Radio value="COMPANY">Empresa</Radio>
+              {/* <Radio value="OUTCOME">Salida</Radio> */}
+              <Radio value="INDIVIDUAL">Individual</Radio>
+            </RadioGroup>
+            {
+              supplierType === 'INDIVIDUAL' && (
+                <SelectSearchPersonAndCreate
+                  isRequired
+                  personsResponse={personsResponse}
+                  token={token}
+                  label='Proveedor personal'
+                  autoFocus={false}
+                  create={true}
+                  name='supplierPersonId'
+                  selectionMode='single'
+                // onPersonsSelectedChange={}
+                />
+              )
+            }
+          </div>
+          {supplierType === 'COMPANY' && (
+            <Input
+              isRequired
+              name='supplierName'
+              label='Nombre'
+              placeholder='Ingrese el nombre del contacto'
+              variant='underlined'
+              value={supplierName}
+              onChange={(e) => setSupplierName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') setSupplierName(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
+              }}
+              onBlur={() => {
+                setSupplierName(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
+              }}
+            />
+          )}
 
           <Input
             isRequired
@@ -233,6 +275,7 @@ export const CreateSupplierForm = ({ token, createContact }: Props) => {
             label='NIT o id Fiscal'
             placeholder='Ingrese el nombre del contacto'
             variant='underlined'
+            isDisabled={supplierType === 'INDIVIDUAL'}
           />
 
           <Input

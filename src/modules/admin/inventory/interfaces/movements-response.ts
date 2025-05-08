@@ -1,5 +1,5 @@
 export interface IMovementsResponse {
-    transactions: ITransaction[];
+    movements: IMovement[];
     meta: IMovementsResponseMeta;
 }
 
@@ -10,20 +10,35 @@ export interface IMovementsResponseMeta {
     currentPage: number;
 }
 
-export interface ITransaction {
+export interface IMovement {
     id: string;
-    movementType: ITransactionMovementType;
-    adjustmentType: ITransactionMovementType | null;
+    movementType: EMovementType;
+    adjustment: IMovementAdjustment | null;
     referenceType: null;
-    status: Status;
+    status: EMovementStatus;
     createdByUserId: string;
     updatedByUserId: null | string;
     createdAt: Date;
-    entryDate: Date | null;
+    deliveryDate: Date | null;
     updatedAt: Date;
-    inventoryTransactionProducts: InventoryMovementProduct[];
+    inventoryMovementDetails: IMovementDetail[];
     createdByUser: AtedByUser;
     updatedByUser: AtedByUser | null;
+    originBranchId: null | string;
+    originWarehouseId: null | string;
+    originBranch: IMovementBranchOrWarehouse | null;
+    originWarehouse: IMovementBranchOrWarehouse | null;
+    destinationBranchId: null | string;
+    destinationWarehouseId: null | string;
+    destinationBranch: IMovementBranchOrWarehouse | null;
+    destinationWarehouse: IMovementBranchOrWarehouse | null;
+}
+
+export interface IMovementAdjustment {
+    id: string;
+    inventoryMovementId: string;
+    adjustmentType: EAdjustmentType;
+    otherAdjustmentReason: string | null;
 }
 
 export interface AtedByUser {
@@ -31,48 +46,49 @@ export interface AtedByUser {
     email: string;
 }
 
-export interface InventoryMovementProduct {
+export interface IMovementDetail {
     id: string;
     inventoryTransactionId: string;
     productId: string;
-    product: IInventoryProduct;
+    product: IMovmentDetailProduct | null;
     unit: string;
-    branchStockId: null | string;
-    warehouseStockId: null | string;
-    branchStock: Stock | null;
-    warehouseStock: Stock | null;
+    expectedQuantity: string;
+    deliveredQuantity?: string;
+    deliveryStatus: EDeliveryStatusDetail;
+    updatedAt: Date;
 }
 
-export interface IInventoryProduct {
+export interface IMovmentDetailProduct {
+    name: string;
+    imageUrl: string | null;
+}
+
+export interface IMovementBranchOrWarehouse {
     name: string;
 }
 
-export interface Stock {
-    id?: string;
-    originBranchId?: null | string;
-    originWarehouseId?: null | string;
-    branchId?: string;
-    quantity?: string;
-    updatedAt?: Date;
-    originBranch: Branch | null;
-    originWarehouse: Branch | null;
-    branch?: Branch | null;
-    warehouseId?: string;
-    warehouse?: Branch | null;
-}
-
-export interface Branch {
-    name: string;
-}
-
-export enum ITransactionMovementType {
+export enum EMovementType {
     Income = "INCOME",
     Outcome = "OUTCOME",
     Transfer = "TRANSFER",
     Adjustment = "ADJUSTMENT",
 }
 
-export enum Status {
+export enum EAdjustmentType {
+    Income = "INCOME",
+    Outcome = "OUTCOME",
+}
+
+export enum EDeliveryStatusDetail {
+    PENDING = 'PENDING', // Pendiente de entrega
+    COMPLETE = 'COMPLETE', // Entregado completamente
+    PARTIAL = 'PARTIAL', // Entregado parcialmente
+    NOT_DELIVERED = 'NOT_DELIVERED', // No entregado
+    OVER_DELIVERED = 'OVER_DELIVERED', // Entregado en exceso
+}
+
+
+export enum EMovementStatus {
     Completed = "COMPLETED",
     Pending = "PENDING",
     Accepted = "ACCEPTED",

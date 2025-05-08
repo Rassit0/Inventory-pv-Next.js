@@ -1,14 +1,19 @@
 "use client"
 import { authLogin, useSessionStore } from '@/modules/auth';
 import { Button, Input } from '@heroui/react';
-import { useRouter } from 'next/navigation';
-import React, { FormEvent, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation';
+import React, { FormEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner';
 
 export const LoginForm = () => {
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter();
     const { setSession } = useSessionStore();
+    const pathname = usePathname();
+
+    useEffect(() => {
+        setIsLoading(false)
+    }, [pathname]);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -46,7 +51,7 @@ export const LoginForm = () => {
         // Si se guarda con éxito
         setSession(session ? session.user : null, session ? session.token : null)
         toast.success(message);
-        setIsLoading(false)
+        // setIsLoading(false)
         router.push('/admin/home/all');
 
     }

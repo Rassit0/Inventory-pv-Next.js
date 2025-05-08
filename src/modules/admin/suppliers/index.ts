@@ -2,7 +2,7 @@
 // ACTIONS
 export { deleteContact } from './actions/delete-contact';
 export { deleteSupplier } from './actions/delete-supplier';
-export { getSuppliers } from './actions/get-suppliers';
+export { getSuppliersResponse } from './actions/get-suppliers-response';
 export { updateSupplier } from './actions/update-supplier';
 
 // COMPONENTS

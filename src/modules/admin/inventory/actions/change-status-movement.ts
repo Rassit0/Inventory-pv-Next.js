@@ -9,7 +9,7 @@ interface Props {
     transactionId: string;
 }
 
-export const changeStatusTransaction = async ({ formData, transactionId, token }: Props) => {
+export const changeStatusMovement = async ({ formData, transactionId, token }: Props) => {
 
     // Preparar los datos para la solicitud
     const data = {

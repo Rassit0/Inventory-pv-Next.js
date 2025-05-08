@@ -116,7 +116,6 @@ export const SelectProductTable = ({ token, productsResponse, onRemoveProduct, r
 
     // FUNCION PARA ACTUALIZAR LOS PRODUCTOS CON FILTROS O SI SE ACTUALIZA UN PRODUCTO
     useEffect(() => {
-
         const fetchProducts = async () => {
             const response = await getProducts({
                 token,
@@ -139,7 +138,7 @@ export const SelectProductTable = ({ token, productsResponse, onRemoveProduct, r
         }
         setIsLoading(true);
         fetchProducts(); // Llama a la funcion que llama a los productos con filtros(params)
-    }, [rowsPerPage, page, filterValue, productsResponse, statusFilter, sortDescriptor, removedProducts]);
+    }, [rowsPerPage, page, filterValue, productsResponse, statusFilter, sortDescriptor, removedProducts, searchBranchId, searchWarehouseId]);
 
     // CONTROL DE LAS IMAGENES QUE TIENEN ERROR AL CARGAR
     const [imageErrors, setImageErrors] = useState<TImageErrors>({});

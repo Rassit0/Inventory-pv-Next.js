@@ -1,9 +1,20 @@
 export interface ISupplierResponse {
     suppliers: ISupplier[];
+    meta: ISuppliersResponseMeta;
+}
+
+export interface ISuppliersResponseMeta {
+    totalItems: number;
+    itemsPerPage: number;
+    totalPages: number;
+    currentPage: number;
 }
 
 export interface ISupplier {
     id: string;
+    type: 'INDIVIDUAL'|'COMPANY'
+    personId: string | null;
+    person: ISupplierPerson | null;
     name: string;
     address: null | string;
     city: null | string;
@@ -33,3 +44,20 @@ export interface ISupplierContactInfo {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export interface ISupplierPerson {
+    id: string;
+    name: string;
+    lastname: string;
+    secondLastname: null;
+    nit: string;
+    imageUrl: null;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: null;
+    updatedByUserId: string;
+    createdByUserId: string;
+    deletedByUserId: null;
+}
+
