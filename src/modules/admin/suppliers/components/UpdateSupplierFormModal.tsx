@@ -4,7 +4,7 @@ import React, { FormEvent, useEffect, useState } from 'react'
 import { DeleteContact, ISupplier, ISupplierContactInfo, updateSupplier } from '@/modules/admin/suppliers';
 import { Delete01Icon, PencilEdit01Icon, PlusSignIcon } from 'hugeicons-react';
 import { toast } from 'sonner';
-import { IPersonsResponse, SelectSearchPersonAndCreate } from '@/modules/admin/persons';
+import { IPerson, IPersonsResponse, SelectSearchPersonAndCreate } from '@/modules/admin/persons';
 
 interface Props {
     token: string;
@@ -19,12 +19,25 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier, personsR
     const [isLoading, setIsLoading] = useState(false);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     // FORM
-    const [supplierType, setSupplierType] = useState<string>(supplier.type);
+    const [supplierType, setSupplierType] = useState<'COMPANY' | 'INDIVIDUAL'>(supplier.type);
     const [supplierName, setSupplierName] = useState(supplier.name);
     const [supplierAddress, setSupplierAddress] = useState(supplier.address || '');
     const [supplierCity, setSupplierCity] = useState(supplier.city || '');
     const [supplierState, setSupplierState] = useState(supplier.state || '');
     const [supplierCountry, setSupplierCountry] = useState(supplier.country || '');
+    const [selectedPerson, setSelectedPerson] = useState<IPerson | null>(null)
+    const [supplierTaxId, setSupplierTaxId] = useState(supplier.taxId || '');
+    // useEffect
+    useEffect(() => {
+        if (supplierType === 'INDIVIDUAL') {
+            if (selectedPerson) {
+                setSupplierTaxId(selectedPerson.nit);
+                console.log(selectedPerson.nit)
+                return;
+            }
+            setSupplierTaxId(supplier.taxId || '');
+        }
+    }, [selectedPerson, supplierType])
 
     useEffect(() => {
         setContacts(supplier.contactInfo);
@@ -157,7 +170,7 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier, personsR
                                                     isRequired
                                                     name='supplierType'
                                                     value={supplierType}
-                                                    onValueChange={setSupplierType}
+                                                    onValueChange={(value) => setSupplierType(value as 'INDIVIDUAL' | 'COMPANY')}
                                                     classNames={{
                                                         label: "text-small"
                                                     }}
@@ -177,7 +190,10 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier, personsR
                                                             create={true}
                                                             name='supplierPersonId'
                                                             selectionMode='single'
-                                                            defaultSelectedPersonIds={supplier.personId ? [supplier.personId] : undefined}
+                                                            defaultSelectedSingleKey={supplier.personId ? supplier.personId : undefined}
+                                                            onSelecteSingledPerson={(person) => {
+                                                                setSelectedPerson(person)
+                                                            }}
                                                         // onPersonsSelectedChange={}
                                                         />
                                                     )
@@ -276,8 +292,9 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier, personsR
                                                 label='NIT o id Fiscal'
                                                 placeholder='Ingrese el nombre del contacto'
                                                 variant='underlined'
-                                                defaultValue={supplier.taxId || ''}
-                                                isRequired={supplierType === 'COMPANY'}
+                                                isDisabled={supplierType === 'INDIVIDUAL'}
+                                                value={supplierTaxId}
+                                                onChange={(e) => setSupplierTaxId(e.target.value)}
                                             />
 
                                             <Input
@@ -444,6 +461,7 @@ export const UpdateSupplierFormModal = ({ token, editContact, supplier, personsR
                                                     </div>
 
                                                     <DeleteContact
+                                                        token={token}
                                                         isDisabled={!editContact}
                                                         contactId={contact.id}
                                                         onDelete={() => handleRemoveContactForm(contact.id)} />

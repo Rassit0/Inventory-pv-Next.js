@@ -1,12 +1,12 @@
 "use client"
 import { Button, Form, Input, Radio, RadioGroup, Select, SelectItem, Switch } from '@heroui/react'
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import { ISupplierContactInfo } from '../interfaces/supplier-response';
 import { CheckmarkCircle01Icon, Delete01Icon, PlusSignIcon } from 'hugeicons-react';
 import { createSupplier } from '../actions/create-supplier';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import { IPersonsResponse, SelectMultipleSearchPersonsAndCreate, SelectSearchPersonAndCreate } from '@/modules/admin/persons';
+import { IPerson, IPersonsResponse, SelectMultipleSearchPersonsAndCreate, SelectSearchPersonAndCreate } from '@/modules/admin/persons';
 
 
 interface Contact {
@@ -27,13 +27,28 @@ export const CreateSupplierForm = ({ token, createContact, personsResponse }: Pr
   const [supplierIsActive, setSupplierIsActive] = useState<boolean>(true);
   const [contacts, setContacts] = useState<ISupplierContactInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  // FORM
+  // FORM usestate
+  const [supplierType, setSupplierType] = useState<'INDIVIDUAL' | 'COMPANY'>("COMPANY");
   const [supplierName, setSupplierName] = useState('');
   const [supplierAddress, setSupplierAddress] = useState('');
   const [supplierCity, setSupplierCity] = useState('');
   const [supplierState, setSupplierState] = useState('');
   const [supplierCountry, setSupplierCountry] = useState('');
   const [contactName, setContactName] = useState<Record<number, Contact>>();
+  const [selectedPerson, setSelectedPerson] = useState<IPerson | null>(null)
+  const [supplierTaxId, setSupplierTaxId] = useState('');
+  // useEffect
+  useEffect(() => {
+    if (supplierType === 'INDIVIDUAL') {
+      if (selectedPerson) {
+        setSupplierTaxId(selectedPerson.nit);
+        console.log(selectedPerson.nit)
+        return;
+      }
+      setSupplierTaxId('');
+    }
+  }, [selectedPerson, supplierType])
+
 
   const handleContactChange = (id: number, field: keyof ISupplierContactInfo, value: string) => {
 
@@ -135,7 +150,6 @@ export const CreateSupplierForm = ({ token, createContact, personsResponse }: Pr
 
   // usestate Form
 
-  const [supplierType, setSupplierType] = useState<string>("COMPANY");
   return (
     <Form
       validationBehavior='native'
@@ -156,7 +170,7 @@ export const CreateSupplierForm = ({ token, createContact, personsResponse }: Pr
               isRequired
               name='supplierType'
               value={supplierType}
-              onValueChange={setSupplierType}
+              onValueChange={(value) => setSupplierType(value as 'COMPANY' | 'INDIVIDUAL')}
               classNames={{
                 label: "text-small"
               }}
@@ -176,7 +190,9 @@ export const CreateSupplierForm = ({ token, createContact, personsResponse }: Pr
                   create={true}
                   name='supplierPersonId'
                   selectionMode='single'
-                // onPersonsSelectedChange={}
+                  onSelecteSingledPerson={(person) => {
+                    setSelectedPerson(person)
+                  }}
                 />
               )
             }
@@ -276,6 +292,8 @@ export const CreateSupplierForm = ({ token, createContact, personsResponse }: Pr
             placeholder='Ingrese el nombre del contacto'
             variant='underlined'
             isDisabled={supplierType === 'INDIVIDUAL'}
+            value={supplierTaxId}
+            onChange={(e) => setSupplierTaxId(e.target.value)}
           />
 
           <Input

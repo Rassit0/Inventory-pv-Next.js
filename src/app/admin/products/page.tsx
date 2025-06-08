@@ -3,6 +3,7 @@ import { getAuthUser, hasModuleAccess, hasPermission } from "@/lib";
 import { getBranches } from "@/modules/admin/branches";
 import { getCategories } from "@/modules/admin/categories";
 import { getHandlingUnits } from "@/modules/admin/handling-units";
+import { getPersonsResponse } from "@/modules/admin/persons";
 import { getProducts, ProductTable } from "@/modules/admin/products";
 import { HeaderPage } from "@/modules/admin/shared";
 import { getSuppliersResponse } from "@/modules/admin/suppliers";
@@ -16,13 +17,16 @@ export default async function ProductsPage() {
   const { user, authToken } = await getAuthUser();
   // Verificar acceso al módulo "branches"
   if (!hasModuleAccess({ user, moduleName: "PRODUCTS", permissions: [RoleModulePermission.Read] })) redirect("/403");
+  if (!hasModuleAccess({ user, moduleName: "PERSONS", permissions: [RoleModulePermission.Read] })) redirect("/403");
+  if (!hasModuleAccess({ user, moduleName: "SUPPLIERS", permissions: [RoleModulePermission.Read] })) redirect("/403");
 
   // OBTERNER PRODUCTOS
   const productsResponse = await getProducts({ token: authToken, limit: 5 }); // Limite de 10 items por pagina
   const categories = await getCategories({ token: authToken });
   const handlingUnits = await getHandlingUnits({ token: authToken });
   const branchesResponse = await getBranches({ token: authToken });
-  const suppliers = await getSuppliersResponse({ token: authToken });
+  const personsResponse = await getPersonsResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
+  const suppliersResponse = await getSuppliersResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
 
 
 
@@ -56,7 +60,18 @@ export default async function ProductsPage() {
         categories={categories}
         handlingUnits={handlingUnits}
         branches={branchesResponse?.branches || []}
-        suppliers={suppliers || []}
+        supplierProps={{
+          create: {
+            createSupplier: hasPermission(user, "SUPPLIERS", RoleModulePermission.Write),
+            createContact: hasPermission(user, "SUPPLIERS_CONTACTS", RoleModulePermission.Write),
+            personsResponse: personsResponse || {
+              persons: [], meta: { currentPage: 0, itemsPerPage: 0, totalItems: 0, totalPages: 0 },
+            }
+          },
+          suppliersResponse: suppliersResponse || {
+            suppliers: [], meta: { currentPage: 0, itemsPerPage: 0, totalItems: 0, totalPages: 0 },
+          },
+        }}
       />
     </>
   );

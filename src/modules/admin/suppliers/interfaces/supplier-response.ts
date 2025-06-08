@@ -1,4 +1,4 @@
-export interface ISupplierResponse {
+export interface ISuppliersResponse {
     suppliers: ISupplier[];
     meta: ISuppliersResponseMeta;
 }

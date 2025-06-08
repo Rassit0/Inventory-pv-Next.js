@@ -13,7 +13,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import { IBranch } from '@/modules/admin/branches'
 import dynamic from 'next/dynamic'
 import useSWR from 'swr'
-import { ISupplier } from '@/modules/admin/suppliers'
+import { ISupplier, ISuppliersResponse } from '@/modules/admin/suppliers'
+import { IPersonsResponse } from '@/modules/admin/persons'
+import { sup } from 'framer-motion/client'
 
 // Solo cargar el componente Table dinámicamente
 const Table = dynamic(() => import('@heroui/react').then((mod) => mod.Table), { ssr: false });
@@ -26,7 +28,14 @@ interface Props {
   categories: ISimpleCategory[];
   handlingUnits: ISimpleHandlingUnit[];
   branches: IBranch[];
-  suppliers: ISupplier[];
+  supplierProps: {
+    create?: {
+      createSupplier: boolean;
+      createContact: boolean;
+      personsResponse: IPersonsResponse;
+    };
+    suppliersResponse: ISuppliersResponse;
+  }
 }
 
 const columns = [
@@ -58,7 +67,7 @@ type TSortDescriptor = {
 
 const INITIAL_VISIBLE_COLUMNS: string[] = ["image", "name", "description", "price", "status", "actions"];
 
-export const ProductTable = ({ token, editProduct, deleteProduct, productsResponse, categories, handlingUnits, branches, suppliers }: Props) => {
+export const ProductTable = ({ token, editProduct, deleteProduct, productsResponse, categories, handlingUnits, branches, supplierProps }: Props) => {
   const router = useRouter();
   const isMounted = useRef(false);
   const [productsFilteredResponse, setProductsFilteredresponse] = useState<IProductsResponse>(productsResponse)
@@ -68,7 +77,7 @@ export const ProductTable = ({ token, editProduct, deleteProduct, productsRespon
   const [filterValue, setFilterValue] = useState('');
   const [visibleColumns, setVisibleColumns] = useState<SharedSelection>(new Set(INITIAL_VISIBLE_COLUMNS));
   const [statusFilter, setStatusFilter] = useState<SharedSelection>("all");
-  const [rowsPerPage, setRowsPerPage] = useState(productsResponse.products.length);
+  const [rowsPerPage, setRowsPerPage] = useState(productsResponse.meta.itemsPerPage || 10);
 
   // Descriptor de clasificacion
   const [sortDescriptor, setSortDescriptor] = useState<TSortDescriptor>({
@@ -208,11 +217,12 @@ export const ProductTable = ({ token, editProduct, deleteProduct, productsRespon
             />
             <DetailsStockModal product={product} />
             {editProduct && (<UpdateProductFormModal
+              token={token}
               categories={categories}
               product={product}
               handlingUnits={handlingUnits}
               branches={branches}
-              suppliers={suppliers}
+              supplierProps={supplierProps || undefined}
             />)}
             {deleteProduct && (<DeleteProductModal productId={product.id} token={token} />)}
           </div>

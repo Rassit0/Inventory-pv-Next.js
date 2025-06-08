@@ -5,6 +5,8 @@ import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, In
 import { usePathname } from 'next/navigation';
 import { ArrowDown01Icon, Search01Icon } from 'hugeicons-react';
 import dynamic from 'next/dynamic';
+import { IPersonsResponse } from '@/modules/admin/persons';
+import { ISuppliersResponse } from '@/modules/admin/suppliers';
 
 // Solo cargar el componente Table dinámicamente
 const Table = dynamic(() => import('@heroui/react').then((mod) => mod.Table), { ssr: false });
@@ -12,7 +14,15 @@ const Table = dynamic(() => import('@heroui/react').then((mod) => mod.Table), { 
 interface Props {
     token: string;
     editInventory: boolean;
-    movementsResponse: IMovementsResponse;
+    itemsResponse: IMovementsResponse;
+    supplierProps: {
+        create?: {
+            createSupplier: boolean;
+            createContact: boolean;
+            personsResponse: IPersonsResponse;
+        }
+        suppliersResponse: ISuppliersResponse;
+    }
 }
 
 type TSortDescriptor = {
@@ -28,7 +38,8 @@ const movementTypeMap = {
 };
 
 const columns = [
-    { name: "Tipo", uid: "movementType" },
+    { name: "TIPO", uid: "movementType" },
+    { name: "DESCRIPCIÓN", uid: "description" },
     // { name: "NAME", uid: "name", sortable: true },
     // { name: "EMAIL", uid: "email", sortable: true },
     { name: "ESTADO", uid: "status" },
@@ -75,9 +86,9 @@ const INITIAL_VISIBLE_COLUMNS: string[] = [
     "actions",
 ];
 
-export const InventoryMovementsTable = ({ token, editInventory, movementsResponse }: Props) => {
+export const InventoryMovementsTable = ({ token, editInventory, itemsResponse, supplierProps }: Props) => {
     const isMounted = useRef(false);
-    const [transactionsFilteredResponse, setTransactionsFilteredResponse] = useState<IMovementsResponse>(movementsResponse)
+    const [transactionsFilteredResponse, setTransactionsFilteredResponse] = useState<IMovementsResponse>(itemsResponse)
     const [isLoading, setIsLoading] = useState(false);
 
     // filters table
@@ -85,10 +96,10 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
     const hasSearchFilter = Boolean(searchValue);
     const [visibleColumns, setVisibleColumns] = useState<SharedSelection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState<SharedSelection>("all")
-    const [movementFilter, setMovementFilter] = useState<SharedSelection>(new Set(['INCOME']))
-    const [itemsPerPage, setItemsPerPage] = useState<number>(movementsResponse.movements.length);
+    const [itemFilter, setMovementFilter] = useState<SharedSelection>(new Set(['INCOME']))
+    const [itemsPerPage, setItemsPerPage] = useState<number>(itemsResponse.meta.itemsPerPage || 10);
     const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(movementsResponse.meta.totalPages);
+    const [totalPages, setTotalPages] = useState(itemsResponse.meta.totalPages);
     const headerColumns = useMemo(() => {
         if (visibleColumns === "all") return columns;
         return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
@@ -121,7 +132,7 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
             return;
         }
 
-        // console.log(Array.from(movementFilter))
+        // console.log(Array.from(itemFilter))
         const fetchUsers = async () => {
             const response = await getMovementsResponse({
                 token: token,
@@ -130,13 +141,14 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
                 status: Array.from(statusFilter).length === statusOptions.length || statusFilter === "all"
                     ? null
                     : (Array.from(statusFilter) as EMovementStatus[]),
-                movementType: Array.from(movementFilter).length === movementOptions.length || movementFilter === "all"
+                movementType: Array.from(itemFilter).length === movementOptions.length || itemFilter === "all"
                     ? null
-                    : (Array.from(movementFilter) as EMovementType[]),
+                    : (Array.from(itemFilter) as EMovementType[]),
                 orderBy: sortDescriptor.direction === 'ascending' ? 'asc' : 'desc',
                 columnOrderBy: sortDescriptor.column ? sortDescriptor.column as 'createdAt' | 'updatedAt' | null : undefined
             });
 
+            console.log("response", response);
             if (response) {
                 setTransactionsFilteredResponse(response);
                 setTotalPages(response.meta.totalPages);
@@ -146,7 +158,7 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
 
         setIsLoading(true);
         fetchUsers();
-    }, [itemsPerPage, page, searchValue, movementsResponse, statusFilter, sortDescriptor, movementFilter]);
+    }, [itemsPerPage, page, searchValue, itemsResponse, statusFilter, sortDescriptor, itemFilter]);
 
     // CAMBIAR EL VALOR DE LA PAGINACIÓN
     const onNextPage = useCallback(() => {
@@ -199,14 +211,14 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
                         <Dropdown>
                             <DropdownTrigger className="flex">
                                 <Button endContent={<ArrowDown01Icon className="text-small" />} variant="flat">
-                                    {movementOptions.find(m => m.uid === movementFilter.currentKey)?.name || "Entradas"}
+                                    {movementOptions.find(m => m.uid === itemFilter.currentKey)?.name || "Entradas"}
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
                                 disallowEmptySelection
                                 aria-label="Table Columns Type"
                                 closeOnSelect={false}
-                                selectedKeys={movementFilter}
+                                selectedKeys={itemFilter}
                                 selectionMode="single"
                                 onSelectionChange={setMovementFilter}
                             >
@@ -284,7 +296,7 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
     }, [
         searchValue,
         statusFilter,
-        movementFilter,
+        itemFilter,
         visibleColumns,
         onRowsPerPageChange,
         transactionsFilteredResponse.movements.length,
@@ -323,12 +335,14 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
     const renderCell = useCallback((movement: IMovement, columnKey: keyof IMovement) => {
 
         switch (columnKey as string) {
+            case "description":
+                return movement.description ? movement.description : <div className='text-default-400'>N/A</div>;
             case "entryDate":
                 return movement.deliveryDate ? movement.deliveryDate.toLocaleString() : <div className='text-default-400'>N/A</div>;
             case "createdAt":
                 return movement.createdAt.toLocaleString();
             case "movementType":
-                return movement.movementType !== 'ADJUSTMENT' ? movementTypeMap[movement.movementType] : movementTypeMap[movement.movementType]+' de '+movementTypeMap[movement.adjustment!.adjustmentType];
+                return movement.movementType !== 'ADJUSTMENT' ? movementTypeMap[movement.movementType] : movementTypeMap[movement.movementType] + ' de ' + movementTypeMap[movement.adjustment!.adjustmentType];
             case "status":
                 return (
                     <ChangeStatusModal
@@ -336,6 +350,7 @@ export const InventoryMovementsTable = ({ token, editInventory, movementsRespons
                         colorButton={statusColorMap[movement.status] ?? 'default'}
                         title={statusOptions.find(status => status.uid === movement.status)?.name || ''}
                         movement={movement}
+                        supplierProps={supplierProps}
                     />
                 )
             case "actions":

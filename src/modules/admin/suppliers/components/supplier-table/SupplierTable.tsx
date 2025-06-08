@@ -8,7 +8,7 @@ import warning_error_image from '@/assets/warning_error.png'
 import { ArrowDown01Icon, Delete01Icon, PencilEdit01Icon, Search01Icon } from 'hugeicons-react';
 import { HighlinghtedText } from '@/modules/admin/shared';
 import dynamic from 'next/dynamic';
-import { DeleteSupplierModal, getSuppliersResponse, ISupplier, ISupplierResponse, SupplierDetailsModal, UpdateSupplierFormModal } from '@/modules/admin/suppliers';
+import { DeleteSupplierModal, getSuppliersResponse, ISupplier, ISuppliersResponse, SupplierDetailsModal, UpdateSupplierFormModal } from '@/modules/admin/suppliers';
 import { IPersonsResponse } from '@/modules/admin/persons';
 
 // Solo cargar el componente Table dinámicamente
@@ -19,7 +19,7 @@ interface Props {
     editContact: boolean;
     deleteSupplier: boolean;
     token: string;
-    itemsResponse: ISupplierResponse;
+    itemsResponse: ISuppliersResponse;
     personsResponse: IPersonsResponse;
 }
 
@@ -58,7 +58,7 @@ const INITIAL_VISIBLE_COLUMNS: string[] = ["name", "address", "status", "main_co
 
 export const SupplierTable = ({ deleteSupplier, editSupplier, itemsResponse, token, editContact, personsResponse }: Props) => {
     const isMounted = useRef(false);
-    const [itemsFilteredResponse, setItemsFilteredResponse] = useState<ISupplierResponse>(itemsResponse)
+    const [itemsFilteredResponse, setItemsFilteredResponse] = useState<ISuppliersResponse>(itemsResponse)
     const [isLoading, setIsLoading] = useState(false);
 
     // useState filters
@@ -310,7 +310,7 @@ export const SupplierTable = ({ deleteSupplier, editSupplier, itemsResponse, tok
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button endContent={<ArrowDown01Icon className="text-small" />} variant="flat">
-                                    Status
+                                    Estado
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -331,7 +331,7 @@ export const SupplierTable = ({ deleteSupplier, editSupplier, itemsResponse, tok
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button endContent={<ArrowDown01Icon className="text-small" />} variant="flat">
-                                    Columns
+                                    Columnas
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu

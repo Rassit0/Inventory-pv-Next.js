@@ -12,10 +12,11 @@ import { useInfiniteScroll } from '@heroui/use-infinite-scroll';
 interface Props {
     token: string;
     personsResponse: IPersonsResponse;
+    defaultSelectedSingleKey?: string;
     name?: string;
     isRequired?: boolean;
     label?: string
-    setSelectedPerson?: (person: IPerson | null) => void;
+    onSelecteSingledPerson?: (person: IPerson | null) => void;
     autoFocus?: boolean;
     create?: boolean;
     onPersonSelectedChange?: (persons: IPerson[]) => void;
@@ -147,7 +148,7 @@ function usePersonList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', co
 /**
  * Componente SelectAutocompletePersons: Un autocomplete personalizado para seleccionar personas.
  */
-export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, personsResponse, name, isRequired = false, setSelectedPerson, token, autoFocus = false, create = true, onPersonSelectedChange, selectionMode = 'single' }: Props) => {
+export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, personsResponse, name, isRequired = false, onSelecteSingledPerson, token, autoFocus = false, create = true, onPersonSelectedChange, selectionMode = 'single', defaultSelectedSingleKey }: Props) => {
 
     const [searchValue, setSearchValue] = useState('');
     const [orderBy, setOrderBy] = useState<'asc' | 'desc'>('asc');
@@ -207,8 +208,6 @@ export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, p
     useEffect(() => {
         // Limpia los errores de imagen cuando cambia la lista de personas
         setImageErrors({})
-
-
     }, [personsResponse])
 
     /**
@@ -257,9 +256,6 @@ export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, p
     const addSelectedPerson = (person: IPerson | undefined) => {
         if (!person) return;
 
-        // Llama a la función para actualizar la persona seleccionada en el componente padre
-        if (setSelectedPerson) setSelectedPerson(person);
-
         setSelectPersons((prev) => {
             const alreadyExists = prev.some(p => p.id === person.id);
             if (alreadyExists) return prev;
@@ -293,9 +289,6 @@ export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, p
                 : [...prev, person];
             return sortPersons(updated);
         });
-
-        // Limpia la selección en el componente padre si se deselecciona la persona actualmente seleccionada
-        if (setSelectedPerson) setSelectedPerson(null);
     };
 
 
@@ -322,8 +315,8 @@ export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, p
 
     useEffect(() => {
         if (onPersonSelectedChange)
-            onPersonSelectedChange(filteredItems)
-    }, [filteredItems])
+            onPersonSelectedChange(selectPersons)
+    }, [selectPersons])
 
 
     useEffect(() => {
@@ -452,6 +445,8 @@ export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, p
                 variant="bordered"
                 // Muestra la sucursal seleccionada
                 selectedKey={selectionMode === 'multiple' ? '' : undefined}
+                defaultSelectedKey={selectionMode === 'multiple' ? undefined : defaultSelectedSingleKey ? defaultSelectedSingleKey : undefined}
+                // selectedKey={selectionMode === 'single' && defaultSelectedSingleKey ? defaultSelectedSingleKey : undefined}
                 onSelectionChange={selectionMode === 'multiple' ? (key) => {
                     const selected = items.find(person => person.id === key);
                     addSelectedPerson(selected);
@@ -460,6 +455,8 @@ export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, p
                     // setSearchValue(`${selected?.name || ''} ${selected?.lastname || ''} ${selected?.secondLastname || ''}`.trim());
                     setSelectSinglePersonid(key as string || null)
                     setSearchValue('')
+                    const selected = items.find(person => person.id === key);
+                    if (onSelecteSingledPerson) onSelecteSingledPerson(selected || null)
                 }}
                 // isInvalid={isInvalid && isRequired && selectPersons.length === 0}
                 isInvalid={selectionMode === 'multiple' ? (isRequired && isInvalid && selectPersons.length <= 0 ? true : selectPersons.length > 0 ? false : undefined) : undefined}
@@ -500,7 +497,7 @@ export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, p
                 isRequired={selectionMode === 'multiple' ? (!isInvalid && isRequired) : isRequired}
             >
                 {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.name}>
+                    <AutocompleteItem key={item.id} textValue={(`${item.name} ${item.lastname}`)}>
                         <div className="flex justify-between items-center">
                             <div className="flex gap-2 items-center cursor-pointer">
                                 <div className='min-w-10 w-[35px] h-[35px] relative'>

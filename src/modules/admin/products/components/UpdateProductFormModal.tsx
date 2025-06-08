@@ -14,24 +14,30 @@ import { parseAbsolute } from '@internationalized/date';
 import { IWarehouse } from '@/modules/admin/warehouses';
 import { ImageUploaderInput } from "@/modules/admin/shared";
 import { useSessionStore } from '@/modules/auth';
-import { ISupplier } from '@/modules/admin/suppliers';
+import { ISupplier, ISuppliersResponse, SelectSearchSupplierAndCreate } from '@/modules/admin/suppliers';
+import { IPersonsResponse } from '@/modules/admin/persons';
 
 interface Props {
+    token: string;
     product: IProduct,
     categories: ISimpleCategory[];
     handlingUnits: ISimpleHandlingUnit[];
     branches: IBranch[];
-    suppliers: ISupplier[];
+    supplierProps: {
+        create?: {
+            createSupplier: boolean;
+            createContact: boolean;
+            personsResponse: IPersonsResponse;
+        };
+        suppliersResponse: ISuppliersResponse;
+    }
 }
 
 interface SelectedProduct {
     id: string;
     quantity: number;
 }
-export const UpdateProductFormModal = ({ product, categories, handlingUnits, branches, suppliers }: Props) => {
-
-    //Session
-    const { token } = useSessionStore();
+export const UpdateProductFormModal = ({ product, categories, handlingUnits, branches, supplierProps, token }: Props) => {
 
     // Form
     const [productName, setProductName] = useState(product.name);
@@ -52,78 +58,6 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
     useEffect(() => {
         setBranchProductStock(product.branchProductStock)
     }, [product])
-
-
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const fileURL = URL.createObjectURL(file);
-            setPreviewImage(fileURL);
-        } else {
-            setPreviewImage(null);
-        }
-    }
-
-    const handleBranchInventoryChange = (branchId: string, field: keyof IBranchProductStock, value: string) => {
-        setBranchProductStock((prev) => {
-            const updatedInventory = [...prev];
-            const inventoryIndex = updatedInventory.findIndex((inventory) => inventory.branchId === branchId);
-            if (inventoryIndex >= 0) {
-                updatedInventory[inventoryIndex] = {
-                    ...updatedInventory[inventoryIndex],
-                    [field]: value
-                };
-            }
-            return updatedInventory;
-        });
-    };
-
-    // const handleAddBranchForm = (branchId: string) => {
-    //     // Verificar que la sucursal no esté ya agregada
-    //     const isBranchAlreadyAdded = branchProductStock.some((inventory) => inventory.branchId === branchId);
-    //     if (isBranchAlreadyAdded) return;
-
-
-    //     // Buscar si la sucursal ya tiene un inventario en el producto
-    //     const existingInventory = product.branchProductStock.find(p => p.branchId === branchId);
-
-    //     // Agregar el inventario para la sucursal seleccionada
-    //     setBranchProductStock((prev) => [
-    //         ...prev,
-    //         existingInventory ?? {
-    //             branchId,
-    //             stock: "",
-    //             minimumStock: "",
-    //             reorderPoint: "",
-    //             warehouseId: "",
-    //             lastStockUpdate: new Date(),
-    //             purchasePriceOverride: null,
-    //             priceOverride: null
-    //         },
-    //     ]);
-
-    //     // Eliminar la sucursal seleccionada de la lista de sucursales disponibles
-    //     setAvailableBranches((prev) => prev.filter(branch => branch.id !== branchId));
-    // };
-
-    const handleRemoveBranchForm = (branchId: string) => {
-        // Eliminar el formulario de sucursal de la lista de inventarios
-        setBranchProductStock((prev) => {
-            const updatedInventory = prev.filter(inventory => inventory.branchId !== branchId);
-            return updatedInventory;
-        });
-
-        // Restaurar la sucursal eliminada a la lista de sucursales disponibles
-        const branch = branches.find((branch) => branch.id === branchId);
-        if (branch) {
-            setAvailableBranches((prev) => {
-                const updatedBranches = [...prev, branch];
-
-                // Ordenar las sucursales por 'name' al restaurar
-                return updatedBranches.sort((a, b) => a.name.localeCompare(b.name));
-            });
-        }
-    };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -147,10 +81,6 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
         setIsLoading(false);
 
         onClose();
-    }
-
-    const handleRestoreInventory = () => {
-
     }
 
     // useEffect para resetear la previsualización al cerrar el modal
@@ -339,6 +269,20 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                                         setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1));
                                                     }}
                                                 />
+
+                                                <div className="md:col-span-3">
+                                                    <SelectSearchSupplierAndCreate
+                                                        isRequired
+                                                        token={token}
+                                                        name={`productSuppliers`}
+                                                        itemsResponse={supplierProps.suppliersResponse}
+                                                        // selectedSingleKey={entry.supplierId ?? ''}
+                                                        // onSelecteSingledItem={(value) => value && handleSupplierChange(item.id, index, value.id)}
+                                                        defaultSelectedItemIds={product.suppliers.map(supplier => supplier.supplierId)}
+                                                        create={supplierProps.create}
+                                                        selectionMode='multiple'
+                                                    />
+                                                </div>
 
                                                 <input type="hidden" name="productIsEnable" value={productIsEnable ? 'true' : 'false'} />
                                                 <Switch

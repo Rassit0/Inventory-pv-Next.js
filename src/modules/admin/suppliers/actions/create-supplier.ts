@@ -65,7 +65,8 @@ export const createSupplier = async ({ token, formData }: Props): Promise<IRespo
         if (isApiError(error)) {
             return {
                 error: true,
-                message: error.message
+                message: error.message,
+                response: error.response
             }
         }
 

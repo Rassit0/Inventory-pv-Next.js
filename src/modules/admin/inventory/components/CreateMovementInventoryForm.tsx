@@ -12,7 +12,8 @@ import Image from 'next/image';
 import no_image from '@/assets/no_image.png';
 import warning_error_image from '@/assets/warning_error.png';
 import { createMovement } from '@/modules/admin/inventory';
-import { IPersonsResponse, SelectPersonAndCreate } from '@/modules/admin/persons';
+import { IPersonsResponse, SelectPersonAndCreate, SelectSearchPersonAndCreate } from '@/modules/admin/persons';
+import { parseDate } from '@internationalized/date';
 
 
 interface Contact {
@@ -51,8 +52,14 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
     const [contacts, setContacts] = useState<ISupplierContactInfo[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     // FORM
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const localDateString = `${yyyy}-${mm}-${dd}`;
     const [movementType, setTransactionType] = useState<string>("INCOME");
     const [managerDeliveryType, setManagerDeliveryType] = useState<string>("supplier");
+    const [adjustmentReason, setAdjustmentReason] = useState<string>("");
     const [adjustmentType, setAdjustmentType] = useState<string>("");
     const [selectOrigin, setSelectOrigin] = useState<string>('')
     const [selectDestiny, setSelectDestiny] = useState<string>('')
@@ -128,10 +135,10 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
     };
 
     // const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    const handleSubmit = async () => {
-        // e.preventDefault();
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-        if (!formRef.current) return;
+        // if (!formRef.current) return;
         setIsLoading(true);
 
         if (removedProductsTable.length <= 0) {
@@ -167,7 +174,8 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
 
         setIsLoading(false);
 
-        const formData = new FormData(formRef.current);
+        // const formData = new FormData(formRef.current);
+        const formData = new FormData(e.currentTarget);
         const dataArray: any[] = [];
         formData.forEach((value, key) => {
             dataArray.push({ key, value });
@@ -226,7 +234,7 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
                     {/* <h2 className='font-semibold'>Datos generales</h2> */}
 
                     <div className="grid grid-cols-1 gap-4">
-                        <div className='w-full'>
+                        {/* <div className='w-full'>
                             <RadioGroup
                                 isRequired
                                 name='managerDeliveryType'
@@ -237,16 +245,21 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
                                 }}
                                 size='sm' label="Tipo de transacción" orientation="horizontal">
                                 <Radio value="supplier">Proveedor</Radio>
-                                {/* <Radio value="OUTCOME">Salida</Radio> */}
                                 <Radio value="person">Persona</Radio>
                             </RadioGroup>
                             {
                                 managerDeliveryType === 'supplier' ?
                                     <></>
                                     :
-                                    <SelectPersonAndCreate token={token} name='selectPerson' personsResponse={personsResponse} />
+                                    <SelectSearchPersonAndCreate
+                                        isRequired
+                                        token={token}
+                                        name='selectPerson'
+                                        personsResponse={personsResponse}
+                                        label=''
+                                    />
                             }
-                        </div>
+                        </div> */}
                         <div className='w-full'>
                             <RadioGroup
                                 isRequired
@@ -405,14 +418,57 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
                                 name="movementDeliveryDate"
                                 label="Fecha de ingreso"
                                 variant="underlined"
+                                defaultValue={parseDate(localDateString)}
                             />
+                        )}
+
+                        {movementType === 'ADJUSTMENT' && (
+                            <div className='w-full'>
+                                <RadioGroup
+                                    isRequired
+                                    name='adjustmentReason'
+                                    value={adjustmentReason}
+                                    onValueChange={setAdjustmentReason}
+                                    classNames={{
+                                        label: "text-small"
+                                    }}
+                                    size='sm'
+                                    label="Razón del ajuste"
+                                    orientation="horizontal">
+                                    <Tooltip color='primary' content="Inundación, incendio, etc.">
+                                        <Radio value="DAMAGE">Daño</Radio>
+                                    </Tooltip>
+                                    <Tooltip color='primary' content="Robo, extravío, etc.">
+                                        <Radio value="LOSS">Pérdida</Radio>
+                                    </Tooltip>
+                                    <Tooltip color='primary' content="Corrección de inventario.">
+                                        <Radio value="AUDIT">Auditoría</Radio>
+                                    </Tooltip>
+                                    <Tooltip color='primary' content="Exceso de inventario.">
+                                        <Radio value="EXCESS">Exceso</Radio>
+                                    </Tooltip>
+                                    <Tooltip color='primary' content="Tipo de ajuste no especificado.">
+                                        <Radio value="OTHER">Otro</Radio>
+                                    </Tooltip>
+                                </RadioGroup>
+                                {adjustmentReason === 'OTHER' && (
+                                    <Input
+                                        key={adjustmentReason}
+                                        isRequired={adjustmentReason === 'OTHER'}
+                                        name='otherAdjustmentReason'
+                                        variant='underlined'
+                                        label='Otra razón del ajuste'
+                                        errorMessage={adjustmentReason === 'OTHER' ? 'Especificar la razón del ajuste.' : undefined}
+                                    />
+                                )}
+                            </div>
                         )}
 
                         <Textarea
                             key={movementType}
                             isRequired={movementType === 'ADJUSTMENT'}
                             name='movementDescription'
-                            disableAnimation
+                            // disableAnimation
                             disableAutosize
                             variant='underlined'
                             label='Descripción'
@@ -495,8 +551,8 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
             </div>
 
             <Button
-                type='button'
-                onPress={handleSubmit}
+                type='submit'
+                // onPress={handleSubmit}
                 color='primary'
                 isLoading={isLoading}
                 isDisabled={isLoading}

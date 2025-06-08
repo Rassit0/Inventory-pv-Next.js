@@ -6,12 +6,13 @@ import { toast } from 'sonner';
 import { Delete01Icon } from 'hugeicons-react';
 
 interface Props {
+    token: string;
     isDisabled: boolean;
     contactId: number,
     onDelete: (id: number) => void; // Recibe una funcion
 }
 
-export const DeleteContact = ({ isDisabled = false, contactId, onDelete }: Props) => {
+export const DeleteContact = ({ isDisabled = false, contactId, onDelete, token }: Props) => {
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +22,7 @@ export const DeleteContact = ({ isDisabled = false, contactId, onDelete }: Props
 
         if (contactId > 0) {
             // SERVER ACTION
-            const { error, message, response } = await deleteContact(contactId);
+            const { error, message, response } = await deleteContact({id:contactId, token});
             if (error) {
                 if (response && Array.isArray(response.message)) {
                     // Itera sobre cada mensaje en response.message y muestra un toast para cada uno

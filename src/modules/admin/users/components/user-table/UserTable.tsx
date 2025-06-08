@@ -62,7 +62,7 @@ export const UserTable = ({ deleteUser, editUser, token, usersResponse }: Props)
     const [searchValue, setSearchValue] = useState('');
     const [visibleColumns, setVisibleColumns] = useState<SharedSelection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState<SharedSelection>("all")
-    const [itemsPerPage, setItemsPerPage] = useState<number>(usersResponse.users.length);
+    const [itemsPerPage, setItemsPerPage] = useState<number>(usersResponse.meta.itemsPerPage || 10);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(usersResponse.meta.totalPages);
 
@@ -300,7 +300,7 @@ export const UserTable = ({ deleteUser, editUser, token, usersResponse }: Props)
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button endContent={<ArrowDown01Icon className="text-small" />} variant="flat">
-                                    Status
+                                    Estado
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
@@ -321,7 +321,7 @@ export const UserTable = ({ deleteUser, editUser, token, usersResponse }: Props)
                         <Dropdown>
                             <DropdownTrigger className="hidden sm:flex">
                                 <Button endContent={<ArrowDown01Icon className="text-small" />} variant="flat">
-                                    Columns
+                                    Columnas
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu

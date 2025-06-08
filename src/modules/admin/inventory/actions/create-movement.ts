@@ -16,9 +16,18 @@ interface Props {
 }
 export const createMovement = async ({ token, formData }: Props): Promise<any> => {
 
+    const movementAdjustmentType = formData.get('movementAdjustmentType');
+    const adjustmentReason = formData.get('adjustmentReason') || undefined;
+    const otherAdjustmentReason = formData.get('otherAdjustmentReason') || undefined;
+
     const data = {
         movementType: formData.get('movementType'),
-        adjustmentType: formData.get('movementAdjustmentType')|| undefined,
+        adjustment: adjustmentReason && movementAdjustmentType ? {
+            adjustmentType: movementAdjustmentType,
+            adjustmentReason: adjustmentReason,
+            ...(adjustmentReason === 'OTHER' && otherAdjustmentReason ? { otherAdjustmentReason } : undefined)
+        } : undefined,
+        // adjustmentType: formData.get('movementAdjustmentType')|| undefined,
         // adjustmentReason: 'DAMAGE',
         deliveryDate: formData.get('movementDeliveryDate') ? new Date(formData.get('movementDeliveryDate') as string).toISOString() : undefined,
         originBranchId: formData.get('movementBranchOriginId') || undefined,
@@ -26,9 +35,9 @@ export const createMovement = async ({ token, formData }: Props): Promise<any> =
         destinationBranchId: formData.get('movementDestinationBranchId') || undefined,
         destinationWarehouseId: formData.get('movementDestinationWarehouseId') || undefined,
         description: formData.get('movementDescription') || undefined,
-        deliveryManagers: formData.getAll("selectPerson").map(categoryId => (
-            { id: categoryId }
-        )),
+        // deliveryManagers: formData.getAll("selectPerson").map(categoryId => (
+        //     { id: categoryId }
+        // )),
         inventoryMovementDetails: formData.getAll('productIds').map(productId => {
             // const inventoryStock = {
             //     originBranchId: formData.get('branchOriginIdTransaction') || undefined,
@@ -41,7 +50,7 @@ export const createMovement = async ({ token, formData }: Props): Promise<any> =
             return {
                 productId,
                 unit: formData.get(`unitNameProduct[${productId}]`),
-                expectedQuantity: quantity
+                totalExpectedQuantity: quantity
                 // ...(() => {
                 //     if (!formData.get('warehouseDestinyIdTransaction')) {
                 //         if (formData.get('branchDestinyIdTransaction')) {

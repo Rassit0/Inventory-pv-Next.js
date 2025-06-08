@@ -13,6 +13,7 @@ export interface IMovementsResponseMeta {
 export interface IMovement {
     id: string;
     movementType: EMovementType;
+    description: string | null;
     adjustment: IMovementAdjustment | null;
     referenceType: null;
     status: EMovementStatus;
@@ -50,17 +51,32 @@ export interface IMovementDetail {
     id: string;
     inventoryTransactionId: string;
     productId: string;
-    product: IMovmentDetailProduct | null;
+    product: IMovementDetailProduct | null;
     unit: string;
-    expectedQuantity: string;
-    deliveredQuantity?: string;
+    totalExpectedQuantity: string;
+    totalDeliveredQuantity?: string;
     deliveryStatus: EDeliveryStatusDetail;
     updatedAt: Date;
+    detailSuppliers: IMovementDetailSupplier[];
 }
 
-export interface IMovmentDetailProduct {
+export interface IMovementDetailSupplier {
+    id: string;
+    inventoryMovementDetailId: string;
+    supplierId: string;
+    deliveredQuantity: string;
+}
+
+
+export interface IMovementDetailProduct {
     name: string;
     imageUrl: string | null;
+    unit: IMovementDetailProductUnit;
+}
+
+export interface IMovementDetailProductUnit {
+    name: string;
+    abbreviation: string;
 }
 
 export interface IMovementBranchOrWarehouse {

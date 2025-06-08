@@ -13,7 +13,7 @@ import { Delete01Icon, PlusMinus01Icon, PlusSignIcon } from "hugeicons-react";
 import { IBranch } from "@/modules/admin/branches";
 import { ImageUploaderInput } from "@/modules/admin/shared";
 import { useSessionStore } from "@/modules/auth";
-import { ISupplier } from "@/modules/admin/suppliers";
+import { ISupplier, ISuppliersResponse, SelectSearchSupplierAndCreate } from "@/modules/admin/suppliers";
 import { IPersonsResponse, SelectMultipleSearchPersonsAndCreate } from "@/modules/admin/persons";
 
 
@@ -23,8 +23,14 @@ interface Props {
     categories: ISimpleCategory[];
     handlingUnits: ISimpleHandlingUnit[];
     branches: IBranch[];
-    suppliers: ISupplier[];
-    personsResponse: IPersonsResponse
+    supplierProps: {
+        create?: {
+            createSupplier: boolean;
+            createContact: boolean;
+            personsResponse: IPersonsResponse;
+        };
+        suppliersResponse: ISuppliersResponse;
+    }
 }
 
 interface SelectedProduct {
@@ -32,7 +38,7 @@ interface SelectedProduct {
     quantity: number;
 }
 
-export const CreateProductForm = ({ token, products, categories, handlingUnits, branches, suppliers, personsResponse }: Props) => {
+export const CreateProductForm = ({ token, categories, handlingUnits, branches, supplierProps }: Props) => {
 
     //Form
     const [productName, setProductName] = useState('');
@@ -326,14 +332,16 @@ export const CreateProductForm = ({ token, products, categories, handlingUnits, 
                             />
                         </div>
                         <div className="md:col-span-3">
-                            <SelectMultipleSearchPersonsAndCreate
+                            <SelectSearchSupplierAndCreate
                                 isRequired
-                                personsResponse={personsResponse}
                                 token={token}
-                                label='Proveedor personal'
-                                autoFocus={false}
-                                create={true}
-                                name='productPersonSuppliers'
+                                name={`productSuppliersIds`}
+                                itemsResponse={supplierProps.suppliersResponse}
+                                // selectedSingleKey={entry.supplierId ?? ''}
+                                // onSelecteSingledItem={(value) => value && handleSupplierChange(item.id, index, value.id)}
+                                // defaultSelectedItemIds={product.suppliers.map(supplier => supplier.supplierId)}
+                                create={supplierProps.create}
+                                selectionMode='multiple'
                             />
                         </div>
                         {/* <DatePicker

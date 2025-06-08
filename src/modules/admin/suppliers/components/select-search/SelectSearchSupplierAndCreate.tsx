@@ -6,35 +6,48 @@ import { Add01Icon, Search01Icon } from 'hugeicons-react';
 import Image from 'next/image';
 import no_image from '@/assets/no_image.png';
 import warning_error_image from '@/assets/warning_error.png';
-import { CreatePersonFormModal, getPersonsResponse, IPerson, IPersonsResponse } from '@/modules/admin/persons';
+import { CreatePersonFormModal, getPersonsResponse, IPersonsResponse } from '@/modules/admin/persons';
 import { useInfiniteScroll } from '@heroui/use-infinite-scroll';
-import { CreateSupplierFormModal } from '../CreatePersonFormModal';
+import { getSuppliersResponse, ISupplier, ISuppliersResponse, CreateSupplierFormModal, createSupplier } from '@/modules/admin/suppliers';
 
 interface Props {
     token: string;
-    personsResponse: IPersonsResponse;
+    itemsResponse: ISuppliersResponse;
+    filterSuppliersByProductId?: string;
+    supplierIds?: string[]; // IDs de proveedores específicos para filtrar
+    excludeSupplierIds?: string[]; // IDs de proveedores a excluir de la lista
+    defaultSelectedSingleKey?: string;
     name?: string;
     isRequired?: boolean;
     label?: string
-    setSelectedPerson?: (person: IPerson | null) => void;
+    onSelecteSingledItem?: (item: ISupplier | null) => void;
     autoFocus?: boolean;
-    create?: boolean;
+    create?: {
+        createSupplier: boolean;
+        createContact: boolean;
+        personsResponse: IPersonsResponse;
+    };
+    onItemSelectedChange?: (items: ISupplier[]) => void;
+    selectionMode?: 'single' | 'multiple'
+    defaultSelectedItemIds?: string[];
 }
 
-interface PropsPersonList {
+interface PropsItemList {
     fetchDelay: number
     token: string;
     propsSearch: {
         value: string;
-        discardItemsSearch: IPerson[];// Recibe los items ya seleccionados para filtrar y que no aparezcan en los resultados de la busqueda
+        discardItemsSearch: ISupplier[];// Recibe los items ya seleccionados para filtrar y que no aparezcan en los resultados de la busqueda
     };
     orderBy?: 'asc' | 'desc';
-    columnOrderBy?: "name" | "lastname" | "secondLastname" | "nit" | null | undefined;
+    columnOrderBy?: 'name' | 'type' | 'address' | 'city' | 'state' | 'country' | 'createdAt' | null | undefined;
+    filterSuppliersByProductId?: string; // ID del producto para filtrar los proveedores
+    supplierIds?: string[]; // IDs de proveedores específicos para filtrar
 }
 
-function usePersonList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', columnOrderBy = 'name' }: PropsPersonList) {
+function useItemList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', columnOrderBy = 'name', filterSuppliersByProductId, supplierIds }: PropsItemList) {
 
-    const [items, setItems] = useState<IPerson[]>([]);
+    const [items, setItems] = useState<ISupplier[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [page, setPage] = useState(1);
@@ -47,7 +60,7 @@ function usePersonList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', co
      * @param token El token de autenticación.
      * @param search Término de búsqueda opcional.
      */
-    const loadPerson = async (currentPage: number, token: string, search?: string) => {
+    const loadPerson = async ({ currentPage, token, search, supplierIds, filterSuppliersByProductId }: { currentPage: number, token: string, search?: string, supplierIds?: string[], filterSuppliersByProductId?: string }) => {
         const controller = new AbortController();
         // Controla para abortar el fetch si el por ej el usuario se va a otra pagina
         const { signal } = controller;
@@ -61,8 +74,9 @@ function usePersonList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', co
             }
 
 
-            const res = await getPersonsResponse({ token, orderBy, columnOrderBy, limit, page: currentPage, signal, search });
+            const res = await getSuppliersResponse({ token, orderBy, columnOrderBy, limit, page: currentPage, signal, searchName: search, supplierIds, filterSuppliersByProductId });
 
+            console.log("Response from getSuppliersResponse:", res);
             if (!res) {
                 throw new Error("Network response was not ok");
             }
@@ -79,7 +93,7 @@ function usePersonList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', co
                 // Obtiene los IDs de las personas que ya han sido seleccionadas.
                 const currentlyDiscardedIds = propsSearch?.discardItemsSearch?.map(d => d.id) || [];
                 // Combina la lista de items anterior con los nuevos items de la API.
-                const combined = [...prevItems, ...res.persons];
+                const combined = [...prevItems, ...res.suppliers];
                 // Elimina los items duplicados basándose en su ID.
                 const uniqueCombined = Array.from(new Map(combined.map(item => [item.id, item])).values());
                 // Filtra la lista única para excluir las personas que ya están en la lista de descartados.
@@ -113,7 +127,7 @@ function usePersonList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', co
             setPage(newPage);
             setHasMore(true);
         }
-        loadPerson(newPage, token, propsSearch.value === '' ? undefined : propsSearch.value)
+        loadPerson({ currentPage: newPage, token, search: propsSearch.value === '' ? undefined : propsSearch.value, supplierIds, filterSuppliersByProductId }) // Agregar filterSuppliersByProductId aquí
         // La dependencia de propsSearch.discardItemsSearch se eliminó aquí para evitar recargas innecesarias
         // }, [propsSearch.value, propsSearch.discardItemsSearch])
     }, [propsSearch.value])
@@ -130,7 +144,7 @@ function usePersonList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', co
         const newPage = page + 1;
 
         setPage(newPage);
-        loadPerson(newPage, token, propsSearch.value === '' ? undefined : propsSearch.value);
+        loadPerson({ currentPage: newPage, token, search: propsSearch.value === '' ? undefined : propsSearch.value, supplierIds, filterSuppliersByProductId });
     };
 
     return {
@@ -145,11 +159,11 @@ function usePersonList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', co
 /**
  * Componente SelectAutocompletePersons: Un autocomplete personalizado para seleccionar personas.
  */
-export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, isRequired = false, setSelectedPerson, token, autoFocus = false, create = true }: Props) => {
+export const SelectSearchSupplierAndCreate = ({ defaultSelectedItemIds, label, itemsResponse, name, isRequired = false, onSelecteSingledItem, token, autoFocus = false, create, onItemSelectedChange, selectionMode = 'single', supplierIds, filterSuppliersByProductId, excludeSupplierIds }: Props) => {
 
     const [searchValue, setSearchValue] = useState('');
     const [orderBy, setOrderBy] = useState<'asc' | 'desc'>('asc');
-    const [columnOrderBy, setColumnOrderBy] = useState<"name" | "lastname" | "secondLastname" | "nit" | null | undefined>('name');
+    const [columnOrderBy, setColumnOrderBy] = useState<'name' | 'type' | 'address' | 'city' | 'state' | 'country' | 'createdAt' | null | undefined>('name');
 
     // estado para el primer intento submit que inicia en false, si se pone en true ya se hizo el primer intento submit
     const [isInvalid, setIsInvalid] = useState(false);
@@ -158,16 +172,59 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
     const [hasAttemptedOnBlur, setHasAttemptedOnBlur] = useState(false);
     const [hasAttemptedValidation, setHasAttemptedValidation] = useState(false); // Nuevo estado para la primera validación
 
-    const [selectPersons, setSelectPersons] = useState<IPerson[]>([]);
+    const [selectedItems, setSelectedItems] = useState<ISupplier[]>([]);
+    // const [selectSingleItemId, setSelectSingleItemId] = useState<string | null>(null);
+    const [selectedKey, setSelectedKey] = useState<string | null>(defaultSelectedItemIds ? defaultSelectedItemIds[0] : null);
 
     const [isOpen, setIsOpen] = React.useState(false);
     // Utiliza el hook personalizado para la gestión de la lista de personas
-    const { items, setItems, hasMore, isLoading, onLoadMore } = usePersonList({ fetchDelay: 1500, propsSearch: { discardItemsSearch: selectPersons, value: searchValue }, token, orderBy, columnOrderBy });
+    const { items, setItems, hasMore, isLoading, onLoadMore } = useItemList({ fetchDelay: 0, propsSearch: { discardItemsSearch: selectedItems, value: searchValue }, token, orderBy, columnOrderBy, supplierIds, filterSuppliersByProductId });
 
     // Inicializa los items con la respuesta inicial
     useEffect(() => {
-        setItems(personsResponse.persons || [])
-    }, [])
+        const initializeItems = async () => {
+            try {
+                // Inicializa los items con la respuesta inicial
+                let initialItems = itemsResponse.suppliers || [];
+
+                if (filterSuppliersByProductId) {
+                    console.log(supplierIds)
+                    const response = await getSuppliersResponse({ supplierIds, filterSuppliersByProductId: filterSuppliersByProductId, token });
+                    if (response && response.suppliers && response.suppliers.length > 0) {
+                        initialItems = response.suppliers;
+                    }
+                    setItems(initialItems);
+                    return;
+                }
+
+                if (defaultSelectedItemIds && defaultSelectedItemIds.length > 0) {
+                    // Llama a la API para obtener los seleccionados por defecto
+                    const response = await getSuppliersResponse({ supplierIds: defaultSelectedItemIds, token });
+                    if (response && response.suppliers && response.suppliers.length > 0) {
+                        if (selectionMode === 'single') {
+                            setSelectedKey(response.suppliers[0].id);
+                        }
+                        else {
+                            setSelectedItems(response.suppliers);
+                        }
+                        // Filtra duplicados y agrega los seleccionados al principio
+                        const selectedIdsSet = new Set(response.suppliers.map(s => s.id));
+                        initialItems = [
+                            ...response.suppliers,
+                            ...initialItems.filter(item => !selectedIdsSet.has(item.id))
+                        ];
+                        console.log(initialItems)
+                    }
+                }
+
+                setItems(initialItems);
+            } catch (error) {
+                console.error("Error al inicializar los items:", error);
+            }
+        };
+
+        initializeItems();
+    }, []);
 
     // Configura el scroll infinito utilizando el hook de Hero UI
     const [, scrollerRef] = useInfiniteScroll({
@@ -182,25 +239,25 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
     useEffect(() => {
         // Limpia los errores de imagen cuando cambia la lista de personas
         setImageErrors({})
-    }, [personsResponse])
+    }, [itemsResponse])
 
     /**
      * Manejador de errores de carga de imágenes.
-     * @param personId El ID de la persona cuya imagen no se pudo cargar.
+     * @param itemId El ID del item cuya imagen no se pudo cargar.
      */
-    const handleImageError = (personId: string) => {
+    const handleImageError = (itemId: string) => {
         setImageErrors((prevErrors) => ({
             ...prevErrors,
-            [personId]: true,
+            [itemId]: true,
         }));
     };
 
     /**
-     * Función para ordenar la lista de personas.
-     * @param data La lista de personas a ordenar.
-     * @returns La lista de personas ordenada.
+     * Función para ordenar la lista de items.
+     * @param data La lista de items a ordenar.
+     * @returns La lista de items ordenada.
      */
-    const sortPersons = (data: IPerson[]) => {
+    const sortItems = (data: ISupplier[]) => {
         if (!columnOrderBy) return data;
 
         const sorted = [...data].sort((a, b) => {
@@ -224,23 +281,20 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
     };
 
     /**
-     * Función para agregar una persona a la lista de seleccionados.
-     * @param person La persona a seleccionar.
+     * Función para agregar una item a la lista de seleccionados.
+     * @param item El item a seleccionar.
      */
-    const addSelectedPerson = (person: IPerson | undefined) => {
-        if (!person) return;
+    const addSelectedItem = (item: ISupplier | undefined) => {
+        if (!item) return;
 
-        // Llama a la función para actualizar la persona seleccionada en el componente padre
-        if (setSelectedPerson) setSelectedPerson(person);
-
-        setSelectPersons((prev) => {
-            const alreadyExists = prev.some(p => p.id === person.id);
+        setSelectedItems((prev) => {
+            const alreadyExists = prev.some(p => p.id === item.id);
             if (alreadyExists) return prev;
-            return [...prev, person];
+            return [...prev, item];
         });
 
-        // Quitar la persona seleccionada del listado de opciones
-        setItems((prev) => prev.filter(p => p.id !== person.id));
+        // Quitar la itema seleccionada del listado de opciones
+        setItems((prev) => prev.filter(p => p.id !== item.id));
 
         // si los items rebajan a menos de 6 sumandole el que se acaba de quitar cargara más items
         if (items.length < 7) {
@@ -248,50 +302,58 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
         }
 
         // Limpia el valor de búsqueda para que no siga filtrando por el ítem recién seleccionado
-        setSearchValue(person.name);
+        setSearchValue(item.name);
         setSearchValue('');
     };
 
     // Remueve de la seleccion y lo mueve de nuevo a los items de la lista
     /**
-    * Función para remover una persona de la lista de seleccionados y devolverla a la lista de opciones.
-    * @param person La persona a remover.
+    * Función para remover un item de la lista de seleccionados y devolverla a la lista de opciones.
+    * @param item El itema a remover.
     */
-    const removeSelectedPerson = (person: IPerson) => {
-        setSelectPersons((prev) => prev.filter(p => p.id !== person.id));
+    const removeSelectedItem = (item: ISupplier) => {
+        setSelectedItems((prev) => prev.filter(p => p.id !== item.id));
 
         setItems((prev) => {
-            const updated = prev.some(p => p.id === person.id)
+            const updated = prev.some(p => p.id === item.id)
                 ? prev
-                : [...prev, person];
-            return sortPersons(updated);
+                : [...prev, item];
+            return sortItems(updated);
         });
-
-        // Limpia la selección en el componente padre si se deselecciona la persona actualmente seleccionada
-        if (setSelectedPerson) setSelectedPerson(null);
     };
-
 
     const filteredItems = useMemo(() => {
         const searchTerm = searchValue.toLowerCase();
         const searchParts = searchTerm.split(' ').map(part => part.trim()).filter(part => part.length > 0);
 
-        return items.filter(item => {
-            const fullName = `${item.name} ${item.lastname} ${item.secondLastname || ''}`.toLowerCase().trim();
-            const nameLastname = `${item.name} ${item.lastname}`.toLowerCase().trim();
+        // Crea un Set para búsqueda rápida de IDs seleccionados
+        const selectedIds = new Set(selectedItems.map(supplier => supplier.id));
+        // Crea un Set para los IDs a excluir si existe excludeSupplierIds
+        const excludeIds = excludeSupplierIds ? new Set(excludeSupplierIds) : undefined;
 
+        return sortItems(items.filter(item => {
+            // No mostrar si ya está seleccionado
+            if (selectedIds.has(item.id)) return false;
+            // No mostrar si está en la lista de excluidos
+            if (excludeIds && excludeIds.has(item.id)) return false;
+
+            // Búsqueda por nombre y taxId
             const matchesSearchParts = searchParts.every(part =>
-                [item.name, item.lastname, item.secondLastname || ''].some(field => field.toLowerCase().includes(part))
+                item.name.toLowerCase().includes(part)
             );
 
             return (
                 matchesSearchParts ||
-                item.nit.toLowerCase().includes(searchTerm) ||
-                fullName.includes(searchTerm) ||
-                nameLastname.includes(searchTerm)
-            ) && !selectPersons.some(person => person.id === item.id);
-        });
-    }, [items, searchValue, selectPersons]);
+                item.taxId?.toLowerCase().includes(searchTerm)
+            );
+        })
+        );
+    }, [items, searchValue, selectedItems, excludeSupplierIds]);
+
+    useEffect(() => {
+        if (onItemSelectedChange)
+            onItemSelectedChange(selectedItems)
+    }, [selectedItems])
 
     useEffect(() => {
         // Si solo se valido al intentar hacer submit se pone focus y click en false
@@ -301,16 +363,17 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
         }
     }, [hasAttemptedOnBlur, hasAttemptedValidation, hasAttemptedOnClick, hasAttemptedOnFocus])
 
-
     return (
-        <div className='w-full flex items-start justify-center'>
+        <div className={`w-full flex ${label ? 'items-start' : 'items-center'} justify-center`}>
             {/* Campo oculto para enviar el ID de la sucursal (si es necesario) */}
             {
-                selectPersons.map(person => (
-                    <input type='hidden' key={person.id} name={name || undefined} value={person.id} />
-                ))
+                selectionMode === 'single' ?
+                    <input type='hidden' key={selectedKey} name={name || undefined} value={selectedKey || ''} />
+                    :
+                    selectedItems.map(item => (
+                        <input type='hidden' key={item.id} name={name || undefined} value={item.id} />
+                    ))
             }
-
 
             <Autocomplete
                 onOpenChange={setIsOpen}
@@ -323,31 +386,31 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
                     onPress: () => setSearchValue('')
                 }}
                 onValueChange={setSearchValue}
-                inputValue={searchValue}
+                inputValue={selectionMode === 'multiple' ? searchValue : undefined}
                 shouldCloseOnBlur={true}
-                // name={name}
+                // name={selectionMode === 'single' ? name : undefined}
                 label={label ? <>{label}{!(!isInvalid && isRequired) ? <span className='text-sm text-danger-500'> *</span> : ''}</> : undefined}
                 labelPlacement='outside'
                 size='sm'
                 aria-label="Select an person"
-                classNames={{
+                classNames={selectionMode === 'multiple' ? {
                     base: "max-w-full",
                     listboxWrapper: "max-h-[320px] sm:block",
                     selectorButton: "text-default-500",
                     endContentWrapper: "w-12 h-auto ml-auto",
                     clearButton: "ml-[-15px]",
-                }}
-                inputProps={{
+                } : undefined}
+                inputProps={selectionMode === 'multiple' ? {
                     startContent:
-                        (selectPersons.length > 0 ?
-                            selectPersons.map(person => (
+                        (selectedItems.length > 0 ?
+                            selectedItems.map(person => (
                                 <Chip key={person.id} endContent={
                                     <Button
                                         onPress={() => {
                                             if (!isInvalid) {
                                                 setIsInvalid(true)
                                             }
-                                            removeSelectedPerson(person)
+                                            removeSelectedItem(person)
                                         }}
                                         isIconOnly
                                         radius="full"
@@ -370,12 +433,12 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
                         innerWrapper: "flex flex-wrap gap-1",
                         label: "top-0 mt-4"
                     },
-                }}
-                endContent={create && (
-                    <div className='absolute bottom-0 right-0 left-14'>
-                        <CreateSupplierFormModal token={token} onCreate={person => { if (person) addSelectedPerson(person) }} />
-                    </div>
-                )}
+                } : undefined}
+                // endContent={create && (
+                //     <div className='absolute bottom-0 right-0 left-14'>
+                //         <CreatePersonFormModal token={token} onCreate={person => { if (person) addSelectedItem(person) }} />
+                //     </div>
+                // )}
                 listboxProps={{
                     emptyContent: isLoading
                         ? (
@@ -412,14 +475,28 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
                 }}
                 radius="md"
                 variant="bordered"
-                selectedKey={''} // Muestra la sucursal seleccionada
-                onSelectionChange={(key) => {
+                // Muestra la sucursal seleccionada
+                // selectedKey={selectionMode === 'multiple' ? '' : undefined}
+                selectedKey={selectionMode === 'multiple' ? '' : selectedKey}
+                defaultSelectedKey={selectionMode === 'multiple' ? undefined : defaultSelectedItemIds ? defaultSelectedItemIds[0] : undefined}
+                // selectedKey={selectionMode === 'single' && defaultSelectedSingleKey ? defaultSelectedSingleKey : undefined}
+                onSelectionChange={selectionMode === 'multiple' ? (key) => {
                     const selected = items.find(person => person.id === key);
-                    addSelectedPerson(selected);
+                    addSelectedItem(selected);
+                } : (key) => {
+                    // const selected = items.find(person => person.id === key);
+                    // setSearchValue(`${selected?.name || ''} ${selected?.lastname || ''} ${selected?.secondLastname || ''}`.trim());
+                    // setSelectSingleItemId(key as string || null)
+                    setSelectedKey(key as string || null)
+                    setSearchValue('')
+                    const selected = items.find(person => person.id === key);
+                    if (onSelecteSingledItem) onSelecteSingledItem(selected || null)
                 }}
-                // isInvalid={isInvalid && isRequired && selectPersons.length === 0}
-                isInvalid={isRequired && isInvalid && selectPersons.length <= 0}
-                errorMessage={"Debes seleccionar al menos un encargado"}
+                // isInvalid={isInvalid && isRequired && selectedItems.length === 0}
+                isInvalid={selectionMode === 'multiple' ? (isRequired && isInvalid && selectedItems.length <= 0 ? true : selectedItems.length > 0 ? false : undefined) : isInvalid && selectedKey === null && isRequired}
+                errorMessage={selectionMode === 'multiple' ?
+                    "Debes seleccionar al menos un encargado"
+                    : "Debes seleccionar un encargado"}
 
                 onBlur={(e) => {
                     if (!hasAttemptedOnBlur) {
@@ -428,6 +505,7 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
                     if (!hasAttemptedValidation) {
                         setHasAttemptedValidation(true);
                     }
+                    setSearchValue('')
                 }}
 
                 onClick={(e) => {
@@ -450,13 +528,14 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
                 autoFocus={autoFocus}
 
                 // esta linea es requerida para que valide al hacer submit al formulario
-                isRequired={!isInvalid && isRequired}
+                isRequired={selectionMode === 'multiple' ? (!isInvalid && isRequired) : isRequired}
+
             >
                 {(item) => (
-                    <AutocompleteItem key={item.id} textValue={item.name}>
+                    <AutocompleteItem key={item.id} textValue={(`${item.name}`)}>
                         <div className="flex justify-between items-center">
                             <div className="flex gap-2 items-center cursor-pointer">
-                                <div className='min-w-10 w-[35px] h-[35px] relative'>
+                                {/* <div className='min-w-10 w-[35px] h-[35px] relative'>
                                     <Image
                                         fill
                                         src={imageErrors[item.id] ? warning_error_image : item.imageUrl || no_image}
@@ -465,11 +544,11 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
                                         className='rounded-full object-contain'
                                         onError={() => handleImageError(item.id)}
                                     />
-                                </div>
+                                </div> */}
                                 <div className="flex-col min-w-0 flex">
-                                    <span className="text-small">{item.name} {item.lastname}{item.secondLastname ? ` ${item.secondLastname}` : ''}</span>
+                                    <span className="text-small">{item.name}</span>
 
-                                    <span className="text-tiny text-default-400 truncate">CI/NIT: {item.nit}</span>
+                                    <span className="text-tiny text-default-400 truncate">CI/NIT: {item.taxId}</span>
                                 </div>
                             </div>
                             <Button
@@ -485,9 +564,20 @@ export const SelectSearchSuppliersAndCreate = ({ label, personsResponse, name, i
                 )}
 
             </Autocomplete>
-            
-            {/* {create && (<CreatePersonFormModal token={token} onCreate={person => { if (person) addSelectedPerson(person) }} />)} */}
-            {create && (<div className='w-12'></div>)}
-        </div>
+
+            {/* {create && (<CreatePersonFormModal token={token} onCreate={person => { if (person) addSelectedItem(person) }} />)} */}
+            {
+                create && create.createSupplier && (
+                    <div className={label ? 'mt-4' : ''}>
+                        <CreateSupplierFormModal
+                            token={token}
+                            createContact={create.createContact}
+                            onCreate={supplier => { if (supplier) removeSelectedItem(supplier) }}
+                            personsResponse={create.personsResponse}
+                        />
+                    </div>
+                )
+            }
+        </div >
     )
 }

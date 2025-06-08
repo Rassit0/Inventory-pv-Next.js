@@ -33,7 +33,7 @@ export interface IProduct {
     categories: IProductCategory[];
     branchProductStock: IBranchProductStock[];
     warehouseProductStock: IWarehouseProductStock[];
-    suppliersProduct: ISupplierProduct[];
+    suppliers: ISupplierProduct[];
 }
 
 export interface ISupplierProduct {

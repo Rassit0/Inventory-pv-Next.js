@@ -1,7 +1,7 @@
 "use client"
 import { Button, DropdownItem, DropdownMenu, DropdownTrigger, Dropdown } from '@heroui/react';
 import React, { useState } from 'react'
-import { EDeliveryStatusDetail } from '../../interfaces/movements-response';
+import { EDeliveryStatusDetail } from '@/modules/admin/inventory';
 import { PencilEdit01Icon } from 'hugeicons-react';
 
 interface Props{
