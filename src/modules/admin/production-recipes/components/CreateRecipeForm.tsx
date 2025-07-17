@@ -54,31 +54,31 @@ export const CreateRecipeForm = ({ token, productsResponse }: Props) => {
     const [preparationInstructions, setPreparationInstructions] = useState('');
     const [preparationTime, setPreparationTime] = useState('');
     const [recipeIsEnable, setRecipeIsEnable] = useState(true);
-    const [transactionType, setTransactionType] = useState<string>("INCOME");
-    const [adjustmentType, setAdjustmentType] = useState<string>("");
-    const [selectOrigin, setSelectOrigin] = useState<string>('')
-    const [selectDestiny, setSelectDestiny] = useState<string>('')
-    const [branchDestiny, setBranchDestiny] = useState<Record<string, IBranch>>({})
-    const [selectedBranchOrigin, setSelectedBranchOrigin] = useState<IBranch | null>(null);
-    const [selectedWarehouseOrigin, setSelectedWarehouseOrigin] = useState<IWarehouse | null>(null);
-    const [selectedBranchDestiny, setSelectedBranchDestiny] = useState<IBranch | null>(null);
-    const [selectedWarehouseDestiny, setSelectedWarehouseDestiny] = useState<IWarehouse | null>(null);
+    // const [transactionType, setTransactionType] = useState<string>("INCOME");
+    // const [adjustmentType, setAdjustmentType] = useState<string>("");
+    // const [selectOrigin, setSelectOrigin] = useState<string>('')
+    // const [selectDestiny, setSelectDestiny] = useState<string>('')
+    // const [branchDestiny, setBranchDestiny] = useState<Record<string, IBranch>>({})
+    // const [selectedBranchOrigin, setSelectedBranchOrigin] = useState<IBranch | null>(null);
+    // const [selectedWarehouseOrigin, setSelectedWarehouseOrigin] = useState<IWarehouse | null>(null);
+    // const [selectedBranchDestiny, setSelectedBranchDestiny] = useState<IBranch | null>(null);
+    // const [selectedWarehouseDestiny, setSelectedWarehouseDestiny] = useState<IWarehouse | null>(null);
     const { branchId } = useUIStore();
 
-    useEffect(() => {
-        setSelectDestiny('');
-        setSelectOrigin('');
-        if (transactionType === 'OUTCOME') {
-            setSelectOrigin('branch');
-        }
-        if (transactionType !== 'ADJUSTMENT') {
-            setAdjustmentType('')
-        }
-        setSelectedBranchOrigin(null)
-        setSelectedWarehouseOrigin(null)
-        setSelectedBranchDestiny(null)
-        setSelectedWarehouseDestiny(null)
-    }, [transactionType])
+    // useEffect(() => {
+    //     // setSelectDestiny('');
+    //     // setSelectOrigin('');
+    //     if (transactionType === 'OUTCOME') {
+    //         setSelectOrigin('branch');
+    //     }
+    //     if (transactionType !== 'ADJUSTMENT') {
+    //         setAdjustmentType('')
+    //     }
+    //     // setSelectedBranchOrigin(null)
+    //     // setSelectedWarehouseOrigin(null)
+    //     // setSelectedBranchDestiny(null)
+    //     // setSelectedWarehouseDestiny(null)
+    // }, [transactionType])
 
 
 
@@ -92,34 +92,34 @@ export const CreateRecipeForm = ({ token, productsResponse }: Props) => {
     // Productos removidos de la tabla
     const [removedProductsTable, setRemovedProductsTable] = useState<IProduct[]>([]);
 
-    useEffect(() => {
-        /// Filtrar productos solo si hay sucursal o almacén seleccionado
-        const filteredProducts = removedProductsTable.filter(p => {
-            const hasBranchStock = selectedBranchOrigin ?
-                p.branchProductStock.some(b => b.branchId === selectedBranchOrigin.id) : false;
-            const hasWarehouseStock = selectedWarehouseOrigin ?
-                p.warehouseProductStock.some(w => w.warehouseId === selectedWarehouseOrigin.id) : false;
+    // useEffect(() => {
+    //     /// Filtrar productos solo si hay sucursal o almacén seleccionado
+    //     const filteredProducts = removedProductsTable.filter(p => {
+    //         const hasBranchStock = selectedBranchOrigin ?
+    //             p.branchProductStock.some(b => b.branchId === selectedBranchOrigin.id) : false;
+    //         const hasWarehouseStock = selectedWarehouseOrigin ?
+    //             p.warehouseProductStock.some(w => w.warehouseId === selectedWarehouseOrigin.id) : false;
 
-            // Devolver el producto solo si tiene stock en la sucursal o el almacén
-            return hasBranchStock || hasWarehouseStock;
-        });
-        setRemovedProductsTable(filteredProducts)
+    //         // Devolver el producto solo si tiene stock en la sucursal o el almacén
+    //         return hasBranchStock || hasWarehouseStock;
+    //     });
+    //     setRemovedProductsTable(filteredProducts)
 
-    }, [selectedBranchOrigin, selectedWarehouseOrigin])
-
-
-    useEffect(() => {
-        setSelectedBranchOrigin(null)
-        setSelectedWarehouseOrigin(null)
+    // }, [selectedBranchOrigin, selectedWarehouseOrigin])
 
 
-    }, [selectOrigin])
+    // useEffect(() => {
+    //     setSelectedBranchOrigin(null)
+    //     setSelectedWarehouseOrigin(null)
+
+
+    // }, [selectOrigin])
 
     const handleOpenModatProductsTable = () => {
-        if (!selectedBranchOrigin && !selectedWarehouseOrigin && (transactionType === 'TRANSFER' || (adjustmentType === 'OUTCOME'))) {
-            toast.error("Debe seleccionar una sucursal o almacén de origen");
-            return
-        }
+        // if (!selectedBranchOrigin && !selectedWarehouseOrigin && (transactionType === 'TRANSFER' || (adjustmentType === 'OUTCOME'))) {
+        //     toast.error("Debe seleccionar una sucursal o almacén de origen");
+        //     return
+        // }
         onOpen();
     }
     const handleRemoveProduct = (product: IProduct) => {
@@ -430,8 +430,8 @@ export const CreateRecipeForm = ({ token, productsResponse }: Props) => {
                                     productsResponse={productsResponse}
                                     onRemoveProduct={handleRemoveProduct} // Ahora recibe la función correcta
                                     removedProducts={removedProductsTable} // Enviamos la lista de eliminados
-                                    searchBranchId={selectedBranchOrigin?.id ?? undefined}
-                                    searchWarehouseId={selectedWarehouseOrigin?.id ?? undefined}
+                                    // searchBranchId={selectedBranchOrigin?.id ?? undefined}
+                                    // searchWarehouseId={selectedWarehouseOrigin?.id ?? undefined}
                                 />
                             </ModalBody>
                             <ModalFooter>

@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useRef, useState } from 'react'
 import { OrderCard } from './OrderCard'
-import { getParallelGroups, getProductions, IParallelGroup, IProduction } from '@/modules/admin/production'
+import { getParallelGroups, getProductions, IParallelGroup, IProductionOrder } from '@/modules/admin/production'
 import { DatePicker, Spinner } from '@heroui/react';
 import { CalendarDate, parseAbsolute, parseDate, ZonedDateTime } from '@internationalized/date';
 import { usePathname } from 'next/navigation';
@@ -9,7 +9,7 @@ import useSWR from 'swr';
 import { useUIStore } from '@/modules/admin/shared';
 
 interface Props {
-    orderProductions: IProduction[];
+    orderProductions: IProductionOrder[];
     token: string;
     parallelGroups: IParallelGroup[];
     editOrder: boolean;
@@ -60,14 +60,14 @@ export const OrderList = ({ orderProductions, token, parallelGroups, editOrder }
             token,
             orderBy: "desc",
             date: isoDate, // Usa el valor en formato ISO
-            branchId
+            originBranchId: branchId
         });
-        setOrderProductionsFiltered(response.productions);
+        setOrderProductionsFiltered(response.orders);
         setIsLoading(false); // Finaliza la carga
 
-        return response.productions
+        return response.orders
     };
-    useSWR<IProduction[]>('/products', fetchOrderProductions, {
+    useSWR<IProductionOrder[]>('/products', fetchOrderProductions, {
         refreshInterval: 5000, // Actualiza cada 5 segundos (puedes ajustar el intervalo)
         revalidateOnFocus: true, // Vuelve a validar los datos cuando la página vuelve al foco
     });

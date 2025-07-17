@@ -1,14 +1,9 @@
 //snipet prc
 import { getAuthUser, hasModuleAccess, hasPermission } from "@/lib";
-import { getBranches } from "@/modules/admin/branches";
-import { getCategories } from "@/modules/admin/categories";
-import { getHandlingUnits } from "@/modules/admin/handling-units";
 import { findRecipe, ViewRecipe } from "@/modules/admin/production-recipes";
-import { findProduct, getProducts, ProductTable, ViewProduct } from "@/modules/admin/products";
 import { HeaderPage } from "@/modules/admin/shared";
-import { getWarehousesResponse } from "@/modules/admin/warehouses";
 import { RoleModulePermission } from "@/modules/auth";
-import { Add01Icon, LinkBackwardIcon } from "hugeicons-react";
+import { LinkBackwardIcon } from "hugeicons-react";
 import { redirect } from "next/navigation";
 
 export default async function ViewRecipePage({
@@ -36,9 +31,12 @@ export default async function ViewRecipePage({
               linkText: <LinkBackwardIcon />,
               url: '/admin/production/recipes'
             }}
-            isButton
-            popoverText='Volver a la lista'
-            delayPopover={1000}
+            button={{
+              popoverText: 'Volver a la lista',
+              delayPopover: 1000,
+              colorButton: 'primary',
+              variantButton: 'flat'
+            }}
           />
           <div className="container pt-8">
             <p className="text-red-500">Receta no encontrada.</p>
@@ -58,9 +56,12 @@ export default async function ViewRecipePage({
           linkText: <LinkBackwardIcon />,
           url: '/admin/production/recipes'
         }}
-        isButton
-        popoverText='Volver a la lista'
-        delayPopover={1000}
+        button={{
+          popoverText: 'Volver a la lista',
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat',
+        }}
       />
 
       <section className="container pt-8">

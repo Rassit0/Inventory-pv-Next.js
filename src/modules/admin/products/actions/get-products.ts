@@ -8,15 +8,16 @@ interface Props {
     page?: number | null;
     limit?: number | null;
     search?: string | null;
-    status?: string | null;
+    status?: 'active' | 'inactive' | 'all' | null;
     orderBy?: 'asc' | 'desc' | null
     columnOrderBy?: 'name' | 'description' | 'createdAt' | null
-    searchBranchId?: string;
-    searchWarehouseId?: string;
+    // searchBranchId?: string;
+    // searchWarehouseId?: string;
+    filterByLocationId?: string;
     productIds?: string[]; // Se agrega el campo `productIds`
 }
 
-export const getProducts = async ({ token, limit, page, search, status, columnOrderBy, orderBy, searchBranchId, searchWarehouseId, productIds }: Props): Promise<IProductsResponse> => {
+export const getProducts = async ({ token, limit, page, search, status, columnOrderBy, orderBy, filterByLocationId, productIds }: Props): Promise<IProductsResponse> => {
     try {
         // Construir dinámicamente los parámetros de consulta
         const searchParams = new URLSearchParams();
@@ -27,24 +28,29 @@ export const getProducts = async ({ token, limit, page, search, status, columnOr
         if (status) searchParams.append('status', status);
         if (orderBy) searchParams.append('orderBy', orderBy);
         if (columnOrderBy) searchParams.append('columnOrderBy', columnOrderBy);
-        if (searchBranchId) searchParams.append('branchId', searchBranchId);
-        if (searchWarehouseId) searchParams.append('warehouseId', searchWarehouseId);
+        if (filterByLocationId) searchParams.append('filterByLocationId', filterByLocationId);
+        // if (searchBranchId) searchParams.append('branchId', searchBranchId);
+        // if (searchWarehouseId) searchParams.append('warehouseId', searchWarehouseId);
 
         // Si productIds se proporciona, se agrega a la URL usando un forEach
+        let data = null;
         if (productIds && productIds.length > 0) {
-            productIds.forEach((id) => {
-                searchParams.append('productIds', id); // Agrega cada id de productIds como un parámetro individual
-            });
+            data = {
+                productIds
+            }
         }
 
         // Construir la URL con los parámetros de consulta
-        const url = '/products?' + searchParams.toString();
+        const url = `/products${data ? '/by-ids' : ''}?` + searchParams.toString();
 
 
         const response = await valeryClient<IProductsResponse>(url, {
+            method: data ? 'POST' : 'GET',
             headers: {
+                ...(data && { 'Content-Type': 'application/json', }),
                 Authorization: 'Bearer ' + token
             },
+            body: data ? JSON.stringify(data) : undefined,
         });
 
         // COnvertir las fechas a objeros Date

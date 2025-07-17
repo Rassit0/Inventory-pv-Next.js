@@ -12,11 +12,11 @@ import { getSuppliersResponse, ISupplier, ISuppliersResponse, CreateSupplierForm
 
 interface Props {
     token: string;
-    itemsResponse: ISuppliersResponse;
     filterSuppliersByProductId?: string;
+    selectedKeys?: string[];
+    itemsResponse: ISuppliersResponse;
     supplierIds?: string[]; // IDs de proveedores específicos para filtrar
     excludeSupplierIds?: string[]; // IDs de proveedores a excluir de la lista
-    defaultSelectedSingleKey?: string;
     name?: string;
     isRequired?: boolean;
     label?: string
@@ -45,7 +45,7 @@ interface PropsItemList {
     supplierIds?: string[]; // IDs de proveedores específicos para filtrar
 }
 
-function useItemList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', columnOrderBy = 'name', filterSuppliersByProductId, supplierIds }: PropsItemList) {
+function useItemList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', columnOrderBy = 'name', supplierIds, filterSuppliersByProductId }: PropsItemList) {
 
     const [items, setItems] = useState<ISupplier[]>([]);
     const [hasMore, setHasMore] = useState(true);
@@ -59,8 +59,9 @@ function useItemList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', colu
      * @param currentPage El número de página actual a cargar.
      * @param token El token de autenticación.
      * @param search Término de búsqueda opcional.
+     * @param supplierIds Ids de proveedores que tendrá la lista.
      */
-    const loadPerson = async ({ currentPage, token, search, supplierIds, filterSuppliersByProductId }: { currentPage: number, token: string, search?: string, supplierIds?: string[], filterSuppliersByProductId?: string }) => {
+    const loadItems = async ({ currentPage, token, search, supplierIds, filterSuppliersByProductId }: { currentPage: number, token: string, search?: string, supplierIds?: string[], filterSuppliersByProductId?: string }) => {
         const controller = new AbortController();
         // Controla para abortar el fetch si el por ej el usuario se va a otra pagina
         const { signal } = controller;
@@ -127,14 +128,14 @@ function useItemList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', colu
             setPage(newPage);
             setHasMore(true);
         }
-        loadPerson({ currentPage: newPage, token, search: propsSearch.value === '' ? undefined : propsSearch.value, supplierIds, filterSuppliersByProductId }) // Agregar filterSuppliersByProductId aquí
+        loadItems({ currentPage: newPage, token, search: propsSearch.value === '' ? undefined : propsSearch.value, supplierIds, filterSuppliersByProductId }) // Agregar filterSuppliersByProductId aquí
         // La dependencia de propsSearch.discardItemsSearch se eliminó aquí para evitar recargas innecesarias
         // }, [propsSearch.value, propsSearch.discardItemsSearch])
     }, [propsSearch.value])
 
 
     // useEffect(() => {
-    //     loadPerson(page, token);
+    //     loadItems(page, token);
     // }, []);
 
     /**
@@ -144,7 +145,7 @@ function useItemList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', colu
         const newPage = page + 1;
 
         setPage(newPage);
-        loadPerson({ currentPage: newPage, token, search: propsSearch.value === '' ? undefined : propsSearch.value, supplierIds, filterSuppliersByProductId });
+        loadItems({ currentPage: newPage, token, search: propsSearch.value === '' ? undefined : propsSearch.value, supplierIds });
     };
 
     return {
@@ -159,7 +160,7 @@ function useItemList({ fetchDelay = 0, token, propsSearch, orderBy = 'asc', colu
 /**
  * Componente SelectAutocompletePersons: Un autocomplete personalizado para seleccionar personas.
  */
-export const SelectSearchSupplierAndCreate = ({ defaultSelectedItemIds, label, itemsResponse, name, isRequired = false, onSelecteSingledItem, token, autoFocus = false, create, onItemSelectedChange, selectionMode = 'single', supplierIds, filterSuppliersByProductId, excludeSupplierIds }: Props) => {
+export const SelectSearchSupplierAndCreate = ({ defaultSelectedItemIds, label, itemsResponse, name, isRequired = false, onSelecteSingledItem, token, autoFocus = false, create, onItemSelectedChange, selectionMode = 'single', supplierIds, excludeSupplierIds, filterSuppliersByProductId }: Props) => {
 
     const [searchValue, setSearchValue] = useState('');
     const [orderBy, setOrderBy] = useState<'asc' | 'desc'>('asc');
@@ -190,11 +191,9 @@ export const SelectSearchSupplierAndCreate = ({ defaultSelectedItemIds, label, i
                 if (filterSuppliersByProductId) {
                     console.log(supplierIds)
                     const response = await getSuppliersResponse({ supplierIds, filterSuppliersByProductId: filterSuppliersByProductId, token });
-                    if (response && response.suppliers && response.suppliers.length > 0) {
+                    if (response && response.suppliers) {
                         initialItems = response.suppliers;
                     }
-                    setItems(initialItems);
-                    return;
                 }
 
                 if (defaultSelectedItemIds && defaultSelectedItemIds.length > 0) {
@@ -224,7 +223,7 @@ export const SelectSearchSupplierAndCreate = ({ defaultSelectedItemIds, label, i
         };
 
         initializeItems();
-    }, []);
+    }, [defaultSelectedItemIds]);
 
     // Configura el scroll infinito utilizando el hook de Hero UI
     const [, scrollerRef] = useInfiniteScroll({
@@ -447,7 +446,7 @@ export const SelectSearchSupplierAndCreate = ({ defaultSelectedItemIds, label, i
                             </div>
                         ) : (
                             <div className="text-center text-default-400 py-4">
-                                No hay encargados disponibles
+                                No hay proveedores disponibles
                             </div>
                         ),
                     hideSelectedIcon: true,

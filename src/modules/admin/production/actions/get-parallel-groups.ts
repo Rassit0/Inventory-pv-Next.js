@@ -1,7 +1,7 @@
 "use server"
 
 import { valeryClient } from "@/lib/api"
-import { IParallelGroup, IProduction, IProductionsResponse, IResponseParallelGroups } from "@/modules/admin/production";
+import { IParallelGroup, IResponseParallelGroups } from "@/modules/admin/production";
 import { group } from "console";
 
 interface Props {

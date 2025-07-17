@@ -59,7 +59,7 @@ export const ViewProduct = ({ term, token, product }: Props) => {
                     <span
                         className={`px-3 py-1 text-sm rounded-full font-medium ${productInfo.isEnable ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}
                     >
-                        {productInfo.isEnable ? 'Disponible' : 'No disponible'}
+                        {productInfo.isEnable ? 'Activo' : 'Inactivo'}
                     </span>
                 </div>
 
@@ -77,9 +77,9 @@ export const ViewProduct = ({ term, token, product }: Props) => {
                 <div>
                     <h3 className="text-lg font-medium text-gray-800">Stock por Almacén:</h3>
                     <div className="space-y-4">
-                        {productInfo.warehouseProductStock?.map((stock) => (
+                        {productInfo.locationProductStock?.filter(stock => stock.locationType === "WAREHOUSE").map((stock) => (
                             <div key={stock.id} className="p-4 border rounded-lg shadow-sm bg-gray-50">
-                                <h4 className="text-lg font-semibold text-gray-800">{stock.nameWarehouse || "Almacén Desconocido"}</h4>
+                                <h4 className="text-lg font-semibold text-gray-800">{stock.warehouse?.name || "Almacén Desconocido"}</h4>
                                 <p className="text-sm text-gray-600">Stock disponible:
                                     <span className="font-semibold text-gray-900">{stock.stock}</span>
                                 </p>
@@ -92,9 +92,9 @@ export const ViewProduct = ({ term, token, product }: Props) => {
                 <div>
                     <h3 className="text-lg font-medium text-gray-800">Stock por Sucursal:</h3>
                     <div className="space-y-4">
-                        {productInfo.branchProductStock?.map((stock) => (
+                        {productInfo.locationProductStock?.filter(stock => stock.locationType === "BRANCH").map((stock) => (
                             <div key={stock.id} className="p-4 border rounded-lg shadow-sm bg-gray-50">
-                                <h4 className="text-lg font-semibold text-gray-800">{stock.nameBranch || "Sucursal Desconocida"}</h4>
+                                <h4 className="text-lg font-semibold text-gray-800">{stock.branch?.name || "Sucursal Desconocida"}</h4>
                                 <p className="text-sm text-gray-600">Stock disponible:
                                     <span className="font-semibold text-gray-900">{stock.stock}</span>
                                 </p>

@@ -1,10 +1,10 @@
 "use client"
 import React, { FormEvent, useEffect, useState } from 'react'
-import { IBranchProductStock, InventoryByBranchForm, IProduct, updateProduct } from '@/modules/admin/products';
+import { IProduct, updateProduct } from '@/modules/admin/products';
 import { ISimpleCategory } from '@/modules/admin/categories';
 import { ISimpleHandlingUnit } from '@/modules/admin/handling-units';
 import { toast } from 'sonner';
-import { Button, Checkbox, CheckboxGroup, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Switch, Textarea, useDisclosure } from '@heroui/react';
+import { Button, Checkbox, CheckboxGroup, DatePicker, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, SharedSelection, Switch, Textarea, useDisclosure } from '@heroui/react';
 import { Delete01Icon, PencilEdit01Icon, PlusSignIcon } from 'hugeicons-react';
 import Image from 'next/image';
 import no_image from '@/assets/no_image.png';
@@ -43,21 +43,20 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
     const [productName, setProductName] = useState(product.name);
     const [productDescription, setProductDescription] = useState(product.description);
     const [productIsEnable, setProductIsEnable] = useState(product.isEnable);
-    const [handlingUnitId, setHandlingUnitId] = useState(product.unit.id || '');
+    const [handlingUnitId, setHandlingUnitId] = useState<SharedSelection>(new Set([product.unit.id || '']));
+    const [categorySelectedKeys, setCategorySelectedKeys] = useState<SharedSelection>(new Set(product.categories.map(category => category.id)));
+    const [minimumStockProduct, setMinimumStockProduct] = useState<string>(product.minimumStock);
+    const [reorderPointProduct, setReorderPointProduct] = useState<string>(product.reorderPoint);
 
     const [imageError, setImageError] = useState(false);
 
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [previewImage, setPreviewImage] = useState<string | null>(null);
-    const [branchProductStock, setBranchProductStock] = useState<IBranchProductStock[]>(product.branchProductStock)
-    const [backupBranchProductInventory, setBackupBranchProductInventory] = useState<IBranchProductStock[]>(product.branchProductStock)
-    const [availableBranches, setAvailableBranches] = useState<IBranch[]>(branches.filter(branch => !product.branchProductStock.some(inventory => inventory.branchId === branch.id))); // Sucursales disponibles
+    // const [branchProductStock, setBranchProductStock] = useState<IBranchProductStock[]>(product.branchProductStock)
+    // const [backupBranchProductInventory, setBackupBranchProductInventory] = useState<IBranchProductStock[]>(product.branchProductStock)
+    // const [availableBranches, setAvailableBranches] = useState<IBranch[]>(branches.filter(branch => !product.branchProductStock.some(inventory => inventory.branchId === branch.id))); // Sucursales disponibles
 
     const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        setBranchProductStock(product.branchProductStock)
-    }, [product])
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -144,7 +143,9 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                                     placeholder="Seleccione la categoría(s) del producto"
                                                     variant="underlined"
                                                     selectionMode="multiple"
-                                                    defaultSelectedKeys={product.categories.map(category => category.id)}
+                                                    selectedKeys={categorySelectedKeys}
+                                                    onSelectionChange={setCategorySelectedKeys}
+                                                // defaultSelectedKeys={product.categories.map(category => category.id)}
                                                 >
                                                     {
                                                         categories.map(category => (
@@ -171,8 +172,8 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                                     label='Unidad de manejo'
                                                     placeholder="Selecciona la unidad de manejo"
                                                     variant="underlined"
-                                                    selectedKeys={[handlingUnitId]}
-                                                    onChange={(e) => setHandlingUnitId(e.target.value)}
+                                                    selectedKeys={handlingUnitId}
+                                                    onSelectionChange={setHandlingUnitId}
                                                 >
                                                     {
                                                         handlingUnits.map(unit => (
@@ -205,7 +206,8 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                                     type="number"
                                                     variant="underlined"
                                                     endContent={<div className="text-default-400">{handlingUnits.find(unit => unit.id === handlingUnitId)?.abbreviation}</div>}
-                                                    defaultValue={product.minimumStock}
+                                                    value={minimumStockProduct}
+                                                    onValueChange={setMinimumStockProduct}
                                                 />
 
                                                 <Input
@@ -216,7 +218,8 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                                     type="number"
                                                     variant="underlined"
                                                     endContent={<div className="text-default-400">{handlingUnits.find(unit => unit.id === handlingUnitId)?.abbreviation}</div>}
-                                                    defaultValue={product.reorderPoint}
+                                                    value={reorderPointProduct}
+                                                    onValueChange={setReorderPointProduct}
                                                 />
 
                                                 {/* <DatePicker
@@ -261,7 +264,7 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
                                                     placeholder="Agrega una descripción"
                                                     variant='underlined'
                                                     value={productDescription}
-                                                    onChange={(e) => setProductDescription(e.target.value)}
+                                                    onValueChange={setProductDescription}
                                                     onKeyDown={(e) => {
                                                         if (e.key === ' ' || e.key === 'Enter') setProductDescription(prev => prev.charAt(0).toUpperCase() + prev.slice(1))
                                                     }}
@@ -272,7 +275,7 @@ export const UpdateProductFormModal = ({ product, categories, handlingUnits, bra
 
                                                 <div className="md:col-span-3">
                                                     <SelectSearchSupplierAndCreate
-                                                        isRequired
+                                                        // isRequired
                                                         token={token}
                                                         name={`productSuppliers`}
                                                         itemsResponse={supplierProps.suppliersResponse}

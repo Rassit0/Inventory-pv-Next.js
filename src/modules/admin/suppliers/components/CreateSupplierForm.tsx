@@ -351,10 +351,10 @@ export const CreateSupplierForm = ({ token, createContact, personsResponse }: Pr
                   value={contact.lastname}
                   onChange={(e) => handleContactChange(contact.id, 'lastname', e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') handleContactChange(contact.id, 'lastname', contact.lastname.charAt(0).toUpperCase() + contact.contactName.slice(1));
+                    if (e.key === ' ' || e.key === 'Enter') handleContactChange(contact.id, 'lastname', contact.lastname ? contact.lastname.charAt(0).toUpperCase() + contact.lastname.slice(1) : '');
                   }}
                   onBlur={() => {
-                    handleContactChange(contact.id, 'lastname', contact.lastname.charAt(0).toUpperCase() + contact.contactName.slice(1));
+                    handleContactChange(contact.id, 'lastname', contact.lastname ? contact.lastname.charAt(0).toUpperCase() + contact.lastname.slice(1) : '');
                   }}
                 />
                 <Input

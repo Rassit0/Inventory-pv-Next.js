@@ -19,9 +19,12 @@ export default async function NewHandlingUnitsPage() {
           linkText: <LinkBackwardIcon />,
           url: '/admin/products/handling-units'
         }}
-        isButton
-        popoverText='Volver a la lista'
-        delayPopover={1000}
+        button={{
+          popoverText: 'Volver a la lista',
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat'
+        }}
       />
       <section className="container pt-8">
         <CreateHanldinfUnitForm 

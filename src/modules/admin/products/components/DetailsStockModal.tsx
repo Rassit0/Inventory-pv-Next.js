@@ -63,13 +63,13 @@ export const DetailsStockModal = ({ product }: Props) => {
                                     </TableHeader>
 
                                     <TableBody loadingContent={<Spinner />} loadingState={isLoading ? 'loading' : 'filtering'} emptyContent={"¡Ups! No encontramos nada aquí."}
-                                        items={product.branchProductStock}
+                                        items={product.locationProductStock.filter(item => item.locationType === "BRANCH")}
                                     >
                                         {(item) => (
                                             <TableRow>
                                                 <TableCell>{item.stock}</TableCell>
                                                 <TableCell>{product.unit.name}</TableCell>
-                                                <TableCell>{item.nameBranch}</TableCell>
+                                                <TableCell>{item.branch?.name || "N/A"}</TableCell>
                                             </TableRow>
                                         )}
                                     </TableBody>
@@ -85,13 +85,14 @@ export const DetailsStockModal = ({ product }: Props) => {
                                     </TableHeader>
 
                                     <TableBody loadingContent={<Spinner />} loadingState={isLoading ? 'loading' : 'filtering'} emptyContent={"¡Ups! No encontramos nada aquí."}
-                                        items={product.warehouseProductStock}
+                                        items={product.locationProductStock.filter(item => item.locationType === "WAREHOUSE")
+                                        }
                                     >
                                         {(item) => (
                                             <TableRow>
                                                 <TableCell>{item.stock}</TableCell>
                                                 <TableCell>{product.unit.name}</TableCell>
-                                                <TableCell>{item.nameWarehouse}</TableCell>
+                                                <TableCell>{item.warehouse?.name || "N/A"}</TableCell>
                                             </TableRow>
                                         )}
                                     </TableBody>

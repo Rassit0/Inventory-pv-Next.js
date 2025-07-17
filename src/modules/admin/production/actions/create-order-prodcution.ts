@@ -21,7 +21,7 @@ export const createOrderProduction = async ({ formData, token }: Props) => {
     const deliveryDate = new Date(cleanedDate).toISOString();
 
     const data = {
-        branchId: formData.get("orderBranchId"),
+        originBranchId: formData.get("orderBranchId"),
         status: formData.get("orderStatus"),
         deliveryDate,
         productionOrderDetails: formData.getAll("detailIds").map(detailId => (
@@ -61,8 +61,11 @@ export const createOrderProduction = async ({ formData, token }: Props) => {
         if (isApiError(error)) {
             return {
                 error: true,
-                message: error.message, // Mostrar mensafe de error específico de la API
-                response: error.response
+                message: cleanErrorMessage(error.message), // Mostrar mensaje de error específico de la API
+                response: {
+                    ...error.response,
+                    ...(error.response?.message && { message: cleanErrorMessage(error.response.message) }) // Limpiar mensaje de error
+                }
             };
         }
 
@@ -72,4 +75,19 @@ export const createOrderProduction = async ({ formData, token }: Props) => {
             message: "Ha ocurrido un error desconocido"
         }
     }
+}
+/**
+ * Devuelve el/los mensajes sin los IDs entre corchetes.
+ * Si recibe algo que no sea string ni array, lo devuelve tal cual.
+ */
+function cleanErrorMessage(message: any) {
+    const stripIds = (msg: string) => msg.replace(/\s*\[.*?\]/g, '').trim();
+
+    if (Array.isArray(message)) {
+        return message.map(stripIds);
+    }
+    if (typeof message === 'string') {
+        return stripIds(message);
+    }
+    return message; // por si acaso llega otro tipo
 }

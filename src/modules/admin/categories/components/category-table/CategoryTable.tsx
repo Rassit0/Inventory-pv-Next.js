@@ -29,6 +29,7 @@ export const CategoryTable = ({ editCategory, deleteCategory, categories, token 
             ...prevErrors,
             [categoryId]: true,
         }));
+        console.log(imageErrors)
     };
     return (
         <section className='container pt-8'>
@@ -52,7 +53,11 @@ export const CategoryTable = ({ editCategory, deleteCategory, categories, token 
                                     <div className='w-full h-16 flex items-center justify-center'>
                                         <Image
                                             alt={category.name}
-                                            src={imageErrors[category.id] ? warning_error_image : category.imageUrl || no_image}
+                                            src={
+                                                category.imageUrl
+                                                    ? (imageErrors[category.id] ? warning_error_image : category.imageUrl)
+                                                    : no_image
+                                            }
                                             fill
                                             sizes="(max-width: 768px) 100vw, 50vw"
                                             className='object-contain'

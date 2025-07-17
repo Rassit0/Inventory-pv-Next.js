@@ -1,12 +1,15 @@
 'use client';
 import { Button, Card, Chip, Divider, Spinner, Tooltip } from '@heroui/react';
 import React, { useState } from 'react';
-import { IParallelGroup, IProduction, IProductionOrderDetail, updateOrderProduction } from '@/modules/admin/production';
+import { ProductWasteFormModal, IParallelGroup, IProductionOrder, IProductionOrderDetail, updateOrderProduction } from '@/modules/admin/production';
 import { toast } from 'sonner';
+import { DetailsQuantityProductsRecipeModal } from '@/modules/admin/production-recipes';
+import { DetailsQuantityProductsRecipeOrderModal } from '@/modules/admin/production-recipes/components/DetailsQuantityProductsRecipeOrderModal';
+import { DetailsQuantityProductsWasteOrderModal } from '../DetailsQuantityProductsWasteOrderModal';
 
 interface Props {
     token: string;
-    order: IProduction;
+    order: IProductionOrder;
     parallelGroups: IParallelGroup[];
     editOrder: boolean;
 }
@@ -81,7 +84,8 @@ export const OrderCard = ({ order, parallelGroups, token, editOrder }: Props) =>
 
             <Divider className="my-4" />
 
-            <div className="grid grid-cols-3 gap-2 text-center font-semibold mb-2">
+            <div className="grid grid-cols-4 gap-2 text-center font-semibold mb-2">
+                <p></p>
                 <p>Receta</p>
                 <p>Cantidad</p>
                 <p>Tiempo</p>
@@ -91,8 +95,8 @@ export const OrderCard = ({ order, parallelGroups, token, editOrder }: Props) =>
                 {Object.entries(groupedByParallel).map(([groupKey, details]) => (
                     <li key={groupKey} className="space-y-4">
                         {groupKey !== 'no-parallel-group' && (
-                            <div className="grid grid-cols-3 bg-primary-100 rounded-md p-3">
-                                <p className="font-semibold text-lg text-center col-span-2">
+                            <div className="grid grid-cols-4 bg-primary-100 rounded-md p-3">
+                                <p className="font-semibold text-lg text-center col-span-3">
                                     <Tooltip content="En paralelo">
                                         <span className="mr-1 cursor-help">🔄</span>
                                     </Tooltip>
@@ -107,7 +111,8 @@ export const OrderCard = ({ order, parallelGroups, token, editOrder }: Props) =>
 
                         {details.length > 0 ? (
                             details.map((detail: IProductionOrderDetail) => (
-                                <div key={detail.id} className="grid grid-cols-3 items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                <div key={detail.id} className="grid grid-cols-4 items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                    <DetailsQuantityProductsRecipeOrderModal recipe={detail.recipe} recipeCount={Number(detail.quantity)} />
                                     <p className="truncate">{detail.recipe?.name ?? 'Sin nombre'}</p>
                                     <p className="text-center">{detail.quantity}</p>
 
@@ -138,9 +143,10 @@ export const OrderCard = ({ order, parallelGroups, token, editOrder }: Props) =>
 
 
 
-            {(order.status === 'PENDING' && editOrder) && (
-                <div className='flex justify-between items-center space-x-2'>
-                    <Button
+            {(order.status === 'PENDING' && editOrder)
+                ? (
+                    <div className='flex justify-between items-center space-x-2'>
+                        {/* <Button
                         fullWidth
                         color="danger"
                         onPress={() => handleUpdateStatus(order.id, 'CANCELED')}
@@ -149,8 +155,18 @@ export const OrderCard = ({ order, parallelGroups, token, editOrder }: Props) =>
                         className="mt-4"
                     >
                         Cancelar
-                    </Button>
-                    <Button
+                    </Button> */}
+                        <ProductWasteFormModal
+                            token={token}
+                            order={order}
+                            status='CANCELED'
+                        />
+                        <ProductWasteFormModal
+                            token={token}
+                            order={order}
+                            status='COMPLETED'
+                        />
+                        {/* <Button
                         fullWidth
                         color="primary"
                         onPress={() => handleUpdateStatus(order.id, 'COMPLETED')}
@@ -158,11 +174,13 @@ export const OrderCard = ({ order, parallelGroups, token, editOrder }: Props) =>
                         isDisabled={isLoading}
                         className="mt-4"
                     >
-                        {/* {isLoading ? <Spinner size="sm" /> : 'Completar Orden'} */}
                         Completar
-                    </Button>
-                </div>
-            )}
+                    </Button> */}
+                    </div>
+                )
+                :
+                order.productionWaste.length > 0 && (<DetailsQuantityProductsWasteOrderModal productionWaste={order.productionWaste} />)
+            }
         </Card>
     );
 };

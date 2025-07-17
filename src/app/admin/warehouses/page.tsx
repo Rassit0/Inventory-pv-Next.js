@@ -1,5 +1,5 @@
 import { getAuthUser, hasModuleAccess, hasPermission } from "@/lib";
-import { getBranches } from "@/modules/admin/branches";
+import { getBranchesResponse } from "@/modules/admin/branches";
 import { HeaderPage } from "@/modules/admin/shared";
 import { getUsersResponse } from "@/modules/admin/users";
 import { getWarehousesResponse, WarehouseTable } from "@/modules/admin/warehouses";
@@ -16,7 +16,7 @@ export default async function WarehousesPage() {
 
   const warehousesResponse = await getWarehousesResponse({ token: authToken });
   const responseUser = await getUsersResponse({ token: authToken, limit: 0 });
-  const branchesResponse = await getBranches({ token: authToken });
+  const branchesResponse = await getBranchesResponse({ token: authToken });
 
   return (
     <>
@@ -31,11 +31,12 @@ export default async function WarehousesPage() {
             }
             : undefined
         }
-        isButton
-        colorButton='primary'
-        variantButton='flat'
-        popoverText="Nuevo Almacén"
-        delayPopover={1000}
+        button={{
+          popoverText: "Nuevo Almacén",
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat',
+        }}
       />
 
       {/* TABLA DE ALMACENES */}

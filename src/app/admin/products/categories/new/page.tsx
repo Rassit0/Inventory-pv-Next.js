@@ -20,9 +20,12 @@ export default async function NewCategoryPage() {// Obtener usuario autenticado 
                     linkText: <LinkBackwardIcon />,
                     url: '/admin/products/categories'
                 }}
-                isButton
-                popoverText='Volver a la lista'
-                delayPopover={1000}
+                button={{
+                    popoverText: 'Volver a la lista',
+                    delayPopover: 1000,
+                    colorButton: 'primary',
+                    variantButton: 'flat'
+                }}
             />
             <section className="container pt-8">
                 <CategoryForm categories={categories} token={authToken} />

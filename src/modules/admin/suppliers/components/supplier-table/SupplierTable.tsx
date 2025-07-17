@@ -35,7 +35,8 @@ type TSortDescriptor = {
 const columns = [
     // { name: "IMAGEN", uid: "image" },
     { name: "NAME", uid: "name", sortable: true },
-    { name: "DIRECCIÓN", uid: "address", sortable: true },
+    { name: "DIRECCIÓN", uid: "address", sortable: false },
+    { name: "UBICACIÓN", uid: "location", sortable: true },
     { name: "ESTADO", uid: "status" },
     { name: "CONTACTO PRINCIPAL", uid: "main_contact" },
     { name: "CORREO", uid: "email" },
@@ -54,7 +55,7 @@ function capitalize(s: string) {
     return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "";
 }
 
-const INITIAL_VISIBLE_COLUMNS: string[] = ["name", "address", "status", "main_contact", "phone", "actions"];
+const INITIAL_VISIBLE_COLUMNS: string[] = ["name", "location", "address", "status", "main_contact", "phone", "actions"];
 
 export const SupplierTable = ({ deleteSupplier, editSupplier, itemsResponse, token, editContact, personsResponse }: Props) => {
     const isMounted = useRef(false);
@@ -184,6 +185,12 @@ export const SupplierTable = ({ deleteSupplier, editSupplier, itemsResponse, tok
                     </div>
                 );
             case "address":
+                return (
+                    <div>
+                        {item.address || 'N/A'}
+                    </div>
+                );
+            case "location":
                 return (
                     <div>
                         <HighlinghtedText text={`${item.city}, ${item.country}`} highlight={searchValue} />

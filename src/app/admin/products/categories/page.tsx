@@ -29,11 +29,12 @@ export default async function CategoriesPage() {
             }
             : undefined
         }
-        isButton
-        colorButton='primary'
-        variantButton='flat'
-        popoverText="Nueva Categoría"
-        delayPopover={1000}
+        button={{
+          popoverText: "Nueva Categoría",
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat',
+        }}
       />
 
       {/* TABLA DE CATEGORIAS */}

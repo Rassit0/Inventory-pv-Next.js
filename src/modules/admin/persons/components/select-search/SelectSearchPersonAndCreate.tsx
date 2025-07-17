@@ -327,9 +327,6 @@ export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, p
         }
     }, [hasAttemptedOnBlur, hasAttemptedValidation, hasAttemptedOnClick, hasAttemptedOnFocus])
 
-
-    const [selectedKey, setSelectedKey] = useState<string | null>(null);
-
     return (
         <div className='w-full flex items-start justify-center'>
             {/* Campo oculto para enviar el ID de la sucursal (si es necesario) */}
@@ -533,7 +530,10 @@ export const SelectSearchPersonAndCreate = ({ defaultSelectedPersonIds, label, p
             {/* {create && (<CreatePersonFormModal token={token} onCreate={person => { if (person) addSelectedPerson(person) }} />)} */}
             {create && (
                 <div className='mt-4'>
-                    <CreatePersonFormModal token={token} onCreate={person => { if (person) addSelectedPerson(person) }} />
+                    <CreatePersonFormModal
+                        token={token}
+                        onCreate={person => { if (person) removeSelectedPerson(person) }}
+                    />
                 </div>
             )}
         </div>

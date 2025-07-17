@@ -13,7 +13,7 @@ import no_image from '@/assets/no_image.png';
 import warning_error_image from '@/assets/warning_error.png';
 import { createMovement } from '@/modules/admin/inventory';
 import { IPersonsResponse, SelectPersonAndCreate, SelectSearchPersonAndCreate } from '@/modules/admin/persons';
-import { parseDate } from '@internationalized/date';
+import { getLocalTimeZone, now, parseDate } from '@internationalized/date';
 
 
 interface Contact {
@@ -57,12 +57,12 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     const localDateString = `${yyyy}-${mm}-${dd}`;
-    const [movementType, setTransactionType] = useState<string>("INCOME");
+    const [movementType, setTransactionType] = useState<'INCOME' | 'OUTCOME' | 'ADJUSTMENT' | 'TRANSFER'>("INCOME");
     const [managerDeliveryType, setManagerDeliveryType] = useState<string>("supplier");
     const [adjustmentReason, setAdjustmentReason] = useState<string>("");
     const [adjustmentType, setAdjustmentType] = useState<string>("");
     const [selectOrigin, setSelectOrigin] = useState<string>('')
-    const [selectDestiny, setSelectDestiny] = useState<string>('')
+    const [selectDestiny, setSelectDestiny] = useState<'branch' | 'warehouse' | null>(null);
     const [branchDestiny, setBranchDestiny] = useState<Record<string, IBranch>>({})
     const [selectedBranchOrigin, setSelectedBranchOrigin] = useState<IBranch | null>(null);
     const [selectedWarehouseOrigin, setSelectedWarehouseOrigin] = useState<IWarehouse | null>(null);
@@ -70,7 +70,7 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
     const [selectedWarehouseDestiny, setSelectedWarehouseDestiny] = useState<IWarehouse | null>(null);
 
     useEffect(() => {
-        setSelectDestiny('');
+        setSelectDestiny(null);
         setSelectOrigin('');
         if (movementType === 'OUTCOME') {
             setSelectOrigin('branch');
@@ -97,20 +97,27 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
     const [removedProductsTable, setRemovedProductsTable] = useState<IProduct[]>([]);
 
     useEffect(() => {
-        console.log(selectedWarehouseOrigin)
-        /// Filtrar productos solo si hay sucursal o almacén seleccionado
-        const filteredProducts = removedProductsTable.filter(p => {
-            const hasBranchStock = selectedBranchOrigin ?
-                p.branchProductStock.some(b => b.branchId === selectedBranchOrigin.id) : false;
-            const hasWarehouseStock = selectedWarehouseOrigin ?
-                p.warehouseProductStock.some(w => w.warehouseId === selectedWarehouseOrigin.id) : false;
+        if (movementType !== 'INCOME' || adjustmentType !== 'INCOME') {
+            setRemovedProductsTable([]);
+        }
+    }, [movementType, adjustmentType, selectedBranchOrigin, selectedWarehouseOrigin])
 
-            // Devolver el producto solo si tiene stock en la sucursal o el almacén
-            return hasBranchStock || hasWarehouseStock;
-        });
-        setRemovedProductsTable(filteredProducts)
 
-    }, [selectedBranchOrigin, selectedWarehouseOrigin])
+    // useEffect(() => {
+    //     console.log(selectedWarehouseOrigin)
+    //     /// Filtrar productos solo si hay sucursal o almacén seleccionado
+    //     const filteredProducts = removedProductsTable.filter(p => {
+    //         const hasBranchStock = selectedBranchOrigin ?
+    //             p.branchProductStock.some(b => b.branchId === selectedBranchOrigin.id) : false;
+    //         const hasWarehouseStock = selectedWarehouseOrigin ?
+    //             p.warehouseProductStock.some(w => w.warehouseId === selectedWarehouseOrigin.id) : false;
+
+    //         // Devolver el producto solo si tiene stock en la sucursal o el almacén
+    //         return hasBranchStock || hasWarehouseStock;
+    //     });
+    //     setRemovedProductsTable(filteredProducts)
+
+    // }, [selectedBranchOrigin, selectedWarehouseOrigin])
 
 
     useEffect(() => {
@@ -154,17 +161,26 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
         // }
 
         let hasError = false;
-        removedProductsTable.forEach(p => {
-            if (!selectDestiny && (movementType === 'INCOME' || movementType === 'TRANSFER' || (movementType === 'ADJUSTMENT' && adjustmentType === 'INCOME'))) {
-                toast.error(`Debe seleccionar el destino del producto: ${p.name}`)
-                hasError = true;
-            }
+        if (!selectDestiny && (movementType === 'INCOME' || movementType === 'TRANSFER' || (movementType === 'ADJUSTMENT' && adjustmentType === 'INCOME'))) {
+            toast.error(`Debe seleccionar el destino del producto`)
+            hasError = true;
+        }
 
-            if (!selectOrigin && (movementType === 'ADJUSTMENT' && adjustmentType === 'OUTCOME' || movementType === 'TRANSFER')) {
-                toast.error(`Debe seleccionar el origen del producto: ${p.name}`)
-                hasError = true;
-            }
-        })
+        if (!selectOrigin && (movementType === 'ADJUSTMENT' && adjustmentType === 'OUTCOME' || movementType === 'TRANSFER')) {
+            toast.error(`Debe seleccionar el origen del producto`)
+            hasError = true;
+        }
+        // removedProductsTable.forEach(p => {
+        //     if (!selectDestiny && (movementType === 'INCOME' || movementType === 'TRANSFER' || (movementType === 'ADJUSTMENT' && adjustmentType === 'INCOME'))) {
+        //         toast.error(`Debe seleccionar el destino del producto: ${p.name}`)
+        //         hasError = true;
+        //     }
+
+        //     if (!selectOrigin && (movementType === 'ADJUSTMENT' && adjustmentType === 'OUTCOME' || movementType === 'TRANSFER')) {
+        //         toast.error(`Debe seleccionar el origen del producto: ${p.name}`)
+        //         hasError = true;
+        //     }
+        // })
 
         if (hasError) {
             setIsLoading(false);
@@ -265,7 +281,7 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
                                 isRequired
                                 name='movementType'
                                 value={movementType}
-                                onValueChange={setTransactionType}
+                                onValueChange={(value) => setTransactionType(value as "INCOME" | "OUTCOME" | "ADJUSTMENT" | "TRANSFER")}
                                 classNames={{
                                     label: "text-small"
                                 }}
@@ -334,8 +350,8 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
                                             aria-label="Table Columns"
                                             closeOnSelect={false}
                                             selectionMode="single"
-                                            selectedKeys={[selectDestiny]}
-                                            onSelectionChange={(selection) => setSelectDestiny(selection.currentKey || '')}
+                                            selectedKeys={[selectDestiny ?? '']}
+                                            onSelectionChange={(selection) => setSelectDestiny((selection.currentKey || null) as "branch" | "warehouse" | null)}
                                         >
                                             <DropdownItem key={'branch'} className="capitalize">
                                                 Sucursal
@@ -411,16 +427,17 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
 
                             </div>
                         </div>
-
-                        {(movementType === 'INCOME' || movementType === 'TRANSFER' || adjustmentType === 'INCOME') && (
+{/* 
+                        {(movementType === 'INCOME' || movementType === 'TRANSFER' || adjustmentType === 'INCOME') && ( */}
                             <DatePicker
                                 isRequired
-                                name="movementDeliveryDate"
-                                label="Fecha de ingreso"
+                                name="movementGeneralDeliveryDate"
+                                label="Fecha de entrega general"
                                 variant="underlined"
-                                defaultValue={parseDate(localDateString)}
+                                // defaultValue={parseDate(localDateString)}
+                                defaultValue={now(getLocalTimeZone())}
                             />
-                        )}
+                        {/* )} */}
 
                         {movementType === 'ADJUSTMENT' && (
                             <div className='w-full'>
@@ -512,6 +529,7 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
                                             name={`product-quantity[${product.id}]`}
                                             label='Cantidad'
                                             // placeholder='Ingrese el nombre del contacto'
+                                            endContent={product.unit.abbreviation}
                                             variant='underlined'
                                             type='number'
                                         />
@@ -579,8 +597,9 @@ export const CreateMovementInventoryForm = ({ token, productsResponse, branches,
                                     productsResponse={productsResponse}
                                     onRemoveProduct={handleRemoveProduct} // Ahora recibe la función correcta
                                     removedProducts={removedProductsTable} // Enviamos la lista de eliminados
-                                    searchBranchId={selectedBranchOrigin?.id ?? undefined}
-                                    searchWarehouseId={selectedWarehouseOrigin?.id ?? undefined}
+                                    filterByLocationId={selectedBranchOrigin?.id ?? selectedWarehouseOrigin?.id ?? undefined}
+                                // searchBranchId={selectedBranchOrigin?.id ?? undefined}
+                                // searchWarehouseId={selectedWarehouseOrigin?.id ?? undefined}
                                 />
                             </ModalBody>
                             <ModalFooter>

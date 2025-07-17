@@ -1,6 +1,6 @@
 import { Button, DatePicker, Drawer, DrawerBody, DrawerContent, DrawerFooter, DrawerHeader, Form, Input } from '@heroui/react'
 import { Cancel01Icon } from 'hugeicons-react';
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import { useOrderCartStore } from '../stores/order-cart.store';
 import { OrderCartList } from '@/modules/admin/side-orders';
 import { toast } from 'sonner';
@@ -24,9 +24,13 @@ export const SideOrderCart = ({ isOpen, onOpenChange, parallelGroups, token }: P
     const { totalTime, orderCart, cleanOrderCart, parallelGroups: groups } = useOrderCartStore();
     const { branchId } = useUIStore();
 
+    useEffect(() => {
+      console.log(deliveryDate)
+    }, [])
+    
     // Estado para manejar el valor del DatePicker
 
-    const [deliveryDate, setDeliveryDate] = useState<ZonedDateTime | null>(parseAbsolute(((new Date())).toISOString(), 'America/La_Paz'));    
+    const [deliveryDate, setDeliveryDate] = useState<ZonedDateTime | null>(parseAbsolute((new Date()).toISOString(), 'America/La_Paz'));    
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -51,7 +55,7 @@ export const SideOrderCart = ({ isOpen, onOpenChange, parallelGroups, token }: P
         });
 
         // Convertir el array a JSON y mostrarlo
-        console.log(JSON.stringify(dataArray, null, 2));
+        // console.log(JSON.stringify(dataArray, null, 2));
         // EJECUTAR SERVER ACTIONS PARA GUARDAR
         const { error, message, response } = await createOrderProduction({ formData, token: token || '' });
         if (error) {
@@ -62,6 +66,7 @@ export const SideOrderCart = ({ isOpen, onOpenChange, parallelGroups, token }: P
                         description: msg
                     });
                 });
+                console.log(response)
             } else {
                 // Si no es un arreglo, muestra un solo toast con el mensaje
                 toast.warning("Ocurrió un error", {

@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { IRole } from '@/modules/admin/user-roles'
 import { ImageUploaderInput } from '@/modules/admin/shared'
 import { RoleModule } from '../interfaces/users-response';
+import { ViewIcon, ViewOffIcon } from 'hugeicons-react'
 
 interface Props {
   token: string
@@ -21,7 +22,8 @@ export const CreateUserForm = ({ token, branchesResponse, roles }: Props) => {
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [password, setPassword] = useState<string | undefined>('')
+  const [password, setPassword] = useState<string | undefined>('');
+  const [viewPassword, setViewPassword] = useState(false);
 
   // Form
   const [userName, setUserName] = useState('');
@@ -150,12 +152,42 @@ export const CreateUserForm = ({ token, branchesResponse, roles }: Props) => {
               <Input
                 isRequired
                 name='userPassword'
-                type='password'
+                type={viewPassword ? 'text' : 'password'}
                 label='Contraseña'
                 placeholder='Ingrese contraseña'
                 variant='underlined'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                validate={(value) => {
+                  if (value && value.length < 8) {
+                    return "La contraseña debe tener al menos 8 caracteres.";
+                  }
+                  if (value && !/[A-Z]/.test(value)) {
+                    return "Debe contener al menos una letra mayúscula.";
+                  }
+                  if (value && !/[a-z]/.test(value)) {
+                    return "Debe contener al menos una letra minúscula.";
+                  }
+                  if (value && !/[0-9]/.test(value)) {
+                    return "Debe contener al menos un número.";
+                  }
+                  if (value && !/[^A-Za-z0-9]/.test(value)) {
+                    return "Debe contener al menos un símbolo.";
+                  }
+                  return null;
+                }}
+                endContent={
+                  <Button
+                    isIconOnly
+                    variant='light'
+                    radius='full'
+                    color='primary'
+                    startContent={
+                      viewPassword ? <ViewIcon /> : <ViewOffIcon />
+                    }
+                    onPress={() => setViewPassword(!viewPassword)}
+                  />
+                }
               />
 
               <Input

@@ -1,5 +1,5 @@
 import { getAuthUser, hasModuleAccess, hasPermission } from "@/lib";
-import { BranchTable, getBranches } from "@/modules/admin/branches";
+import { BranchTable, getBranchesResponse } from "@/modules/admin/branches";
 import { HeaderPage } from "@/modules/admin/shared";
 import { getUsersResponse } from "@/modules/admin/users";
 import { RoleModulePermission } from "@/modules/auth";
@@ -12,7 +12,7 @@ export default async function BranchesPage() {
   // Verificar acceso al módulo "branches"
   if (!hasModuleAccess({ user, moduleName: "BRANCHES", permissions: [RoleModulePermission.Read] })) redirect("/403");
 
-  const branchesResponse = await getBranches({ token: authToken });
+  const branchesResponse = await getBranchesResponse({ token: authToken });
   const usersResponse = await getUsersResponse({ token: authToken });
   return (
     <>
@@ -27,11 +27,12 @@ export default async function BranchesPage() {
             }
             : undefined
         }
-        isButton
-        colorButton='primary'
-        variantButton='flat'
-        popoverText="Nueva Sucursal"
-        delayPopover={1000}
+        button={{
+          popoverText: "Nueva Sucursal",
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat'
+        }}
       />
 
       {/* TABLA SUCURSALES */}

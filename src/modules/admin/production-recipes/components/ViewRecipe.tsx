@@ -93,7 +93,7 @@ export const ViewRecipe = ({ token, recipe }: Props) => {
                 </div>
 
                 {/* Detalles de producción */}
-                <div>
+                {/* <div>
                     <h3 className="text-lg font-medium text-gray-800">Detalles de producción:</h3>
                     <div className="space-y-4">
                         {recipeInfo.ProductionDetail.map((production) => (
@@ -103,7 +103,7 @@ export const ViewRecipe = ({ token, recipe }: Props) => {
                             </div>
                         ))}
                     </div>
-                </div>
+                </div> */}
 
                 {/* Fechas */}
                 <div>

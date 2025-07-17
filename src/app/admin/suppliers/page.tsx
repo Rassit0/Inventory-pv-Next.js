@@ -28,11 +28,12 @@ export default async function SuppliersPage() {
                         }
                         : undefined
                 }
-                isButton
-                colorButton='primary'
-                variantButton='flat'
-                popoverText="Nuevo Proveedor"
-                delayPopover={1000}
+                button={{
+                    popoverText: "Nuevo Proveedor",
+                    delayPopover: 1000,
+                    colorButton: 'primary',
+                    variantButton: 'flat'
+                }}
             />
 
             {/* TABLA PROVEEDORES */}

@@ -1,5 +1,5 @@
 import { getAuthUser, hasModuleAccess } from "@/lib";
-import { getBranches } from "@/modules/admin/branches";
+import { getBranchesResponse } from "@/modules/admin/branches";
 import { HeaderPage } from "@/modules/admin/shared";
 import { getUsersResponse } from "@/modules/admin/users";
 import { CreateWarehouseForm } from "@/modules/admin/warehouses";
@@ -15,7 +15,7 @@ export default async function NewWarehousePage() {
     if (!hasModuleAccess({ user, moduleName: 'WAREHOUSES', permissions: [RoleModulePermission.Write] })) redirect("/403");
 
     const responseUser = await getUsersResponse({ token: authToken, limit: 0 });
-    const branchesResponse = await getBranches({ token: authToken });
+    const branchesResponse = await getBranchesResponse({ token: authToken });
 
     return (
         <>
@@ -26,9 +26,12 @@ export default async function NewWarehousePage() {
                     linkText: <LinkBackwardIcon />,
                     url: '/admin/warehouses'
                 }}
-                isButton
-                popoverText='Volver a la lista'
-                delayPopover={1000}
+                button={{
+                    popoverText: 'Volver a la lista',
+                    delayPopover: 1000,
+                    colorButton: 'primary',
+                    variantButton: 'flat'
+                }}
             />
 
             <section className="container pt-8">

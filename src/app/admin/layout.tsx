@@ -1,5 +1,5 @@
 import { getAuthUser, hasModuleAccess } from "@/lib";
-import { getBranches } from "@/modules/admin/branches";
+import { getBranchesResponse } from "@/modules/admin/branches";
 import { getParallelGroups } from "@/modules/admin/production";
 import { NavMenu, SideMenu } from "@/modules/admin/shared";
 import { findUser } from "@/modules/admin/users";
@@ -16,7 +16,7 @@ export default async function AdminLayout({
     if (!authToken) {
         redirect("/auth/login"); // Redirige si no hay token
     }
-    const branchesResponse = await getBranches({ token: authToken });
+    const branchesResponse = await getBranchesResponse({ token: authToken });
     const userInfo = await findUser({ token: authToken, id: user.id });
     if (!userInfo) {
         redirect("/auth/login"); // Redirige si no hay token
@@ -33,7 +33,7 @@ export default async function AdminLayout({
             <main className="admin__layout--main">
                 <NavMenu
                     token={authToken}
-                    branches={branchesResponse?.branches || []}
+                    branchesResponse={branchesResponse || { branches: [], meta: { currentPage: 0, itemsPerPage: 0, totalItems: 0, totalPages: 0 } }}
                     userBranchIds={userInfo.userBranches.map(b => (b.branchId))}
                     // hiddeBranches={userInfo.hasGlobalBranchesAccess}
                     parallelGroups={parallelGroups}

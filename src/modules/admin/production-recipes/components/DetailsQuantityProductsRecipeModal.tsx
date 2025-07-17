@@ -1,6 +1,6 @@
 "use client"
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip, useDisclosure, Spinner } from '@heroui/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AlignBoxBottomLeftIcon } from 'hugeicons-react';
 import { IRecipe, IRecipeItem } from '@/modules/admin/production-recipes';
 
@@ -13,8 +13,10 @@ export const DetailsQuantityProductsRecipeModal = ({ recipe, recipeCount }: Prop
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isLoading, setIsLoading] = useState(false);
 
+
     // Calcular la cantidad total de productos necesarios por receta
     const calculateProductQuantities = () => {
+        if (!recipe || !recipe.items) return [];
         return recipe.items.map((item: IRecipeItem) => {
             const totalQuantity = parseFloat(item.quantity) * recipeCount;  // Multiplicamos por la cantidad de recetas
             return {
@@ -61,7 +63,7 @@ export const DetailsQuantityProductsRecipeModal = ({ recipe, recipeCount }: Prop
                                         <strong>Nombre:</strong> {recipe.name}
                                     </p>
                                     <p>
-                                        <strong>Descripción:</strong> {recipe.description}
+                                        <strong>Descripción:</strong> {recipe.description || ''}
                                     </p>
                                     {/* <p>
                                         <strong>Tiempo de preparación:</strong> {recipe.preparationTime} minutos

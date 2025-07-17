@@ -17,7 +17,23 @@ export const NavOrderMenuButton = ({ parallelGroups, token }: Props) => {
     return (
         <>
             <div className='flex items-center'>
-                <Badge className='mt-1 mr-1' color="danger" content={orderCart.length + Object.keys(groups).length || undefined} shape='circle'>
+                {(orderCart.length > 0 || Object.keys(groups).length > 0) ? (
+                    <Badge
+                        className='mt-1 mr-1'
+                        color="danger"
+                        content={orderCart.length + Object.keys(groups).length}
+                        shape='circle'
+                    >
+                        <Button
+                            onPress={onOpen}
+                            isIconOnly
+                            variant='light'
+                            startContent={<ChefHatIcon size={30} />}
+                            radius='full'
+                            color='primary'
+                        />
+                    </Badge>
+                ) : (
                     <Button
                         onPress={onOpen}
                         isIconOnly
@@ -26,7 +42,8 @@ export const NavOrderMenuButton = ({ parallelGroups, token }: Props) => {
                         radius='full'
                         color='primary'
                     />
-                </Badge>
+                )}
+
             </div>
             <SideOrderCart token={token} parallelGroups={parallelGroups} isOpen={isOpen} onOpenChange={onOpenChange} />
         </>

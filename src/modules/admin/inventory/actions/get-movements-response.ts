@@ -10,7 +10,7 @@ interface Props {
     status?: EMovementStatus[] | null;
     movementType?: EMovementType[] | null;
     orderBy?: 'asc' | 'desc' | null
-    columnOrderBy?: 'createdAt' | 'updatedAt' | null
+    columnOrderBy?: 'createdAt' | 'updatedAt' | 'generalDeliveryDate' | null
 }
 
 export const getMovementsResponse = async ({ token, limit, page, status, columnOrderBy, orderBy, movementType }: Props): Promise<IMovementsResponse> => {
@@ -35,7 +35,7 @@ export const getMovementsResponse = async ({ token, limit, page, status, columnO
 
         // Construir la URL con los parámetros de consulta
         const url = '/inventory/movements?' + searchParams.toString();
-        
+
         const response = await valeryClient<IMovementsResponse>(url, {
             headers: {
                 Authorization: 'Bearer ' + token
@@ -45,7 +45,14 @@ export const getMovementsResponse = async ({ token, limit, page, status, columnO
         // COnvertir las fechas a objeros Date
         const movements = response.movements.map((movement: IMovement) => ({
             ...movement,
-            ...(movement.deliveryDate && { deliveryDate: new Date(movement.deliveryDate) }),
+            inventoryMovementDetails: movement.inventoryMovementDetails.map(detail => ({
+                ...detail,
+                detailSuppliers: detail.detailSuppliers?.map(supplier => ({
+                    ...supplier,
+                    deliveryDate: supplier.deliveryDate ? new Date(supplier.deliveryDate) : null,
+                })),
+            })),
+            ...(movement.generalDeliveryDate && { generalDeliveryDate: new Date(movement.generalDeliveryDate) }),
             createdAt: new Date(movement.createdAt),
             updatedAt: new Date(movement.updatedAt)
         }));

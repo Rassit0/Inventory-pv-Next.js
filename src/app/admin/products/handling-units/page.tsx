@@ -28,11 +28,12 @@ export default async function HandlingUnitsPage() {
               }
               : undefined
           }
-          isButton
-          colorButton='primary'
-          variantButton='flat'
-          popoverText="Nueva Unidad"
-          delayPopover={1000}
+          button={{
+            popoverText: "Nueva Unidad de Manejo",
+            delayPopover: 1000,
+            colorButton: 'primary',
+            variantButton: 'flat'
+          }}
         />
 
         {/* TABLA DE UNIDADES */}

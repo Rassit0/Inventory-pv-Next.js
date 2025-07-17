@@ -1,5 +1,5 @@
 "use client"
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { IUsersResponse, UserAccessWarehouseSelect } from '@/modules/admin/users'
 import { IBranch } from '@/modules/admin/branches'
 import { Button, Form, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Switch, useDisclosure } from '@heroui/react'
@@ -19,8 +19,13 @@ interface Props {
 export const UpdateWarehouseFormModal = ({ warehouse, branches, usersResponse, token }: Props) => {
 
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(warehouse.imageUrl || null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setPreviewImage(warehouse.imageUrl || null);
+  }, [warehouse, isOpen])
+
 
   // Form
   const [warehouseIsEnable, setWarehouseIsEnable] = useState(warehouse.isEnable);

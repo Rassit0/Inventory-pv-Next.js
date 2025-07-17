@@ -1,5 +1,5 @@
 export interface IProductionsResponse {
-    productions: IProduction[];
+    orders: IProductionOrder[];
     meta: IProductionsResponseMeta;
 }
 
@@ -10,8 +10,9 @@ export interface IProductionsResponseMeta {
     currentPage: number;
 }
 
-export interface IProduction {
+export interface IProductionOrder {
     id: string;
+    originBranchId: string;
     createdAt: Date;
     updatedAt: Date;
     status: string;
@@ -25,7 +26,33 @@ export interface IProduction {
     updatedByUser: IProductionAtedByUser;
     deliveryDate: Date | null;
     totalTime: number;
+    productionWaste: IProductionWaste[];
 }
+export interface IProductionWaste {
+    id: string;
+    productionOrderId: string;
+    productId: string;
+    quantity: string;
+    reason: string;
+    reasonDescription: null;
+    createdAt: Date;
+    product: Product;
+}
+
+export interface Product {
+    id: string;
+    name: string;
+    slug: string;
+    imageUrl: string;
+    unit: Unit;
+    isEnable: boolean;
+}
+
+export interface Unit {
+    name: string;
+    abbreviation: string;
+}
+
 
 export interface IProductionAtedByUser {
     id: string;
@@ -61,17 +88,17 @@ export interface ParallelGroup {
 }
 
 export interface IProductionDetailRecipe {
-    id: string;
+    // id: string;
     name: string;
     slug: string;
     description: string;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date;
-    updatedByUserId: string;
-    createdByUserId: string;
-    deletedByUserId: null;
-    preparationInstructions: string;
+    // createdAt: Date;
+    // updatedAt: Date;
+    // deletedAt: Date;
+    // updatedByUserId: string;
+    // createdByUserId: string;
+    // deletedByUserId: null;
+    // preparationInstructions: string;
     imageUrl: null;
     isEnable: boolean;
     preparationTime: number;
@@ -83,4 +110,17 @@ export interface IProductionDetailRecipeItem {
     productId: string;
     quantity: string;
     recipeId: string;
+    product: IRecipeItemProduct;
+}
+
+export interface IRecipeItemProduct {
+    id: string;
+    name: string;
+    slug: string;
+    imageUrl: string;
+    unit: {
+        name: string;
+        abbreviation: string;
+    },
+    isEnable: boolean;
 }

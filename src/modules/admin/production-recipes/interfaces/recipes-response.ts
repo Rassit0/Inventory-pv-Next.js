@@ -14,7 +14,7 @@ export interface IRecipe {
     id: string;
     name: string;
     slug: string;
-    description: string;
+    description?: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt: Date | null;
@@ -26,7 +26,7 @@ export interface IRecipe {
     isEnable: boolean;
     preparationTime: number;
     items: IRecipeItem[];
-    ProductionDetail: IRecipeProductionDetail[];
+    ProductionDetail?: IRecipeProductionDetail[];
     createdByUser: IRecipeAtedByUser;
     updatedByUser: IRecipeAtedByUser;
     deletedByUser: IRecipeAtedByUser | null;

@@ -46,6 +46,7 @@ export const WarehouseTable = ({ deleteWarehouse, editWarehouse, token, warehous
 
 
     useEffect(() => {
+        setImageErrors({});
         // Si esta en false no cargará de nuevo los productos
         if (!isMounted.current) {
             isMounted.current = true; // Marcar como montado

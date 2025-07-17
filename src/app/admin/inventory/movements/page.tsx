@@ -32,11 +32,12 @@ export default async function transactionsPage() {
                         }
                         : undefined
                 }
-                isButton
-                colorButton='primary'
-                variantButton='flat'
-                popoverText="Nuevo Almacén"
-                delayPopover={1000}
+                button={{
+                    popoverText: "Nuevo Movimiento de Inventario",
+                    delayPopover: 1000,
+                    colorButton: 'primary',
+                    variantButton: 'flat'
+                }}
             />
 
             {/* TABLA DE USUARIOS */}

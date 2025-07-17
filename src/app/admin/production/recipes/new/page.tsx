@@ -1,5 +1,5 @@
 import { getAuthUser, hasModuleAccess } from "@/lib";
-import { getBranches } from "@/modules/admin/branches";
+import { getBranchesResponse } from "@/modules/admin/branches";
 import { CreateMovementInventoryForm } from "@/modules/admin/inventory";
 import { CreateRecipeForm } from "@/modules/admin/production-recipes";
 import { getProducts } from "@/modules/admin/products";
@@ -16,7 +16,7 @@ export default async function NewRecipePage() {
   if (!hasModuleAccess({ user, moduleName: "PRODUCTION_RECIPES", permissions: [RoleModulePermission.Write] })) redirect("/403");
   // OBTERNER PRODUCTOS
   const productsResponse = await getProducts({ token: authToken, limit: 5, status: 'active' });
-  const branchesResponse = await getBranches({ token: authToken });
+  const branchesResponse = await getBranchesResponse({ token: authToken });
   const warehousesResponse = await getWarehousesResponse({ token: authToken });
   return (
     <>
@@ -27,9 +27,12 @@ export default async function NewRecipePage() {
           linkText: <LinkBackwardIcon />,
           url: '/admin/production/recipes'
         }}
-        isButton
-        popoverText='Volver a la lista'
-        delayPopover={1000}
+        button={{
+          popoverText: 'Volver a la lista',
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat'
+        }}
       />
 
       <section className="container pt-8">

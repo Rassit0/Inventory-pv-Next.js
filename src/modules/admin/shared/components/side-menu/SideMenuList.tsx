@@ -27,7 +27,8 @@ export const SideMenuItems = ({ user }: Props) => {
                     size='lg'
                     variant='light'
                     color='primary'
-                    onPress={() => router.push(`/admin/home/${branchId ?? 'all'}`)}
+                    // onPress={() => router.push(`/admin/home/${branchId ?? 'all'}`)}
+                    onPress={() => router.push(`/admin/home`)}
                     className={pathname.includes('/admin/home') ? 'sidemenu__item--active' : 'sidemenu__item'}
                     startContent={<Home01Icon />}
                 >
@@ -49,20 +50,6 @@ export const SideMenuItems = ({ user }: Props) => {
                 </Button>
                 : ''}
 
-            {user?.role && user.role.roleModule.some(role => role.module.name === 'SUPPLIERS') ?
-                <Button
-                    as='li'
-                    size='lg'
-                    variant='light'
-                    color='primary'
-                    onPress={() => router.push('/admin/suppliers')}
-                    className={pathname.includes('/admin/suppliers') ? 'sidemenu__item--active' : 'sidemenu__item'}
-                    startContent={<TruckIcon />}
-                >
-                    Proveedores
-                </Button>
-                : ''}
-
             {user?.role && user.role.roleModule.some(role => role.module.name === 'WAREHOUSES') ?
                 <Button
                     as='li'
@@ -74,6 +61,20 @@ export const SideMenuItems = ({ user }: Props) => {
                     startContent={<WarehouseIcon />}
                 >
                     Almacenes
+                </Button>
+                : ''}
+
+            {user?.role && user.role.roleModule.some(role => role.module.name === 'SUPPLIERS') ?
+                <Button
+                    as='li'
+                    size='lg'
+                    variant='light'
+                    color='primary'
+                    onPress={() => router.push('/admin/suppliers')}
+                    className={pathname.includes('/admin/suppliers') ? 'sidemenu__item--active' : 'sidemenu__item'}
+                    startContent={<TruckIcon />}
+                >
+                    Proveedores
                 </Button>
                 : ''}
 

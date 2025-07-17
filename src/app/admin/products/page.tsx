@@ -1,6 +1,6 @@
 //snipet prc
 import { getAuthUser, hasModuleAccess, hasPermission } from "@/lib";
-import { getBranches } from "@/modules/admin/branches";
+import { getBranchesResponse } from "@/modules/admin/branches";
 import { getCategories } from "@/modules/admin/categories";
 import { getHandlingUnits } from "@/modules/admin/handling-units";
 import { getPersonsResponse } from "@/modules/admin/persons";
@@ -24,7 +24,7 @@ export default async function ProductsPage() {
   const productsResponse = await getProducts({ token: authToken, limit: 5 }); // Limite de 10 items por pagina
   const categories = await getCategories({ token: authToken });
   const handlingUnits = await getHandlingUnits({ token: authToken });
-  const branchesResponse = await getBranches({ token: authToken });
+  const branchesResponse = await getBranchesResponse({ token: authToken });
   const personsResponse = await getPersonsResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
   const suppliersResponse = await getSuppliersResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
 
@@ -44,11 +44,12 @@ export default async function ProductsPage() {
             }
             : undefined
         }
-        isButton
-        colorButton='primary'
-        variantButton='flat'
-        popoverText="Nuevo Producto"
-        delayPopover={1000}
+        button={{
+          popoverText: "Nuevo Producto",
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat',
+        }}
       />
 
       {/* TABLA DE PRODUCTOS */}

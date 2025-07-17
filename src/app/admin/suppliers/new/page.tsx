@@ -21,9 +21,12 @@ export default async function NewSupplierPage() {
                     linkText: <LinkBackwardIcon />,
                     url: '/admin/suppliers'
                 }}
-                isButton
-                popoverText='Volver a la lista'
-                delayPopover={1000}
+                button={{
+                    popoverText: 'Volver a la lista',
+                    delayPopover: 1000,
+                    colorButton: 'primary',
+                    variantButton: 'flat'
+                }}
             />
 
             <section className="container pt-8">

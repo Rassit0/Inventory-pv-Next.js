@@ -2,6 +2,7 @@
 
 import { isApiError, valeryClient } from "@/lib/api";
 import { uploadFile } from "@/utils/upload-file";
+import { parseZonedDateTime } from "@internationalized/date";
 import { revalidatePath } from "next/cache";
 
 interface IResponse {
@@ -20,6 +21,10 @@ export const createMovement = async ({ token, formData }: Props): Promise<any> =
     const adjustmentReason = formData.get('adjustmentReason') || undefined;
     const otherAdjustmentReason = formData.get('otherAdjustmentReason') || undefined;
 
+    const rawDate = formData.get('movementGeneralDeliveryDate') as string; // puede ser null o ""
+
+    const generalDeliveryDate = parseZonedDateTime(rawDate).toAbsoluteString();     // «2025‑07‑03T12:41:28.027‑04:00»;
+
     const data = {
         movementType: formData.get('movementType'),
         adjustment: adjustmentReason && movementAdjustmentType ? {
@@ -29,7 +34,7 @@ export const createMovement = async ({ token, formData }: Props): Promise<any> =
         } : undefined,
         // adjustmentType: formData.get('movementAdjustmentType')|| undefined,
         // adjustmentReason: 'DAMAGE',
-        deliveryDate: formData.get('movementDeliveryDate') ? new Date(formData.get('movementDeliveryDate') as string).toISOString() : undefined,
+        generalDeliveryDate,
         originBranchId: formData.get('movementBranchOriginId') || undefined,
         originWarehouseId: formData.get('movementWarehouseOriginId') || undefined,
         destinationBranchId: formData.get('movementDestinationBranchId') || undefined,
@@ -99,7 +104,8 @@ export const createMovement = async ({ token, formData }: Props): Promise<any> =
         if (isApiError(error)) {
             return {
                 error: true,
-                message: error.message
+                message: error.message,
+                response: error.response
             };
         }
 

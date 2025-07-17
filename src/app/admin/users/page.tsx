@@ -1,5 +1,7 @@
 import { getAuthUser, hasModuleAccess, hasPermission } from "@/lib";
+import { getBranchesResponse } from "@/modules/admin/branches";
 import { HeaderPage } from "@/modules/admin/shared";
+import { getUserRoles } from "@/modules/admin/user-roles";
 import { getUsersResponse } from "@/modules/admin/users";
 import { UserTable } from "@/modules/admin/users/components/user-table/UserTable";
 import { RoleModulePermission } from "@/modules/auth";
@@ -12,7 +14,11 @@ export default async function UsersPage() {
 
   // Verificar acceso al módulo "branches"
   if (!hasModuleAccess({ user, moduleName: "USERS", permissions: [RoleModulePermission.Read] })) redirect("/403");
+  if (!hasModuleAccess({ user, moduleName: "USERS_ROLES", permissions: [RoleModulePermission.Read] })) redirect("/403");
+  if (!hasModuleAccess({ user, moduleName: "BRANCHES", permissions: [RoleModulePermission.Read] })) redirect("/403");
   const usersResponse = await getUsersResponse({ token: authToken, limit: 10 });
+  const branchesResponse = await getBranchesResponse({ token: authToken });
+  const roles = await getUserRoles({ token: authToken });
   return (
     <>
       <HeaderPage
@@ -26,11 +32,12 @@ export default async function UsersPage() {
             }
             : undefined
         }
-        isButton
-        colorButton='primary'
-        variantButton='flat'
-        popoverText="Nuevo Usuario"
-        delayPopover={1000}
+        button={{
+          popoverText: "Nuevo Usuario",
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat',
+        }}
       />
 
       {/* TABLA DE USUARIOS */}
@@ -40,6 +47,8 @@ export default async function UsersPage() {
           deleteUser={hasPermission(user, "USERS", RoleModulePermission.Delete)}
           token={authToken}
           usersResponse={usersResponse}
+          branchesResponse={branchesResponse ?? { meta: { currentPage: 0, itemsPerPage: 0, totalItems: 0, totalPages: 0 }, branches: [] }}
+          roles={roles || []}
         />
       )}
     </>

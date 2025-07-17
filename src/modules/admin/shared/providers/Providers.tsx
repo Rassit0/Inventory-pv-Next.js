@@ -10,6 +10,7 @@ export const Providers = ({ children }: Props) => {
     return (
         <HeroUIProvider>
             <Toaster
+                visibleToasts={10}
                 position='top-center'
                 closeButton
                 richColors //Hace que los estados de error y éxito sean más coloridos.

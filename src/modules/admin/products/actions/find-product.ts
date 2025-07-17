@@ -25,7 +25,6 @@ export const findProduct = async ({ token, term }: Props): Promise<IProduct | nu
         // COnvertir las fechas a objeros Date
         const product = {
             ...response,
-            ...(response.lastSaleDate && { lastSaleDate: new Date(response.lastSaleDate) }),
             ...(response.launchDate && { launchDate: new Date(response.launchDate) }),
             ...(response.expirationDate && { expirationDate: new Date(response.expirationDate) }),
             createdAt: new Date(response.createdAt),

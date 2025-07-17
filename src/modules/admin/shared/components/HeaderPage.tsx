@@ -12,16 +12,16 @@ interface ILink {
 interface Props {
     title: string,
     description?: string,
-
+    button?: {
+        popoverText?: string;
+        delayPopover?: number;
+        colorButton?: "primary" | "default" | "secondary" | "success" | "warning" | "danger" | undefined;
+        variantButton?: "shadow" | "light" | "solid" | "bordered" | "flat" | "faded" | "ghost" | undefined;
+    };
     linkProps?: ILink
-    isButton?: boolean
-    popoverText?: string
-    delayPopover?: number;
-    colorButton?: "primary" | "default" | "secondary" | "success" | "warning" | "danger" | undefined
-    variantButton?: "shadow" | "light" | "solid" | "bordered" | "flat" | "faded" | "ghost" | undefined
 }
 
-export const HeaderPage = ({ title, description, linkProps, isButton = false, popoverText, colorButton = 'primary', variantButton ='light', delayPopover }: Props) => {
+export const HeaderPage = ({ title, description, linkProps, button = { colorButton: 'primary', variantButton: 'light' } }: Props) => {
     const router = useRouter()
     return (
         <section className='header'>
@@ -34,21 +34,21 @@ export const HeaderPage = ({ title, description, linkProps, isButton = false, po
 
             {/* Si linkProps es del tipo ILink, se renderiza un enlace */}
             {linkProps ? (
-                !isButton ?
-                    <Link href={linkProps.url} className='block text-primary'>
+                !button ?
+                    (<Link href={linkProps.url} className='block text-primary'>
                         {linkProps.linkText}
-                    </Link>
+                    </Link>)
                     :
-                    <Tooltip hidden={popoverText ? false : true} content={popoverText} color='primary' delay={delayPopover}>
+                    (<Tooltip hidden={button.popoverText ? false : true} content={button.popoverText} color='primary' delay={button.delayPopover}>
                         <Button
                             isIconOnly={typeof linkProps.linkText !== 'string'}
                             startContent={linkProps.linkText}
                             radius='full'
-                            color={colorButton}
-                            variant={variantButton}
+                            color={button.colorButton}
+                            variant={button.variantButton}
                             onPress={() => router.push(linkProps.url)}
                         >{typeof linkProps.linkText !== 'string' ? undefined : linkProps.linkText}</Button>
-                    </Tooltip>
+                    </Tooltip>)
             ) : (
                 // Si linkProps es un ReactNode, simplemente se renderiza
                 linkProps

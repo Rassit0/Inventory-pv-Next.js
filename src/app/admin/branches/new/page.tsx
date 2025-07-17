@@ -22,9 +22,12 @@ export default async function NewBranchPage() {
                     linkText: <LinkBackwardIcon />,
                     url: '/admin/branches'
                 }}
-                isButton
-                popoverText='Volver a la lista'
-                delayPopover={1000}
+                button={{
+                    popoverText: 'Volver a la lista',
+                    delayPopover: 1000,
+                    colorButton: 'primary',
+                    variantButton: 'flat',
+                }}
             />
             <section className="container pt-8">
                 <CreateBranchForm

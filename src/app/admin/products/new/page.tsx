@@ -1,5 +1,5 @@
 import { getAuthUser, hasModuleAccess, hasPermission } from '@/lib';
-import { getBranches } from '@/modules/admin/branches';
+import { getBranchesResponse } from '@/modules/admin/branches';
 import { getCategories } from '@/modules/admin/categories';
 import { getHandlingUnits } from '@/modules/admin/handling-units';
 import { getPersonsResponse } from '@/modules/admin/persons';
@@ -23,7 +23,7 @@ export default async function NewProductPage() {
     const categories = await getCategories({ token: authToken });
     const handlingUnits = await getHandlingUnits({ token: authToken });
 
-    const branchesResponse = await getBranches({ token: authToken });
+    const branchesResponse = await getBranchesResponse({ token: authToken });
     const personsResponse = await getPersonsResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
     const suppliersResponse = await getSuppliersResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
     return (
@@ -35,9 +35,12 @@ export default async function NewProductPage() {
                     linkText: <LinkBackwardIcon />,
                     url: '/admin/products'
                 }}
-                isButton
-                popoverText='Volver a la lista'
-                delayPopover={1000}
+                button={{
+                    popoverText: 'Volver a la lista',
+                    delayPopover: 1000,
+                    colorButton: 'primary',
+                    variantButton: 'flat'
+                }}
             />
 
             <section className='container pt-8'>

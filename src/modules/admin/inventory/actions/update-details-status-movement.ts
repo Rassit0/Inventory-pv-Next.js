@@ -2,6 +2,7 @@
 import { isApiError, valeryClient } from "@/lib/api";
 import { uploadFile } from "@/utils/upload-file";
 import { form } from "@heroui/react";
+import { parseZonedDateTime } from "@internationalized/date";
 import { revalidatePath } from "next/cache";
 
 interface Props {
@@ -37,7 +38,17 @@ export const updateDetailsAndStatusMovement = async ({ formData, transactionId, 
                                 if (isNaN(num)) return undefined;
                                 return num.toFixed(2);
                             })(),
-                            supplierId: formData.get(`supplierId-${detailId}-${dsIndex}`) === '' ? undefined : formData.get(`supplierId-${detailId}-${dsIndex}`) ?? undefined
+                            supplierId: formData.get(`supplierId-${detailId}-${dsIndex}`) === '' ? undefined : formData.get(`supplierId-${detailId}-${dsIndex}`) ?? undefined,
+                            deliveryDate: (() => {
+                                const value = formData.get(`supplierDeliveryDate-${detailId}-${dsIndex}`);
+                                if(value === '' || value === null || value === undefined) return null;
+                                else {
+                                    const zonedDate = parseZonedDateTime(value as string);
+                                    if (zonedDate) {
+                                        return zonedDate.toAbsoluteString();
+                                    }
+                                }
+                            })(),
                         };
                     })
                     : undefined,
@@ -45,7 +56,18 @@ export const updateDetailsAndStatusMovement = async ({ formData, transactionId, 
         }),
     }
 
-    console.log(data)
+    if (data.status === 'COMPLETED') {
+        for (const detail of data.inventoryMovementDetails) {
+            if ((detail.detailSuppliers === undefined || detail.detailSuppliers.length === 0) && detail.totalDeliveredQuantity === undefined) {
+                return {
+                    error: true,
+                    message: "Debe agregar al menos una cantidad-proveedor por detalle cuando el estado es Completado"
+                };
+            }
+        }
+    }
+
+    console.log(data.inventoryMovementDetails?.[0].detailSuppliers?.[0].deliveryDate || null)
 
     // const error: any = {};
     // return {
@@ -65,7 +87,7 @@ export const updateDetailsAndStatusMovement = async ({ formData, transactionId, 
         });
 
         // Revalidar la ruta de productos
-        revalidatePath('/admin/movements');
+        revalidatePath('/admin/inventory/movements');
 
         return {
             error: null,
@@ -76,8 +98,7 @@ export const updateDetailsAndStatusMovement = async ({ formData, transactionId, 
         if (isApiError(error)) {
             return {
                 error: true,
-                message: error.message,
-                response: error.response
+                message: error.message
             };
         }
 

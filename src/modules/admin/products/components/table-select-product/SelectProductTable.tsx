@@ -20,8 +20,9 @@ interface Props {
     onRemoveProduct: (product: IProduct) => void;
     removedProducts: IProduct[]; // Recibimos los eliminados
     // removedProducts: IRecipeItemProduct[]
-    searchBranchId?: string;
-    searchWarehouseId?: string;
+    filterByLocationId?: string;
+    // searchBranchId?: string;
+    // searchWarehouseId?: string;
     defaultProductsIds?: string[];
 }
 
@@ -55,7 +56,7 @@ type TSortDescriptor = {
 
 const INITIAL_VISIBLE_COLUMNS: string[] = ["addButton", "image", "name", "actions"];
 
-export const SelectProductTable = ({ token, productsResponse, onRemoveProduct, removedProducts, searchBranchId, searchWarehouseId, defaultProductsIds }: Props) => {
+export const SelectProductTable = ({ token, productsResponse, onRemoveProduct, removedProducts, filterByLocationId, defaultProductsIds }: Props) => {
     const isMounted = useRef(false);
     const [productsFilteredResponse, setProductsFilteredresponse] = useState<IProductsResponse>(() => {
         // console.log(response)
@@ -125,8 +126,9 @@ export const SelectProductTable = ({ token, productsResponse, onRemoveProduct, r
                 status: 'active',
                 orderBy: sortDescriptor.direction === 'ascending' ? 'asc' : 'desc',
                 columnOrderBy: sortDescriptor.column ? sortDescriptor.column : undefined,
-                searchBranchId: searchBranchId,
-                searchWarehouseId: searchWarehouseId
+                filterByLocationId: filterByLocationId,
+                // searchBranchId: searchBranchId,
+                // searchWarehouseId: searchWarehouseId
             });
             // console.log(response)
             const filteredProducts = response!.products.filter(
@@ -138,7 +140,7 @@ export const SelectProductTable = ({ token, productsResponse, onRemoveProduct, r
         }
         setIsLoading(true);
         fetchProducts(); // Llama a la funcion que llama a los productos con filtros(params)
-    }, [rowsPerPage, page, filterValue, productsResponse, statusFilter, sortDescriptor, removedProducts, searchBranchId, searchWarehouseId]);
+    }, [rowsPerPage, page, filterValue, productsResponse, statusFilter, sortDescriptor, removedProducts, filterByLocationId]);
 
     // CONTROL DE LAS IMAGENES QUE TIENEN ERROR AL CARGAR
     const [imageErrors, setImageErrors] = useState<TImageErrors>({});

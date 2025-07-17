@@ -116,7 +116,7 @@ export const ProductTable = ({ token, editProduct, deleteProduct, productsRespon
       limit: rowsPerPage,
       page: page,
       search: filterValue,
-      status: Array.from(statusFilter).length === statusOptions.length || statusFilter === "all" ? "all" : String(Array.from(statusFilter)[0]),
+      status: Array.from(statusFilter).length === statusOptions.length || statusFilter === "all" ? "all" : String(Array.from(statusFilter)[0]) as "active" | "inactive",
       orderBy: sortDescriptor.direction === 'ascending' ? 'asc' : 'desc',
       columnOrderBy: sortDescriptor.column ? sortDescriptor.column : undefined
     });
@@ -153,6 +153,7 @@ export const ProductTable = ({ token, editProduct, deleteProduct, productsRespon
       ...prevErrors,
       [productId]: true,
     }));
+    console.log(imageErrors)
   };
 
   // Articulos ordenados
@@ -175,7 +176,11 @@ export const ProductTable = ({ token, editProduct, deleteProduct, productsRespon
           <div className='w-full h-16 flex items-center justify-center'>
             <Image
               alt={product.name}
-              src={imageErrors[product.id] ? warning_error_image : product.imageUrl || no_image}
+              src={
+                product.imageUrl
+                  ? (imageErrors[product.id] ? warning_error_image : product.imageUrl)
+                  : no_image
+              }
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className='object-contain'

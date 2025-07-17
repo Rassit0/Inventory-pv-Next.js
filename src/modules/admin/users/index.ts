@@ -1,7 +1,10 @@
 
+export { updateUser } from './actions/update-user';
+
 // COMPONENTS
 export { createUser } from './actions/create-user';
 export { CreateUserForm } from './components/CreateUserForm';
+export { UpdateUserFormModal } from './components/UpdateUserFormModal';
 export { UserAccessWarehouseSelect } from './components/UserAccessWarehouseSelect';
 
 // ACTIONS
@@ -10,3 +13,4 @@ export { findUser } from './actions/find-one-id';
 
 // INTERFACES
 export type { IUsersResponse, IUser, IUsersResponseMeta, IUserBranch,Branch,Role,RoleModule,RoleModulePermission } from './interfaces/users-response';
+

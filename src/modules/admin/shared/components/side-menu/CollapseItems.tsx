@@ -77,7 +77,13 @@ export const CollapseItems = ({ items, title, ariaLabel, moduleIcon }: Props) =>
                                             variant='light'
                                             color='primary'
                                             onPress={() => router.push(item.linkPath)}
-                                            className={pathname === item.linkPath || pathname === item.linkPath + '/new' || pathname.includes(item.linkPath) ? 'sidemenu__item--active' : 'sidemenu__item'}
+                                            className={
+                                                pathname === item.linkPath ||
+                                                pathname === item.linkPath + '/new' ||
+                                                pathname.endsWith(item.linkPath)
+                                                    ? 'sidemenu__item--active'
+                                                    : 'sidemenu__item'
+                                            }
                                             startContent={item.icon || null}
                                         >
                                             {item.label}

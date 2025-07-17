@@ -5,7 +5,7 @@ import { getAuthUser, hasModuleAccess, hasPermission } from '@/lib';
 import { RoleModulePermission } from '@/modules/auth';
 import { redirect } from 'next/navigation';
 import { getProducts } from '@/modules/admin/products';
-import { getBranches } from '@/modules/admin/branches';
+import { getBranchesResponse } from '@/modules/admin/branches';
 import { getWarehousesResponse } from '@/modules/admin/warehouses';
 
 export default async function RecipesPage() {
@@ -18,7 +18,7 @@ export default async function RecipesPage() {
   if (!hasModuleAccess({ user, moduleName: "WAREHOUSES", permissions: [RoleModulePermission.Read] })) redirect("/403");
   const recipesResponse = await getRecipesResponse({ token: authToken });
   const productsResponse = await getProducts({ token: authToken, limit: 5, status: 'active' });
-  const branchesResponse = await getBranches({ token: authToken });
+  const branchesResponse = await getBranchesResponse({ token: authToken });
   const warehousesResponse = await getWarehousesResponse({ token: authToken });
   return (
     <>
@@ -29,11 +29,12 @@ export default async function RecipesPage() {
           linkText: <Add01Icon />,
           url: "/admin/production/recipes/new"
         }}
-        isButton
-        colorButton='primary'
-        variantButton='flat'
-        popoverText="Nueva Receta"
-        delayPopover={1000}
+        button={{
+          popoverText: "Nueva Receta",
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat'
+        }}
       />
 
       {/* TABLA RECETAS */}

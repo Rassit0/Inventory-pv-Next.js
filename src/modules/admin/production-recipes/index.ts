@@ -11,6 +11,7 @@ export { ViewRecipe } from './components/ViewRecipe';
 
 // ACTIONS
 export { createRecipe } from './actions/create-recipe';
+export { getCountRecipes } from './actions/get-count-recipes';
 export { getRecipesResponse } from './actions/get-recipes-response';
 export { deleteRecipe } from './actions/delete-recipe';
 export { findRecipe } from './actions/find-one-by-id';
@@ -18,3 +19,4 @@ export { updateRecipe } from './actions/update-recipe';
 
 // INTERFACES
 export type { IRecipesResponse, IRecipe, IRecipeAtedByUser, IRecipeAtedByUserRole, IRecipeItem, IRecipeItemProduct, IRecipesResponseMeta } from './interfaces/recipes-response';
+export type { ICountRecipes } from './interfaces/count-recipes';

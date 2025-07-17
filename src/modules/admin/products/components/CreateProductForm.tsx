@@ -333,7 +333,7 @@ export const CreateProductForm = ({ token, categories, handlingUnits, branches, 
                         </div>
                         <div className="md:col-span-3">
                             <SelectSearchSupplierAndCreate
-                                isRequired
+                                // isRequired
                                 token={token}
                                 name={`productSuppliersIds`}
                                 itemsResponse={supplierProps.suppliersResponse}

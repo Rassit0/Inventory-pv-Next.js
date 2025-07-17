@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const updateWarehouse = async ({ formData, token, warehouseId }: Props): Promise<IResponse> => {
-    const file = formData.get("productImage");
+    const file = formData.get("warehouseImage");
     let imageUrl: string | null = null;
 
     // Subir la imagen solo si hay un archivo

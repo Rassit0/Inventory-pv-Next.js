@@ -25,7 +25,7 @@ export default async function ProductionOrdersPage() {
       />
       <OrderList 
       parallelGroups={parallelGroups} 
-      orderProductions={ordersProductions.productions} 
+      orderProductions={ordersProductions.orders} 
       token={authToken} 
       editOrder={hasPermission(user, "PRODUCTION_ORDERS", RoleModulePermission.Edit)}
       />

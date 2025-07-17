@@ -20,7 +20,7 @@ export interface IMovement {
     createdByUserId: string;
     updatedByUserId: null | string;
     createdAt: Date;
-    deliveryDate: Date | null;
+    generalDeliveryDate: Date | null;
     updatedAt: Date;
     inventoryMovementDetails: IMovementDetail[];
     createdByUser: AtedByUser;
@@ -65,6 +65,7 @@ export interface IMovementDetailSupplier {
     inventoryMovementDetailId: string;
     supplierId: string;
     deliveredQuantity: string;
+    deliveryDate: Date | null;
 }
 
 

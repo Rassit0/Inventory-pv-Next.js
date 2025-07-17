@@ -30,21 +30,29 @@ export const getSuppliersResponse = async ({ token, columnOrderBy, limit, orderB
         if (columnOrderBy) searchParams.append('columnOrderBy', columnOrderBy);
         if (filterSuppliersByProductId) searchParams.append('filterSuppliersByProductId', filterSuppliersByProductId);
 
-        // Si productIds se proporciona, se agrega a la URL usando un forEach
+        // Si supplierIds se proporciona, se agrega a la URL usando un forEach
+        let data = null;
         if (supplierIds && supplierIds.length > 0) {
-            supplierIds.forEach((id) => {
-                searchParams.append('supplierIds', id); // Agrega cada id de productIds como un parámetro individual
-            });
+            data = {
+                supplierIds
+            }
+            // supplierIds.forEach((id) => {
+            //     searchParams.append('supplierIds', id); // Agrega cada id de productIds como un parámetro individual
+            // });
         }
+        console.log(data ? JSON.stringify(data) : undefined)
 
         // Construir la URL con los parámetros de consulta
-        const url = '/suppliers?' + searchParams.toString();
+        const url = `/suppliers${data ? '/by-ids' : ''}?` + searchParams.toString();
 
         const response = await valeryClient<ISuppliersResponse>(url, {
+            method: data ? 'POST' : 'GET',
             headers: {
+                ...(data && { 'Content-Type': 'application/json', }),
                 Authorization: 'Bearer ' + token,
             },
-            signal
+            signal,
+            body: data ? JSON.stringify(data) : undefined,
         });
 
         const suppliers = response.suppliers.map(supplier => ({

@@ -33,6 +33,15 @@ export const updateOrderProduction = async ({ formData, orderId, token }: Props)
             }
         )) : undefined,
         totalTime: formData.get('orderTotalTime') ? Number(formData.get('orderTotalTime')) : undefined,
+        productionWaste: formData.getAll('productIds') && formData.getAll('productIds').length > 0 ? formData.getAll('productIds').map(productId => (
+            {
+                productId: productId,
+                quantity: Number(formData.get(`wasteQuantity-${productId}`)).toFixed(2),
+                reason: formData.get(`wasteReason-${productId}`) ?? undefined,
+                reasonDescription: formData.get(`reasonDescription-${productId}`) ?? undefined
+            }
+
+        )) : undefined
     }
 
     console.log(data)

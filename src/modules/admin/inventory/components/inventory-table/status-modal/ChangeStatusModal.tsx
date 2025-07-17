@@ -39,9 +39,9 @@ export const ChangeStatusModal = ({ colorButton, title, movement, token, supplie
     const [selectedStatus, setSelectedStatus] = useState<EMovementStatus>(movement.status);
 
     useEffect(() => {
-      setSelectedStatus(movement.status);
+        setSelectedStatus(movement.status);
     }, [isOpen, movement])
-    
+
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -58,11 +58,11 @@ export const ChangeStatusModal = ({ colorButton, title, movement, token, supplie
         console.log(JSON.stringify(dataArray, null, 2));
         // return;
         // EJECUTAR SERVER ACTIONS PARA GUARDAR
-        const { error, message, response } = await updateDetailsAndStatusMovement({ formData, transactionId: movement.id, token });
+        const { error, message } = await updateDetailsAndStatusMovement({ formData, transactionId: movement.id, token });
         if (error) {
-            if (response && Array.isArray(response.message)) {
+            if (Array.isArray(message)) {
                 // Itera sobre cada mensaje en response.message y muestra un toast para cada uno
-                response.message.forEach((msg: string) => {  // Aquí se define el tipo de 'msg'
+                message.forEach((msg: string) => {  // Aquí se define el tipo de 'msg'
                     toast.warning("Ocurrió un error", {
                         description: msg
                     });
@@ -70,7 +70,7 @@ export const ChangeStatusModal = ({ colorButton, title, movement, token, supplie
             } else {
                 // Si no es un arreglo, muestra un solo toast con el mensaje
                 toast.warning("Ocurrió un error", {
-                    description: response ? response.message : message
+                    description: message
                 });
             }
 
@@ -125,12 +125,13 @@ export const ChangeStatusModal = ({ colorButton, title, movement, token, supplie
 
                                     <ConfirmQuantitiesFormTable
                                         token={token}
-                                        checkedProviders={movement.movementType===EMovementType.Adjustment}
+                                        deliveredQuantityMode={movement.movementType === EMovementType.Adjustment ? "both" : movement.movementType === EMovementType.Income ? "suppliers" : "total"}
                                         details={movement.inventoryMovementDetails}
                                         supplierProps={supplierProps}
                                         defaultMovementStatus={movement.status}
                                         isRequiredSelectSupplier={selectedStatus === EMovementStatus.Completed}
                                         isRequiredQuantitySupplier={selectedStatus === EMovementStatus.Completed}
+                                        isRequiredDeliveredQuantity={selectedStatus === EMovementStatus.Completed}
                                     />
 
                                 </ModalBody>

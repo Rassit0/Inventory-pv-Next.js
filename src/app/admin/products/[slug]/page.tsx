@@ -37,9 +37,12 @@ export default async function ProductsPage({
           linkText: <LinkBackwardIcon />,
           url: '/admin/products'
         }}
-        isButton
-        popoverText='Volver a la lista'
-        delayPopover={1000}
+        button={{
+          popoverText: 'Volver a la lista',
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat'
+        }}
       />
 
       <section className="container pt-8">

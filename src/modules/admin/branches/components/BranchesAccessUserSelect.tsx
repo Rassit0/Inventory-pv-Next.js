@@ -21,8 +21,8 @@ type TImageErrors = {
 export const BranchesAccessUserSelect = ({ branchesResponse, isRequired = false, defaultBranches = [], name }: Props) => {
   const [branchesResponseFiltered, setBranchesResponseFiltered] = useState<IBranchesResponse>({
     ...branchesResponse,
-    branches: defaultBranches.length <= 0 ? branchesResponse.branches : branchesResponse.branches.filter(branch =>
-      defaultBranches.some(dbranch => dbranch.branchId === branch.id)
+    branches: !defaultBranches || defaultBranches.length <= 0 ? branchesResponse.branches : branchesResponse.branches.filter(branch =>
+      !defaultBranches.some(dbranch => dbranch.branchId === branch.id)
     ),
   });
   const [selectedBranches, setSelectedBranches] = useState<IBranch[]>(defaultBranches.length <= 0 ? []
@@ -31,7 +31,12 @@ export const BranchesAccessUserSelect = ({ branchesResponse, isRequired = false,
       defaultBranches.some(dbranch => dbranch.branchId === branch.id)
     )
   );
-  const [backupSelectedBranches, setBackupSelectedBranches] = useState<IBranch[]>([])
+  const [backupSelectedBranches, setBackupSelectedBranches] = useState<IBranch[]>(!defaultBranches || defaultBranches.length <= 0 ?
+    []
+    : branchesResponse.branches.filter(branch =>
+      defaultBranches.some(dbranch => dbranch.branchId === branch.id)
+    )
+  )
   const [countDeleteAccess, setCountDeleteAccess] = useState(0);
 
   // CONTROL DE LAS IMAGENES QUE TIENE ERROR AL CARGAR

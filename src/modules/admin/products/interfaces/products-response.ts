@@ -1,3 +1,4 @@
+import { WarehouseIcon } from 'hugeicons-react';
 export interface IProductsResponse {
     products: IProduct[];
     meta: Meta;
@@ -31,8 +32,9 @@ export interface IProduct {
     unit: Unit;
     types: IProductTypes[];
     categories: IProductCategory[];
-    branchProductStock: IBranchProductStock[];
-    warehouseProductStock: IWarehouseProductStock[];
+    locationProductStock: ILocationProductStock[];
+    // branchProductStock: IBranchProductStock[];
+    // warehouseProductStock: IWarehouseProductStock[];
     suppliers: ISupplierProduct[];
 }
 
@@ -40,22 +42,37 @@ export interface ISupplierProduct {
     supplierId: string;
 }
 
-export interface IBranchProductStock {
-    id?: string;
-    productId?: string;
-    branchId: string;
+export interface ILocationProductStock {
+    id: string;
+    productId: string;
+    locationId: string;
+    locationType: "BRANCH" | "WAREHOUSE";
     stock: string;
     updatedAt?: Date;
-    nameBranch: string | null
+    branch: {
+        name: string;
+    } | null;
+    warehouse: {
+        name: string;
+    } | null;
 }
-export interface IWarehouseProductStock {
-    id?: string;
-    productId?: string;
-    warehouseId: string;
-    stock: string;
-    updatedAt?: Date;
-    nameWarehouse: string | null;
-}
+
+// export interface IBranchProductStock {
+//     id?: string;
+//     productId?: string;
+//     branchId: string;
+//     stock: string;
+//     updatedAt?: Date;
+//     nameBranch: string | null
+// }
+// export interface IWarehouseProductStock {
+//     id?: string;
+//     productId?: string;
+//     warehouseId: string;
+//     stock: string;
+//     updatedAt?: Date;
+//     nameWarehouse: string | null;
+// }
 
 export interface IProductCategory {
     id: string;

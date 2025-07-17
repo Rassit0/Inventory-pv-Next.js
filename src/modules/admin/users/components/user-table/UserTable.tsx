@@ -1,6 +1,6 @@
 "use client"
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { IUser, IUsersResponse } from '@/modules/admin/users'
+import { IUser, IUsersResponse, UpdateUserFormModal } from '@/modules/admin/users'
 import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Pagination, Popover, PopoverContent, PopoverTrigger, SharedSelection, SortDescriptor, Spinner, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { usePathname } from 'next/navigation';
 import { getUsersResponse } from '@/modules/admin/users';
@@ -10,6 +10,8 @@ import warning_error_image from '@/assets/warning_error.png'
 import { ArrowDown01Icon, Delete01Icon, PencilEdit01Icon, Search01Icon } from 'hugeicons-react';
 import { HighlinghtedText } from '@/modules/admin/shared';
 import dynamic from 'next/dynamic';
+import { IBranchesResponse } from '@/modules/admin/branches';
+import { IRole } from '@/modules/admin/user-roles';
 
 // Solo cargar el componente Table dinámicamente
 const Table = dynamic(() => import('@heroui/react').then((mod) => mod.Table), { ssr: false });
@@ -19,6 +21,8 @@ interface Props {
     deleteUser: boolean;
     token: string;
     usersResponse: IUsersResponse
+    branchesResponse: IBranchesResponse
+    roles: IRole[]
 }
 
 type TImageErrors = {
@@ -53,7 +57,7 @@ function capitalize(s: string) {
 
 const INITIAL_VISIBLE_COLUMNS: string[] = ["image", "name", "email", "status", "role", "userBranches", "actions"];
 
-export const UserTable = ({ deleteUser, editUser, token, usersResponse }: Props) => {
+export const UserTable = ({ deleteUser, editUser, token, usersResponse, branchesResponse, roles }: Props) => {
     const isMounted = useRef(false);
     const [usersFilteredResponse, setUsersFilteredResponse] = useState<IUsersResponse>(usersResponse)
     const [isLoading, setIsLoading] = useState(false);
@@ -227,15 +231,13 @@ export const UserTable = ({ deleteUser, editUser, token, usersResponse }: Props)
             case "actions":
                 return (
                     <div className="flex justify-center">
-                        {true && (<Button
-                            // onPress={onOpen}
-                            isIconOnly
-                            color='warning'
-                            variant='light'
-                            radius='full'
-                            startContent={<PencilEdit01Icon />}
+                        {editUser && (<UpdateUserFormModal
+                            token={token}
+                            branchesResponse={branchesResponse}
+                            roles={roles}
+                            user={user}
                         />)}
-                        {true && (<Button
+                        {deleteUser && (<Button
                             // onPress={onOpen}
                             isIconOnly
                             color='danger'

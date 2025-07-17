@@ -1,5 +1,5 @@
 import { getAuthUser, hasModuleAccess } from "@/lib";
-import { getBranches } from "@/modules/admin/branches";
+import { getBranchesResponse } from "@/modules/admin/branches";
 import { CreateMovementInventoryForm } from "@/modules/admin/inventory";
 import { getPersonsResponse } from "@/modules/admin/persons";
 import { getProducts } from "@/modules/admin/products";
@@ -16,7 +16,7 @@ export default async function NewTransactionPage() {
   if (!hasModuleAccess({ user, moduleName: "INVENTORY", permissions: [RoleModulePermission.Write] })) redirect("/403");
   // OBTERNER PRODUCTOS
   const productsResponse = await getProducts({ token: authToken, limit: 5, status: 'active' });
-  const branchesResponse = await getBranches({ token: authToken });
+  const branchesResponse = await getBranchesResponse({ token: authToken });
   const warehousesResponse = await getWarehousesResponse({ token: authToken });
   const personsResponse = await getPersonsResponse({ token: authToken, orderBy: 'asc', columnOrderBy: 'name', limit: 10, page: 1 });
   return (
@@ -28,9 +28,12 @@ export default async function NewTransactionPage() {
           linkText: <LinkBackwardIcon />,
           url: '/admin/inventory/movements'
         }}
-        isButton
-        popoverText='Volver a la lista'
-        delayPopover={1000}
+        button={{
+          popoverText: 'Volver a la lista',
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat'
+        }}
       />
 
       <section className="container pt-8">

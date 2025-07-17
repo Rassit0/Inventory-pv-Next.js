@@ -46,7 +46,7 @@ const columns = [
     // { name: "ROL", uid: "role" },
     // { name: "SUCURSALES", uid: "userBranches" },
     { name: "CREADO", uid: "createdAt", sortable: true },
-    { name: "INGRESO", uid: "entryDate", sortable: true },
+    { name: "ENTREGA", uid: "generalDeliveryDate", sortable: true },
     // { name: "ACTUALIZADO", uid: "updatedAt", sortable: true },
     { name: "ACCIONES", uid: "actions" },
 ];
@@ -78,7 +78,7 @@ function capitalize(s: string) {
 
 const INITIAL_VISIBLE_COLUMNS: string[] = [
     "movementType",
-    "entryDate",
+    "generalDeliveryDate",
     "createdAt",
     // "createdByUserId",
     "status",
@@ -145,7 +145,7 @@ export const InventoryMovementsTable = ({ token, editInventory, itemsResponse, s
                     ? null
                     : (Array.from(itemFilter) as EMovementType[]),
                 orderBy: sortDescriptor.direction === 'ascending' ? 'asc' : 'desc',
-                columnOrderBy: sortDescriptor.column ? sortDescriptor.column as 'createdAt' | 'updatedAt' | null : undefined
+                columnOrderBy: sortDescriptor.column ? sortDescriptor.column as 'createdAt' | 'updatedAt' | 'generalDeliveryDate' | null : undefined
             });
 
             console.log("response", response);
@@ -337,8 +337,8 @@ export const InventoryMovementsTable = ({ token, editInventory, itemsResponse, s
         switch (columnKey as string) {
             case "description":
                 return movement.description ? movement.description : <div className='text-default-400'>N/A</div>;
-            case "entryDate":
-                return movement.deliveryDate ? movement.deliveryDate.toLocaleString() : <div className='text-default-400'>N/A</div>;
+            case "generalDeliveryDate":
+                return movement.generalDeliveryDate ? movement.generalDeliveryDate.toLocaleString() : <div className='text-default-400'>N/A</div>;
             case "createdAt":
                 return movement.createdAt.toLocaleString();
             case "movementType":

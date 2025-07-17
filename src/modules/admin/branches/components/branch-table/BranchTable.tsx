@@ -68,7 +68,7 @@ export const BranchTable = ({ token, deleteBranch, editBranch, branches, users }
                                 </TableCell>
                                 <TableCell>{branch.name}</TableCell>
                                 <TableCell>{branch.location}</TableCell>
-                                <TableCell>{branch.phone}</TableCell>
+                                <TableCell>{branch.phone || <div className='text-default-400'>N/A</div>}</TableCell>
                                 <TableCell>{branch.email || <div className='text-default-400'>N/A</div>}</TableCell>
                                 <TableCell>{branch.manager ? branch.manager.email : <div className='text-default-400'>N/A</div>}</TableCell>
                                 <TableCell>{branch.createdaAt.toLocaleString()}</TableCell>

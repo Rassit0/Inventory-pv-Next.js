@@ -24,6 +24,14 @@ const statusOptions = [
 export const RecipeCardList = ({ token, writeProduction, deleteRecipe, editRecipe, recipesResponse, branches, productsResponse, warehouses }: Props) => {
 
 
+    if (!recipesResponse.recipes || recipesResponse.recipes.length === 0) {
+        return (
+            <div className="container pt-8">
+                <p className="text-center text-gray-500">No hay recetas disponibles.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="container pt-8 gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4">
             {recipesResponse.recipes.map((item, index) => (

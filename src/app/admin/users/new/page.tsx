@@ -1,5 +1,5 @@
 import { getAuthUser, hasModuleAccess } from "@/lib";
-import { getBranches } from "@/modules/admin/branches";
+import { getBranchesResponse } from "@/modules/admin/branches";
 import { HeaderPage } from "@/modules/admin/shared";
 import { getUserRoles } from "@/modules/admin/user-roles";
 import { CreateUserForm } from "@/modules/admin/users";
@@ -13,7 +13,7 @@ export default async function NewUserPage() {
 
   // Verificar acceso al módulo "branches"
   if (!hasModuleAccess({ user, moduleName: 'USERS', permissions: [RoleModulePermission.Read, RoleModulePermission.Write] })) redirect("/403");
-  const branchesResponse = await getBranches({ token: authToken });
+  const branchesResponse = await getBranchesResponse({ token: authToken });
   const roles = await getUserRoles({ token: authToken });
   return (
     <>
@@ -24,9 +24,12 @@ export default async function NewUserPage() {
           linkText: <LinkBackwardIcon />,
           url: '/admin/users'
         }}
-        isButton
-        popoverText='Volver a la lista'
-        delayPopover={1000}
+        button={{
+          popoverText: 'Volver a la lista',
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat'
+        }}
       />
 
       {/* form para registro */}

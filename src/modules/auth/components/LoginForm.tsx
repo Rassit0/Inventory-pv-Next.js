@@ -1,6 +1,7 @@
 "use client"
 import { authLogin, useSessionStore } from '@/modules/auth';
 import { Button, Input } from '@heroui/react';
+import { ViewIcon, ViewOffIcon } from 'hugeicons-react';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { FormEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner';
@@ -10,6 +11,7 @@ export const LoginForm = () => {
     const router = useRouter();
     const { setSession } = useSessionStore();
     const pathname = usePathname();
+    const [viewPassword, setViewPassword] = useState(false);
 
     useEffect(() => {
         setIsLoading(false)
@@ -52,7 +54,7 @@ export const LoginForm = () => {
         setSession(session ? session.user : null, session ? session.token : null)
         toast.success(message);
         // setIsLoading(false)
-        router.push('/admin/home/all');
+        router.push('/admin/home');
 
     }
     return (
@@ -66,10 +68,22 @@ export const LoginForm = () => {
             />
 
             <Input
-                type='password'
+                type={viewPassword ? 'text' : 'password'}
                 name='authPassword'
                 label="Contraseña"
                 variant='underlined'
+                endContent={
+                    <Button
+                        isIconOnly
+                        variant='light'
+                        radius='full'
+                        color='primary'
+                        startContent={
+                            viewPassword ? <ViewIcon /> : <ViewOffIcon />
+                        }
+                        onPress={() => setViewPassword(!viewPassword)}
+                    />
+                }
             />
 
             <Button

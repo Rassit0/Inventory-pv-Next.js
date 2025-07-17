@@ -1,5 +1,5 @@
 import { getAuthUser, hasModuleAccess } from "@/lib";
-import { getBranches } from "@/modules/admin/branches";
+import { getBranchesResponse } from "@/modules/admin/branches";
 import { findRecipe, UpdateRecipeForm } from "@/modules/admin/production-recipes";
 import { getProducts } from "@/modules/admin/products";
 import { HeaderPage } from "@/modules/admin/shared";
@@ -20,7 +20,7 @@ export default async function EditRecipePage({
   if (!hasModuleAccess({ user, moduleName: "PRODUCTION_RECIPES", permissions: [RoleModulePermission.Write, RoleModulePermission.Edit] })) redirect("/403");
   // OBTERNER PRODUCTOS
   const productsResponse = await getProducts({ token: authToken, limit: 5, status: 'active' });
-  const branchesResponse = await getBranches({ token: authToken });
+  const branchesResponse = await getBranchesResponse({ token: authToken });
   const warehousesResponse = await getWarehousesResponse({ token: authToken });
   const recipe = await findRecipe({ term: recipeId, token: authToken });
 
@@ -36,9 +36,12 @@ export default async function EditRecipePage({
               linkText: <LinkBackwardIcon />,
               url: '/admin/production/recipes'
             }}
-            isButton
-            popoverText='Volver a la lista'
-            delayPopover={1000}
+            button={{
+              popoverText: 'Volver a la lista',
+              delayPopover: 1000,
+              colorButton: 'primary',
+              variantButton: 'flat',
+            }}
           />
           <div className="container pt-8">
             <p className="text-red-500">Receta no encontrada.</p>
@@ -57,9 +60,12 @@ export default async function EditRecipePage({
           linkText: <LinkBackwardIcon />,
           url: '/admin/production/recipes'
         }}
-        isButton
-        popoverText='Volver a la lista'
-        delayPopover={1000}
+        button={{
+          popoverText: 'Volver a la lista',
+          delayPopover: 1000,
+          colorButton: 'primary',
+          variantButton: 'flat',
+        }}
       />
 
       <section className="container pt-8">
